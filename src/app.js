@@ -86,26 +86,9 @@ export default class App extends Component {
     });
 
     if (points.length > 0) {
-      const newViewport = new WebMercatorViewport({
-        width: this.state.viewport.width, 
-        height: this.state.viewport.height,
-        zoom: 12,
-        pitch: 60
-      });
-
-      // for some reason, the first option below does not work but the other one does :/
-      //points = points.slice(0, 10);
-      let boundingPoints = [points[0], points[(points.length/2).toFixed(0)], points[points.length - 1]];
-
-      //console.log("Points: ", points);
-      const bounds = newViewport.fitBounds(
-        boundingPoints,
-        {padding: 20, offset: [0, 0]}
-      );
-
       let viewport = {
         ...this.state.viewport,
-        ...bounds,
+        ...this._calculateViewportForPoints(points),
         transitionDuration: 1000,
         transitionInterpolator: new FlyToInterpolator(),
         transitionEasing: easeCubic
@@ -116,6 +99,34 @@ export default class App extends Component {
     else {
       this.setState({points});
     }
+  }
+
+  _calculateViewportForPoints(points) {
+    const newViewport = new WebMercatorViewport({
+      ...this.state.viewport
+    });
+
+    let boundingPoints = points.reduce((bounds, point) => {
+      if (bounds.length == 0) {
+        return [ point[0], point[0], point[1], point[1] ];
+      }
+      // Longitude min/max
+      bounds[0] = Math.min(bounds[0], point[0]);
+      bounds[1] = Math.max(bounds[1], point[0]);
+      // Latitude min/max
+      bounds[2] = Math.min(bounds[2], point[1]);
+      bounds[3] = Math.max(bounds[3], point[1]);
+      return bounds;
+    }, [ ]);
+
+    let boundingCoordinates = [ [ boundingPoints[0], boundingPoints[2] ], [ boundingPoints[1], boundingPoints[3] ] ];
+    console.log(boundingCoordinates);
+
+    const bounds = newViewport.fitBounds(
+      boundingCoordinates,
+      {padding: 20, offset: [0, 0]}
+    );
+    return bounds;
   }
   /*
       let segment = pick(line, ['Bsp', 'Awa', 'Aws', 'Twa', 'Tws']);

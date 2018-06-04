@@ -14,7 +14,7 @@ export default class DeckGLOverlay extends Component {
 
     console.log(`will render ${this.props.data.length} segments`)
     console.log(this.props.data);
-    
+
     const layers = [
       new PathLayer({
         id: 'path-layer',
@@ -22,9 +22,11 @@ export default class DeckGLOverlay extends Component {
         pickable: true,
         widthScale: 2,
         widthMinPixels: 2,
+        rounded: true,
         getPath: d => d.path,
         getColor: d => [30, 150, 100],
-        getWidth: d => 5
+        getWidth: d => 5,
+        onHover: info => console.log(`Hovering over`, info)
       })
     ];
 
