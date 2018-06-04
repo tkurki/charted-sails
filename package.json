@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "d3-ease": "^1.0.3",
     "deck.gl": "^4.1.0",
     "immutable": "^3.8.1",
     "luma.gl": "^4.0.1",
@@ -18,7 +19,8 @@
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "react-map-gl": "^3.0.4",
-    "react-vis": "^1.7.2"
+    "react-vis": "^1.7.2",
+    "viewport-mercator-project": "^5.1.0"
   },
   "devDependencies": {
     "buble-loader": "^0.4.0",

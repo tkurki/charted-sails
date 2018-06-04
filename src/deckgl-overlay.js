@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import DeckGL, {LineLayer, ScatterplotLayer} from 'deck.gl';
+import DeckGL, {LineLayer, ScatterplotLayer, PathLayer} from 'deck.gl';
 
 export default class DeckGLOverlay extends Component {
   _initialize(gl) {
@@ -13,30 +13,19 @@ export default class DeckGLOverlay extends Component {
     }
 
     console.log(`will render ${this.props.data.length} segments`)
+    console.log(this.props.data);
     
     const layers = [
-      new LineLayer({
-        id: 'line-layer',
+      new PathLayer({
+        id: 'path-layer',
         data: this.props.data,
         pickable: true,
-        getSourcePosition: d => { /*console.log(d);*/ return d.fromPosition; },
-        getTargetPosition: d => d.toPosition,
+        widthScale: 2,
+        widthMinPixels: 2,
+        getPath: d => d.path,
         getColor: d => [30, 150, 100],
-        getStrokeWidth: 12,
-        ...this.props
-      })/*,
-      new ScatterplotLayer({
-        id: 'scatterplot',
-        getPosition: d=>d.toPosition,
-        getColor: d => [0, 128, 255],
-        getRadius: d => 5,
-        opacity: 0.5,
-        pickable: false,
-        radiusScale: 5,
-        radiusMinPixels: 0.25,
-        radiusMaxPixels: 30,
-        ...this.props
-      })*/
+        getWidth: d => 5
+      })
     ];
 
     return (
