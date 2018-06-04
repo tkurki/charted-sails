@@ -7,16 +7,28 @@ module.exports = {
   devtool: 'source-map',
 
   module: {
-    rules: [{
-      // Compile ES2015 using buble
-      test: /\.js$/,
-      loader: 'buble-loader',
-      include: [resolve('.')],
-      exclude: [/node_modules/],
-      options: {
-        objectAssign: 'Object.assign'
+    rules: [
+      {
+        // Compile ES2015 using buble
+        test: /\.js$/,
+        loader: 'buble-loader',
+        include: [resolve('.')],
+        exclude: [/node_modules/],
+        options: {
+          objectAssign: 'Object.assign'
+        }
+      },
+      {
+        // Load CSV file with csv-loader
+        test: /\.csv$/,
+        loader: 'csv-loader',
+        options: {
+          dynamicTyping: true,
+          header: true,
+          skipEmptyLines: true
+        }
       }
-    }]
+    ]
   },
 
   resolve: {
