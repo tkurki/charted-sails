@@ -135,7 +135,7 @@ export default class App extends Component {
 
     const bounds = newViewport.fitBounds(
       boundingCoordinates,
-      {padding: 20, offset: [0, 0]}
+      {padding: {left: 230 + 20, top: 20, bottom: 20, right: 20}}
     );
     return bounds;
   }
