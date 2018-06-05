@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+
+.tooltip-demo {
+  margin: 50px 100px;
+  background: white;
+  color: "#fff";
+  max-width: 300px;
+}
+
+.data-window {
+  position: absolute;
+  margin: 30px;
+  width: 200px;
+  z-index: 9;
+}
+
+.data-panel {
+  border: 2px solid black;  
+  border-radius: 3px;
+  background-color: #414141;
+  color: white;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-row-gap: 1em;
+}
+
+.data-panel-item {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Titillium Web', 'Open Sans', sans-serif;
+  font-size: 1.5em;
+  margin: 0px;
+  padding: 0px;
+  text-align: center;
+}
+
+.data-panel-item-large {
+  grid-column: 1 / -1;
+}
+
+.data-panel-item > span.data {
+  font-size: 1em;
+  line-height: 100%;
+}
+
+.data-panel-item > span.value {
+  font-size: 1.6em;
+  flex: 0 0;
+  line-height: 100%;
+}
+
+.data-panel-item > span.unit {
+  font-size: 1em;
+  line-height: 100%;
+}

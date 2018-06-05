@@ -1,13 +1,12 @@
-import React, {Component} from 'react';
-import ReactMapGL, {LinearInterpolator, FlyToInterpolator} from 'react-map-gl';
-// 3rd-party easing functions
-import d3, {easeCubic} from 'd3-ease';
-import pick from 'object.pick';
-
-import DeckGLOverlay from './deckgl-overlay'
+import React, { Component } from 'react';
+import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
-
 import sftrip from '../data/expedition-sanfrancisco.csv';
+import DeckGLOverlay from './deckgl-overlay';
+import { prepareExpeditionData } from './processing/expedition';
+import { DataPanel, DataPanelItem, DataWindow } from './components/data-panel';
+
+
 
 //const MAPBOX_STYLE = 'mapbox://styles/mapbox/dark-v9';
 const MAPBOX_STYLE = 'mapbox://styles/sarfata/cjhz42qo83ycz2rpn6f1smby1';
@@ -30,7 +29,7 @@ export default class App extends Component {
         zoom: 1,
         maxZoom: 16
       },
-      points: []
+      trip: []
     };
     this._resize = this._resize.bind(this);
   }
@@ -38,6 +37,8 @@ export default class App extends Component {
   render() {
     return (
       <div>
+        <DataWindow segment={this.state.hoveredObject} />
+      
         <ReactMapGL
           {...this.state.viewport}
           mapStyle={MAPBOX_STYLE}
@@ -46,12 +47,25 @@ export default class App extends Component {
         >
           <DeckGLOverlay
             viewport={this.state.viewport}
-            data={ this.state.points.length > 0 ? [ {path:this.state.points} ] : [] }
+            data={this.state.trip}
+            onHover={hover => this._onHover(hover)}
           />
         </ReactMapGL>
       </div>
     );
   }
+
+  _onHover(hoverInfo) {
+    if (hoverInfo) {
+      console.log("onhover", hoverInfo.x, hoverInfo.y, hoverInfo.object);
+      this.setState({x: hoverInfo.x, y: hoverInfo.y, hoveredObject: hoverInfo.object});
+      }
+    else {
+      console.log("hover - unselected");
+      this.setState({x: null, y: null, hoveredObject: null});
+    }
+  }
+
   _onViewportChange(viewport) {
     this.setState({
       viewport: {...this.state.viewport, ...viewport}
@@ -61,6 +75,7 @@ export default class App extends Component {
   componentDidMount() {
     window.addEventListener('resize', this._resize);
     this._resize();
+    console.log("componentDidMount (app)");
     this._processData();
   }
 
@@ -76,28 +91,24 @@ export default class App extends Component {
   }
 
   _processData() {
-    let currentPosition = null;
+    let trip = prepareExpeditionData(sftrip);
 
-    let points = [];
-    sftrip.forEach(line => {
-      if (line['Lon'] !== null && line['Lat'] !== null) {
-        points.push([ Number(line['Lon']), Number(line['Lat']) ]);
-      }
-    });
-
-    if (points.length > 0) {
+    if (trip.length > 0) {
       let viewport = {
         ...this.state.viewport,
-        ...this._calculateViewportForPoints(points),
+        ...this._calculateViewportForPoints(trip.map(s => s.coordinates)),
+        /*
         transitionDuration: 1000,
         transitionInterpolator: new FlyToInterpolator(),
-        transitionEasing: easeCubic
+        transitionEasing: easeCubic*/
       }; 
 
-      this.setState({viewport, points});
+      console.log("setting state.trip", trip);
+      this.setState({viewport, trip});
     }
     else {
-      this.setState({points});
+      console.log("setting state.trip - with no data");
+      this.setState({trip});
     }
   }
 
@@ -128,22 +139,4 @@ export default class App extends Component {
     );
     return bounds;
   }
-  /*
-      let segment = pick(line, ['Bsp', 'Awa', 'Aws', 'Twa', 'Tws']);
-      segment['time'] = new Date(new Date("1900-01-01T00:00:00Z").getTime() + line['Utc'] * 24 * 3600 * 1000);
-      segment.fromPosition = currentPosition;
-
-      if (line['Lon'] !== null && line['Lat'] !== null) {
-        segment.toPosition = 
-        if (currentPosition != null) {
-          segments.push(segment);
-          points.push([segment.toPosition[0], segment.toPosition[1]]);
-        }
-  
-        currentPosition = segment.toPosition;
-      }
-    });
-
-    segments = segments.slice(1);
-*/
 }

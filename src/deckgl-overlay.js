@@ -9,29 +9,32 @@ export default class DeckGLOverlay extends Component {
 
   render() {
     if (!this.props.data) {
+      console.log("DeckGLOverlay has no data to render");
       return null;
     }
 
-    console.log(`will render ${this.props.data.length} segments`)
-    console.log(this.props.data);
-
     const layers = [
-      new PathLayer({
-        id: 'path-layer',
-        data: this.props.data,
+      new LineLayer({
+        id: 'line-layer',
+        data: this.props.data.slice(1),
         pickable: true,
-        widthScale: 2,
-        widthMinPixels: 2,
-        rounded: true,
-        getPath: d => d.path,
+        getStrokeWidth: 5,
+        getSourcePosition: segment => segment.previousCoordinates,
+        getTargetPosition: segment => segment.coordinates,
         getColor: d => [30, 150, 100],
-        getWidth: d => 5,
-        onHover: info => console.log(`Hovering over`, info)
+        /* onHover: h => this.props.onHover(h),*/
+        autoHighlight: true,
+        highlightColor: [200, 150, 100, 200]
       })
     ];
 
     return (
-      <DeckGL {...this.props.viewport} layers={layers} onWebGLInitialized={this._initialize} />
+      <DeckGL 
+        {...this.props.viewport} 
+        layers={layers} 
+        onWebGLInitialized={this._initialize} 
+        pickingRadius={20} 
+        onLayerHover={ x => this.props.onHover(x) }/>
     )
   }
 }
