@@ -9,13 +9,14 @@ module.exports = {
   module: {
     rules: [
       {
-        // Compile ES2015 using buble
+        // Compile ES2015 using babel
         test: /\.js$/,
-        loader: 'buble-loader',
-        include: [resolve('.')],
         exclude: [/node_modules/],
-        options: {
-          objectAssign: 'Object.assign'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
         }
       },
       {
