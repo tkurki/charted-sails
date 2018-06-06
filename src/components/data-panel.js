@@ -21,7 +21,7 @@ export function DataWindow({segment}) {
   }, {});
 
   let otherPanelItems = Object.keys(otherprops).map(key => {
-    return <DataPanelItem data={ key } unit="-" value={segment[key]} />
+    return <DataPanelItem key={ key } data={ key } unit="-" value={segment[key]} />
   });
   return (
     <div className="data-window">
@@ -37,6 +37,14 @@ export function DataWindow({segment}) {
       </DataPanel>
     </div>
   );
+}
+
+export function DataPanel(props) {
+  return (
+    <div className="data-panel">
+      {props.children}
+    </div>
+  )
 }
 
 export function DataPanelItem(props) {
@@ -66,10 +74,3 @@ export function DataPanelItem(props) {
   )
 }
 
-export function DataPanel(props) {
-  return (
-    <div className="data-panel">
-      {props.children}
-    </div>
-  )
-}

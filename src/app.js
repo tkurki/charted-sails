@@ -5,7 +5,7 @@ import sftrip from '../data/expedition-sanfrancisco.csv';
 import DeckGLOverlay from './deckgl-overlay';
 import { prepareExpeditionData } from './processing/expedition';
 import { DataPanel, DataPanelItem, DataWindow } from './components/data-panel';
-
+import { TimePanel } from './components/time-panel';
 
 
 //const MAPBOX_STYLE = 'mapbox://styles/mapbox/dark-v9';
@@ -38,7 +38,11 @@ export default class App extends Component {
     return (
       <div>
         <DataWindow segment={this.state.hoveredObject} />
-      
+        <TimePanel 
+          tripBeginDate={ this.state.tripBeginDate } 
+          tripEndDate={ this.state.tripEndDate } 
+          hoveredDate={ this.state.hoveredObject? this.state.hoveredObject.time : null } />
+
         <ReactMapGL
           {...this.state.viewport}
           mapStyle={MAPBOX_STYLE}
@@ -104,7 +108,16 @@ export default class App extends Component {
       }; 
 
       console.log("setting state.trip", trip);
-      this.setState({viewport, trip});
+      // super unefficient to walk the list twice but this is called only once so ...
+      let tripBeginDate = trip.reduce((begin, d) => {
+        return d.time < begin ? d.time : begin;
+      });
+      let tripEndDate = trip.reduce((end, d) =>  {
+        return d.time > end ? d.time : end;
+      });
+      console.log("found trip beginning", tripBeginDate);
+      
+      this.setState({viewport, trip, tripBeginDate, tripEndDate});
     }
     else {
       console.log("setting state.trip - with no data");
