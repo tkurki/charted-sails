@@ -10,7 +10,7 @@ module.exports = {
     rules: [
       {
         // Compile ES2015 using babel
-        test: /\.js$/,
+        test: /\.(tsx?)|(js)$/,
         exclude: [/node_modules/],
         use: {
           loader: 'babel-loader',
@@ -33,6 +33,7 @@ module.exports = {
   },
 
   resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ],
     alias: {
       'mapbox-gl$': resolve('./node_modules/mapbox-gl/dist/mapbox-gl.js')
     }

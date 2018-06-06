@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "esnext",
+        "noImplicitAny": false,
+        "sourceMap": true,
+        "allowSyntheticDefaultImports": true,
+        "outDir": "lib",
+        "jsx": "react",
+        "allowJs": true
+    },
+    "exclude": ["node_modules", "lib"]
+}
