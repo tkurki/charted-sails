@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { isNullOrUndefined, isNumber } from 'util';
 
+import './DataPanel.css'
+
 const alwaysOnFields = ['time', 'Sog', 'Cog', 'Twa', 'Tws', 'Awa', 'Aws', 'coordinates', 'previousCoordinates'];
 
 export function DataWindow({segment}) {
