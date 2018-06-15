@@ -3,14 +3,14 @@
  *
  * By react-map-gl/deck.gl convention, this is [Lon,Lat].
  */
-export type GPSCoordinates = [Number, Number]
+export type GPSCoordinates = [number, number]
 
 /**
  * Very simplified definition of a list of SignalK values.
  *
  * The key is a signalk path.
  */
-export type SKValues = Object
+export type SKValues = object
 
 /**
  * A point in time with a some data measured at this point. Nothing required here.
@@ -43,6 +43,31 @@ export interface Segment {
 }
 
 export default class Trip {
+  public static fromExpeditionData(data:object[]) : Trip {
+    const timedData : TimedData[] = []
+    data.forEach(d => {
+      try {
+        const td = convertExpeditionLineToTimedData(d)
+        timedData.push(td)
+      }
+      catch (e) {
+        // ignoring e
+        console.log("Ignoring error with line", d, e)
+      }
+    })
+
+    return Trip.fromTimedData(timedData)
+  }
+
+  public static fromTimedData(timedData:TimedData[]) : Trip {
+    const t = new Trip();
+
+    // TODO: We may want to reduce the number of segments here.
+
+    t.segments = convertTimedDataToSegments(timedData)
+    return t;
+  }
+
   public segments: Segment[]
 
   public getStartTime() : Date | null {
@@ -58,33 +83,84 @@ export default class Trip {
     }
     return null
   }
+
+  /**
+   * Return a set of coordinates that bound this trip.
+   *
+   * @return [ GPSCoordinate(NW corner), GPSCoordinate(SE corner)]
+   */
+  public getBoundingCoordinates() : [GPSCoordinates, GPSCoordinates] | null {
+    const points = this.getPoints()
+
+    if (points.length === 0) {
+      return  null
+    }
+
+    const nwPoint : GPSCoordinates = [ points[0][0], points[0][1] ]
+    const sePoint : GPSCoordinates = [ points[0][0], points[0][1] ]
+
+    points.forEach(point => {
+      // West most longitude
+      nwPoint[0] = Math.min(nwPoint[0], point[0])
+      // North most latitude
+      nwPoint[1] = Math.max(nwPoint[1], point[1])
+      // East most longitude
+      sePoint[0] = Math.max(sePoint[0], point[0])
+      // South most latitude
+      sePoint[1] = Math.min(sePoint[1], point[1])
+    })
+
+    return [nwPoint, sePoint]
+  }
+
+  /**
+   * Returns a list of points that this trip visits (in order).
+   */
+  public getPoints() : GPSCoordinates[] {
+    if (this.segments.length === 0) {
+      return []
+    }
+
+    const points = this.segments.map(s => s.start.coordinates)
+    points.push(this.segments[this.segments.length-1].end.coordinates)
+    return points
+  }
 }
 
-export function loadExpeditionLog(data : Object[]) : Trip {
-  let t = new Trip();
 
-  // TODO: We may want to reduce the number of segments here.
+export function convertExpeditionLineToTimedData(logLine : object) : TimedData {
+  const LONGITUDE_FIELD = 'Lon'
+  const LATITUDE_FIELD = 'Lat'
+  const TIME_FIELD = 'Utc'
 
-  let timedData : TimedData[] = data.map(d => convertExpeditionLineToTimedData(d))
-  t.segments = convertTimedDataToSegments(timedData)
-  return t;
-}
+  if (!Object.keys(logLine).includes(TIME_FIELD) || logLine[TIME_FIELD] === "") {
+    throw new Error('Invalid line')
+  }
 
-export function convertExpeditionLineToTimedData(logLine : Object) : TimedData {
-  return {
-    coordinates: [ Number(logLine['Lon']), Number(logLine['Lat']) ],
-    time: new Date(new Date("1900-01-01T00:00:00Z").getTime() + logLine['Utc'] * 24 * 3600 * 1000),
+  const d = new Date(new Date("1900-01-01T00:00:00Z").getTime() + logLine[TIME_FIELD] * 24 * 3600 * 1000)
+  // Check that the date is valid
+  if (isNaN(d.getTime())) {
+    throw new Error('Invalid Date')
+  }
+
+  const td : TimedData = {
+    time: d,
     values: convertExpeditionFieldsToSignalKValues(logLine)
-  };
+  }
+
+  if (logLine[LONGITUDE_FIELD] !== "" && logLine[LATITUDE_FIELD] !== "") {
+    td.coordinates = [ Number(logLine[LONGITUDE_FIELD]), Number(logLine[LATITUDE_FIELD]) ]
+  }
+  return td
 }
 
-function convertExpeditionFieldsToSignalKValues(expeditionFields : Object) : SKValues {
+function convertExpeditionFieldsToSignalKValues(expeditionFields : object) : SKValues {
   const excludedProperties = ['Utc', 'Lat', 'Lon'];
-  let values : SKValues = {}
+  const values : SKValues = {}
 
   // TODO: Convert units
   // TODO: Convert complex types (string, objects)
-  for (let key in expeditionFields) {
+  for (const key in expeditionFields) {
     if (!excludedProperties.includes(key)) {
       values[key] = expeditionFields[key]
     }
@@ -99,9 +175,9 @@ function convertExpeditionFieldsToSignalKValues(expeditionFields : Object) : SKV
  * available during that segment.
  */
 export function convertTimedDataToSegments(timedDatas : TimedData[]) : Segment[] {
-  let segments : Segment[] = [];
+  const segments : Segment[] = [];
 
-  let currentSegmentData : TimedData[]
+  let currentSegmentData : TimedData[] = []
   let lastPoint : Point|null = null;
   timedDatas.forEach(timedData => {
     if (timedData.coordinates && timedData.coordinates.length > 0) {
@@ -133,10 +209,10 @@ export function convertTimedDataToSegments(timedDatas : TimedData[]) : Segment[]
  * @param timedDatas
  */
 export function aggregateTimedDataValues(timedDatas : TimedData[]) : SKValues {
-  let values : SKValues = {}
+  const values : SKValues = {}
 
-  let valuesArray = {};
-  for (let sample of timedDatas) {
+  const valuesArray = {};
+  for (const sample of timedDatas) {
     // tslint:disable-next-line:forin
     for (const key of Object.keys(sample.values)) {
       if (!(key in valuesArray)) {
@@ -146,8 +222,8 @@ export function aggregateTimedDataValues(timedDatas : TimedData[]) : SKValues {
     }
   }
 
-  const angleFields = ['awa', 'twa']
-  const directionFields = ['twd', 'cog']
+  const angleFields = ['Awa', 'Twa']
+  const directionFields = ['Twd', 'Cog']
 
   for (const key of Object.keys(valuesArray)) {
     if (angleFields.includes(key) || directionFields.includes(key)) {
