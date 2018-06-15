@@ -78,11 +78,9 @@ export default class App extends React.Component<AppProps, AppState> {
 
   public _onHover(hoverInfo : any) {
     if (hoverInfo) {
-      console.log("onhover", hoverInfo.x, hoverInfo.y, hoverInfo.object);
       this.setState({hoveredObject: hoverInfo.object});
       }
     else {
-      console.log("hover - unselected");
       this.setState({hoveredObject: null});
     }
   }

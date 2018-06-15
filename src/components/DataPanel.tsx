@@ -8,7 +8,9 @@ import './DataPanel.css'
 const alwaysOnFields = ['Sog', 'Cog', 'Twa', 'Tws', 'Awa', 'Aws']
 const hiddenFields = ['time', 'coordinates', 'previousCoordinates']
 const fieldConfiguration = {
-  'Twa': { fractionDigits: 0 },
+  'Sog': { unit: 'kts' },
+  'Bsp': { unit: 'kts' },
+  'Twa': { fractionDigits: 0, unit: 'kts' },
   'Cog': { fractionDigits: 0 },
   'Awa': { fractionDigits: 0 }
 }
@@ -18,13 +20,14 @@ export interface DataPanelProps {
 
 export default function DataPanel(props : DataPanelProps) {
   const segment = props.segment
-  let values : SKValues = segment ? segment.values : {}
+  const values : SKValues = segment ? segment.values : {}
 
   // Make sure default fields appear - with null by default
-  values = alwaysOnFields.reduce( (v, f) => {
-    v[f] = f in v ? v[f] : null;
-    return v;
-  }, {});
+  alwaysOnFields.forEach(key => {
+    if (! (key in values)) {
+      values[key] = null
+    }
+  })
 
   const alwaysOnItems = alwaysOnFields.reduce( (p : JSX.Element[], key) => {
     p.push(
