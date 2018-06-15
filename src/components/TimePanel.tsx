@@ -17,7 +17,8 @@ export default function TimePanel({endDate, startDate, hoveredDate, onTimeJump} 
   // We will need to be smarter with longer logs.
   // TODO: Do not do this math every time we render but keep it cached.
   const tickList = [];
-  for (const t = endDate; t < startDate; t) {
+  /*
+  for (const t = startDate; t < endDate; t) {
     if (t.getTime() % (3600*1000) === 0) {
       if (t.getHours() % 6 === 0) {
         tickList.push(<option key={t.getTime()} value={t.getTime()}/>);
@@ -26,7 +27,7 @@ export default function TimePanel({endDate, startDate, hoveredDate, onTimeJump} 
         tickList.push(<option key={t.getTime()} value={t.getTime()} label={t.getHours() + 'h'}/>);
       }
     }
-  }
+  }*/
   return (
     <div className="time-panel">
       <input type="range"
@@ -36,7 +37,7 @@ export default function TimePanel({endDate, startDate, hoveredDate, onTimeJump} 
         value={ hoveredDate ? hoveredDate.getTime() : 0 }
         onChange={ e => onTimeJump ? onTimeJump(new Date(e.target.value)) : true }/>
       <datalist id="time-slider-tickmarks">
-        {tickList}
+        {[]}
       </datalist>
     </div>
   )
