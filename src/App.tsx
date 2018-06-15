@@ -52,11 +52,13 @@ export default class App extends React.Component<AppProps, AppState> {
     return (
       <div>
         <DataPanel segment={this.state.hoveredObject} />
-        <TimePanel
-          endDate={ new Date() }
-          startDate={ new Date() }
+        {this.state.trip &&
+          <TimePanel
+          endTime={ this.state.trip.getEndTime() }
+          startTime={ this.state.trip.getStartTime() }
           onTimeJump={ x => console.log("on time jump") }
           hoveredDate={ this.state.hoveredObject? this.state.hoveredObject.time : null } />
+        }
 
         <ReactMapGL
           {...this.state.viewport}

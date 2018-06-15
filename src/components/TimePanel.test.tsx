@@ -4,6 +4,6 @@ import TimePanel from './TimePanel';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
-  ReactDOM.render(<TimePanel startDate={new Date()} endDate={new Date()}/>, div);
+  ReactDOM.render(<TimePanel startTime={new Date()} endTime={new Date()}/>, div);
   ReactDOM.unmountComponentAtNode(div);
 });

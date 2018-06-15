@@ -2,21 +2,21 @@ import * as React from "react"
 import './TimePanel.css'
 
 export interface TimePanelProps {
-  endDate: Date;
-  startDate: Date;
+  endTime: Date;
+  startTime: Date;
   hoveredDate?: Date;
   onTimeJump?: (d: Date) => void;
 }
 
-export default function TimePanel({endDate, startDate, hoveredDate, onTimeJump} : TimePanelProps) {
-  if (!endDate || !startDate) {
+export default function TimePanel({endTime, startTime, hoveredDate, onTimeJump} : TimePanelProps) {
+  if (!endTime || !startTime) {
     return (<div className="time-panel"/>);
   }
 
   // Put a tick every hour and time every 6h.
   // We will need to be smarter with longer logs.
   // TODO: Do not do this math every time we render but keep it cached.
-  const tickList = [];
+  const tickList : any = [];
   /*
   for (const t = startDate; t < endDate; t) {
     if (t.getTime() % (3600*1000) === 0) {
@@ -31,13 +31,13 @@ export default function TimePanel({endDate, startDate, hoveredDate, onTimeJump} 
   return (
     <div className="time-panel">
       <input type="range"
-        min={ endDate.getTime() }
-        max={ startDate.getTime() }
+        min={ endTime.getTime() }
+        max={ startTime.getTime() }
         list="time-slider-tickmarks"
         value={ hoveredDate ? hoveredDate.getTime() : 0 }
         onChange={ e => onTimeJump ? onTimeJump(new Date(e.target.value)) : true }/>
       <datalist id="time-slider-tickmarks">
-        {[]}
+        {tickList}
       </datalist>
     </div>
   )

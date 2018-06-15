@@ -150,6 +150,20 @@ describe('Transforming time data into segments', () => {
 
 })
 
+describe("Fabric functions", () => {
+  expect(() => Trip.fromTimedData([])).toThrow("Cannot create trip without at least one point!")
+})
+
+describe("Convenience accessors", () => {
+  it('knows its start time', () => {
+    expect(Trip.fromTimedData(sampleTimedData).getStartTime()).toEqual(sampleTimedData[0].time)
+  })
+
+  it('knows its end time', () => {
+    expect(Trip.fromTimedData(sampleTimedData).getEndTime()).toEqual(sampleTimedData[sampleTimedData.length-1].time)
+  })
+})
+
 describe('Aggregation of values', () => {
   const BSP = 'Bsp'
   const AWA = 'Awa'
@@ -195,11 +209,6 @@ describe('Aggregation of values', () => {
 })
 
 describe("Obtain list of points for a given trip", () => {
-  it('does not fail when there is no segments', () => {
-    const points = Trip.fromTimedData([]).getPoints()
-    expect(points).toEqual([])
-  })
-
   it('works with only one segment', () => {
     const points = Trip.fromTimedData(sampleTimedData.slice(0, 2)).getPoints()
     expect(points).toEqual([sampleTimedData[0].coordinates, sampleTimedData[1].coordinates])
@@ -212,11 +221,6 @@ describe("Obtain list of points for a given trip", () => {
 })
 
 describe("It knows how to calcukate its bounds", () => {
-  it("when there are no segments", () => {
-    const bounds = Trip.fromTimedData([]).getBoundingCoordinates()
-    expect(bounds).toBeNull()
-  })
-
   it ("when there is only one segment", () => {
     const bounds = Trip.fromTimedData(sampleTimedData.slice(0, 2)).getBoundingCoordinates()
     expect(bounds).toEqual([[100,42.5], [101, 42]])

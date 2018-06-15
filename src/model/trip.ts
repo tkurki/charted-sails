@@ -42,8 +42,13 @@ export interface Segment {
   values: SKValues
 }
 
+/**
+ * Represents a trip.
+ *
+ * A trip always has at least one segment.
+ */
 export default class Trip {
-  public static fromExpeditionData(data:object[]) : Trip {
+  public static fromExpeditionData(data:object[]) : Trip|null {
     const timedData : TimedData[] = []
     data.forEach(d => {
       try {
@@ -56,32 +61,35 @@ export default class Trip {
       }
     })
 
-    return Trip.fromTimedData(timedData)
+    if (timedData.length > 0) {
+      return Trip.fromTimedData(timedData)
+    }
+    else {
+      return null
+    }
   }
 
   public static fromTimedData(timedData:TimedData[]) : Trip {
-    const t = new Trip();
+    if (timedData.length === 0) {
+      throw new Error('Cannot create trip without at least one point!')
+    }
+    const tripSegments = convertTimedDataToSegments(timedData)
 
-    // TODO: We may want to reduce the number of segments here.
-
-    t.segments = convertTimedDataToSegments(timedData)
-    return t;
+    return new Trip(tripSegments);
   }
 
   public segments: Segment[]
 
-  public getStartTime() : Date | null {
-    if (this.segments.length > 0) {
-      return this.segments[0].start.time;
-    }
-    return null
+  private constructor(segments : Segment[]) {
+    this.segments = segments
   }
 
-  public getEndTime() : Date | null {
-    if (this.segments.length > 0) {
-      return this.segments[-1].end.time;
-    }
-    return null
+  public getStartTime() : Date {
+    return this.segments[0].start.time;
+  }
+
+  public getEndTime() : Date {
+    return this.segments[this.segments.length - 1].end.time;
   }
 
   /**
@@ -89,12 +97,9 @@ export default class Trip {
    *
    * @return [ GPSCoordinate(NW corner), GPSCoordinate(SE corner)]
    */
-  public getBoundingCoordinates() : [GPSCoordinates, GPSCoordinates] | null {
+  public getBoundingCoordinates() : [GPSCoordinates, GPSCoordinates] {
     const points = this.getPoints()
-
-    if (points.length === 0) {
-      return  null
-    }
+    // (always returns at least one point)
 
     const nwPoint : GPSCoordinates = [ points[0][0], points[0][1] ]
     const sePoint : GPSCoordinates = [ points[0][0], points[0][1] ]
@@ -117,10 +122,6 @@ export default class Trip {
    * Returns a list of points that this trip visits (in order).
    */
   public getPoints() : GPSCoordinates[] {
-    if (this.segments.length === 0) {
-      return []
-    }
-
     const points = this.segments.map(s => s.start.coordinates)
     points.push(this.segments[this.segments.length-1].end.coordinates)
     return points
