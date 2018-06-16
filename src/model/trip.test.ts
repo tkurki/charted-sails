@@ -162,6 +162,34 @@ describe("Convenience accessors", () => {
   it('knows its end time', () => {
     expect(Trip.fromTimedData(sampleTimedData).getEndTime()).toEqual(sampleTimedData[sampleTimedData.length-1].time)
   })
+
+  it('can find a segment given a time', () => {
+    const trip = Trip.fromTimedData(sampleTimedData)
+    const segment = trip.getSegmentAtTime(new Date(sampleTimedData[0].time.getTime() + 1))
+
+    expect(segment).toBe(trip.segments[0])
+  })
+
+  it ('can find a segment (not the first one) given a time', () => {
+    const trip = Trip.fromTimedData(sampleTimedData)
+    const segment = trip.getSegmentAtTime(new Date(sampleTimedData[4].time.getTime()-1))
+
+    expect(segment).toHaveProperty("start.time", sampleTimedData[2].time)
+    expect(segment).toHaveProperty("end.time", sampleTimedData[4].time)
+  })
+
+  it('returns null if the time is past the trip bounds', () => {
+    expect(Trip.fromTimedData(sampleTimedData).getSegmentAtTime(new Date("2019-12-23T20:30:00"))).toBeNull()
+  })
+
+  it('returns null if the time is before the trip bounds', () => {
+    expect(Trip.fromTimedData(sampleTimedData).getSegmentAtTime(new Date("1982-12-23T20:30:00"))).toBeNull()
+  })
+
+  it('returns null if the time is exactly the end time of the last segment', () => {
+    const s = Trip.fromTimedData(sampleTimedData).getSegmentAtTime(new Date(sampleTimedData[sampleTimedData.length-1].time.getTime()))
+    expect(s).toBeNull()
+  })
 })
 
 describe('Aggregation of values', () => {
@@ -241,6 +269,7 @@ describe("It knows how to calcukate its bounds", () => {
     expect(bounds).toEqual([[-175, 89.5], [5, 89]])
   })
 })
+
 
 
 const someTimePlusX = (x : number) => new Date(1528489854697 + x*1000)

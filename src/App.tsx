@@ -6,7 +6,7 @@ import WebMercatorViewport from 'viewport-mercator-project';
 import DataPanel from './components/DataPanel';
 import DeckGLOverlay from './components/DeckGLOverlay';
 import TimePanel from './components/TimePanel';
-import Trip, { GPSCoordinates } from './model/Trip'
+import Trip, { GPSCoordinates, Segment } from './model/Trip'
 
 import './App.css'
 import SAMPLE_DATA_SFTRIP from './sample-data/expedition-sanfrancisco.csv'
@@ -27,6 +27,7 @@ export interface AppProps {
 export interface AppState {
   viewport : any
   trip : Trip|null,
+  selectedSegment: Segment | null,
   hoveredObject?: any
 }
 
@@ -35,6 +36,7 @@ export default class App extends React.Component<AppProps, AppState> {
     super(props);
 
     this.state = {
+      selectedSegment: null,
       trip: null,
       viewport: {
         height: window.innerHeight,
@@ -51,13 +53,15 @@ export default class App extends React.Component<AppProps, AppState> {
   public render() {
     return (
       <div>
-        <DataPanel segment={this.state.hoveredObject} />
+        <DataPanel segment={this.state.hoveredObject ? this.state.hoveredObject : this.state.selectedSegment} />
         {this.state.trip &&
           <TimePanel
-          endTime={ this.state.trip.getEndTime() }
-          startTime={ this.state.trip.getStartTime() }
-          onTimeJump={ x => console.log("on time jump") }
-          hoveredDate={ this.state.hoveredObject? this.state.hoveredObject.time : null } />
+            endTime={ this.state.trip.getEndTime() }
+            startTime={ this.state.trip.getStartTime() }
+            // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
+            selectedSegment={ this.state.selectedSegment ? this.state.selectedSegment : this.state.trip.segments[0] }
+            onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
+          />
         }
 
         <ReactMapGL
@@ -152,4 +156,22 @@ export default class App extends React.Component<AppProps, AppState> {
     );
     return bounds;
   }
+
+  /**
+   * Called when the user has selected a new time by dragging the time slider.
+   * @param t new time selected
+   */
+  private _onSelectedTimeChange(t : Date) {
+    console.log("time changed to ", t)
+    if (this.state.trip === null) {
+      this.setState({selectedSegment: null})
+    }
+    else {
+      const s = this.state.trip.getSegmentAtTime(t)
+      if (s) {
+        this.setState({selectedSegment: s})
+      }
+    }
+  }
+
 }

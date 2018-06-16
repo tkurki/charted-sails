@@ -1,14 +1,16 @@
 import * as React from "react"
+import { Segment } from "../model/Trip";
+
 import './TimePanel.css'
 
 export interface TimePanelProps {
   endTime: Date;
   startTime: Date;
-  hoveredDate?: Date;
-  onTimeJump?: (d: Date) => void;
+  selectedSegment: Segment
+  onSelectedTimeChange: (d: Date) => void;
 }
 
-export default function TimePanel({endTime, startTime, hoveredDate, onTimeJump} : TimePanelProps) {
+export default function TimePanel({endTime, startTime, selectedSegment, onSelectedTimeChange} : TimePanelProps) {
   if (!endTime || !startTime) {
     return (<div className="time-panel"/>);
   }
@@ -17,25 +19,24 @@ export default function TimePanel({endTime, startTime, hoveredDate, onTimeJump} 
   // We will need to be smarter with longer logs.
   // TODO: Do not do this math every time we render but keep it cached.
   const tickList : any = [];
-  /*
-  for (const t = startDate; t < endDate; t) {
-    if (t.getTime() % (3600*1000) === 0) {
-      if (t.getHours() % 6 === 0) {
-        tickList.push(<option key={t.getTime()} value={t.getTime()}/>);
-      }
-      else {
-        tickList.push(<option key={t.getTime()} value={t.getTime()} label={t.getHours() + 'h'}/>);
-      }
-    }
-  }*/
+
+  const firstHourMark = new Date(startTime)
+  firstHourMark.setMinutes(0)
+  firstHourMark.setSeconds(0)
+  firstHourMark.setMilliseconds(0)
+
+  for (let t = firstHourMark; t < endTime; t = new Date(t.getTime() + 3600 * 1000)) {
+    tickList.push(<option key={t.getTime()} value={t.getTime()} label={t.getHours() + 'h'}/>);
+  }
+
   return (
     <div className="time-panel">
       <input type="range"
-        min={ endTime.getTime() }
-        max={ startTime.getTime() }
+        min={ startTime.getTime() }
+        max={ endTime.getTime() }
         list="time-slider-tickmarks"
-        value={ hoveredDate ? hoveredDate.getTime() : 0 }
-        onChange={ e => onTimeJump ? onTimeJump(new Date(e.target.value)) : true }/>
+        value={ selectedSegment.start.time.getTime() }
+        onChange={ e => { console.log(e); console.log(e.target.value); onSelectedTimeChange(new Date(Number(e.target.value))) } }/>
       <datalist id="time-slider-tickmarks">
         {tickList}
       </datalist>

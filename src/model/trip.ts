@@ -92,6 +92,15 @@ export default class Trip {
     return this.segments[this.segments.length - 1].end.time;
   }
 
+  public getSegmentAtTime(time : Date) : Segment|null {
+    for (const segment of this.segments) {
+      if (segment.start.time <= time && time < segment.end.time) {
+        return segment
+      }
+    }
+    return null
+  }
+
   /**
    * Return a set of coordinates that bound this trip.
    *

@@ -11,3 +11,20 @@
  - [ ] Add overlay with wind speed arrows
  - [ ] Polar?
  - [ ] Drag/Drop CSV file from Expedition
+
+
+## Interactions
+
+As a user, I can drag the time slider, the data panel represents the moment currently selected and there should be a highlight (or a little moving boat) on the map.
+
+As a user, I can click on the map and the timer slider should jump there.
+
+As a user, I can hover over the map and the timer slider shows a ghost symbole of where I am hovering. The data panel can also show the data in ghost mode.
+
+
+
+"Selected" - one segment that the user has selected via the time slider or by clicking on the trace.
+"Hovered" - on segment the user is moving over.
+
+Next steps:
+Make selected be more than one segment.
