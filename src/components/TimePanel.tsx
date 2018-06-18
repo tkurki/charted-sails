@@ -1,6 +1,5 @@
 import Slider from "rc-slider";
 import * as React from "react"
-import { Segment } from "../model/Trip";
 
 import 'rc-slider/assets/index.css';
 import './TimePanel.css'
@@ -8,11 +7,11 @@ import './TimePanel.css'
 export interface TimePanelProps {
   endTime: Date;
   startTime: Date;
-  selectedSegment: Segment
+  selectedTime: Date
   onSelectedTimeChange: (d: Date) => void;
 }
 
-export default function TimePanel({endTime, startTime, selectedSegment, onSelectedTimeChange} : TimePanelProps) {
+export default function TimePanel({endTime, startTime, selectedTime, onSelectedTimeChange} : TimePanelProps) {
   if (!endTime || !startTime) {
     return (<div className="time-panel"/>);
   }
@@ -22,10 +21,14 @@ export default function TimePanel({endTime, startTime, selectedSegment, onSelect
   // TODO: Do not do this math every time we render but keep it cached.
   const tickList = {};
 
-  const firstHourMark = new Date(startTime)
+  let firstHourMark = new Date(startTime)
   firstHourMark.setMinutes(0)
   firstHourMark.setSeconds(0)
   firstHourMark.setMilliseconds(0)
+
+  if (firstHourMark < startTime) {
+    firstHourMark = new Date(firstHourMark.getTime() + 3600 * 1000)
+  }
 
   for (let t = firstHourMark; t < endTime; t = new Date(t.getTime() + 3600 * 1000)) {
     tickList[t.getTime()] = t.getHours() + 'h'
@@ -37,7 +40,7 @@ export default function TimePanel({endTime, startTime, selectedSegment, onSelect
         min={ startTime.getTime() }
         max={ endTime.getTime() }
         marks={ tickList }
-        value={ selectedSegment.start.time.getTime() }
+        value={ selectedTime.getTime() }
         onChange={ e => { onSelectedTimeChange(new Date(e)) } }/>
     </div>
   )

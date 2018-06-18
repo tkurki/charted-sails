@@ -59,7 +59,7 @@ export default class App extends React.Component<AppProps, AppState> {
             endTime={ this.state.trip.getEndTime() }
             startTime={ this.state.trip.getStartTime() }
             // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
-            selectedSegment={ this.state.selectedSegment ? this.state.selectedSegment : this.state.trip.segments[0] }
+            selectedTime={ this.state.selectedSegment ? this.state.selectedSegment.start.time : this.state.trip.segments[0].start.time }
             onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
           />
         }
