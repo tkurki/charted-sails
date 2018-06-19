@@ -1,12 +1,13 @@
-import Trip from './Trip'
+import TripDataProvider from './DataProvider';
 import TimeSelection from './TimeSelection'
+import Trip from './Trip'
 
 export default class InteractiveTrip {
   private trip : Trip
-  private dataProvider: DataProvider
+  private dataProvider: TripDataProvider
   private selection: TimeSelection
 
-  constructor(trip : Trip, dataProvider : DataProvider) {
+  constructor(trip : Trip, dataProvider : TripDataProvider) {
     this.trip = trip
     this.selection = new TimeSelection(this.trip.getStartTime())
     this.dataProvider = dataProvider
