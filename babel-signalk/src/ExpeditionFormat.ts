@@ -1,5 +1,5 @@
 import { CSVConversion } from "./CSVLoader"
-import { SKValue} from '@aldis/strongly-signalk'
+import { SKValue, SKPosition} from '@aldis/strongly-signalk'
 import * as utils from '@signalk/nmea0183-utilities'
 
 const excelStartOfTime = new Date("1900-01-01T00:00:00Z").getTime()
@@ -39,7 +39,10 @@ export const ExpeditionFormatConversion : CSVConversion = {
       convert: (csvLine) : SKValue => (
         {
           'path': "navigation.position",
-          'value': { 'latitude': Number(csvLine['Lat']), 'longitude': Number(csvLine['Lon']) }
+          'value': SKPosition.fromJSON({
+            'latitude': Number(csvLine['Lat']),
+            'longitude': Number(csvLine['Lon'])
+          })
         }
       )
     }

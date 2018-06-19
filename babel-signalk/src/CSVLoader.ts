@@ -112,7 +112,7 @@ export function signalKFromCSV(data: string,
     }
   })
 
-  const promise = new Promise<SKDelta>((resolve, reject) => {
+  const promise = new Promise<Papa.ParseResult>((resolve, reject) => {
     Papa.parse(data, {
       download: options.download,
       header: true,
@@ -127,7 +127,7 @@ export function signalKFromCSV(data: string,
   })
   .then((data : Papa.ParseResult) => {
     // Map each line to a SKUpdate
-    let updates = data.data.map((csvLine, index, array) => {
+    let updates = data.data.map((csvLine) => {
       const time = converter.timeConverter(csvLine)
 
       // Reject lines that do not have a timestamp
@@ -157,7 +157,7 @@ export function signalKFromCSV(data: string,
 
     let delta = new SKDelta()
     delta.context = options.context
-    delta.updates = updates
+    delta.updates = <SKUpdate[]>updates
     return delta
   })
 

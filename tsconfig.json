@@ -1,17 +1,7 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
-
-    "paths": {
-      "@aldis/*": ["./*/src"]
-    }
+  "extends": "./tsconfig.base.json",
+  "baseUrl": "./",
+  "paths": {
+    "@aldis/*": ["./*/src"]
   }
 }
