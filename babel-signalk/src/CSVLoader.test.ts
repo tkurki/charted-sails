@@ -40,9 +40,3 @@ it('converts Lat/Lon', async () => {
   expect(positionValues[0]).toHaveProperty('value.latitude', 37.806633)
   expect(positionValues[0]).toHaveProperty('value.longitude', -122.445967)
 })
-
-it('converts all available data', async () => {
-  const skdelta = await signalKFromCSV(expeditionCsvData)
-  expect(skdelta.updates[0].values).toHaveLength(4)
-  expect(skdelta.updates[0].values).toHaveLength(18)
-})
