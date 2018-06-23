@@ -4,21 +4,16 @@ import { ExpeditionFormatConversion } from './ExpeditionFormatConversion';
 import { isNull } from 'util';
 import { CSVConversion, columnConvertersForLine } from './CSVConversion';
 
-interface ConversionOption {
+export interface CSVConversionOption {
   /**
    * SignalK Context of the data we are reading.
    */
   context?: string,
 
   /**
-   * Is the data really a URL to the data? Set true to download.
+   * How should the source be defined in the SignalK data.
    */
-  download?: boolean,
-
-  /**
-   * Should CSV parsing happen in a separate worker?
-   */
-  worker?: boolean,
+  sourceLabel?: string
 
   /**
    * Conversion to run on the file. You can use one of the named type
@@ -27,34 +22,79 @@ interface ConversionOption {
   conversion: CSVConversion | 'expedition'
 }
 
-export function signalKFromCSV(data: string,
-                              options: ConversionOption = {conversion: 'expedition' })
-                              : Promise<SKDelta> {
-  let conversion : CSVConversion
-  if (typeof options.conversion === 'string') {
-    conversion = new ExpeditionFormatConversion()
-  }
-  else {
-    conversion = options.conversion
+export class CSVLoader {
+  static defaultOptions: CSVConversionOption = {
+    conversion: 'expedition'
   }
 
-  // Create a source name with the filename, url or "csvdata"
-  const skSource = new SKSource(data.length > 1000 ? 'csvdata' : data)
+  static papaParsingOptions = {
+    header: true
+  }
 
-  const promise = new Promise<Papa.ParseResult>((resolve, reject) => {
-    Papa.parse(data, {
-      download: options.download,
-      header: true,
-      worker: options.worker,
-      complete: (results) => {
-        resolve(results)
-      },
-      error: (error) => {
-        reject(error)
-      }
+  /**
+   * Parse from a string.
+   *
+   * @param data
+   * @param options
+   */
+  static fromString(data: string, options: CSVConversionOption = this.defaultOptions): SKDelta {
+    let result = Papa.parse(data, this.papaParsingOptions)
+    return this.fromParseResult(result, options)
+  }
+
+  /**
+   * Parse from a DOM File object (in the browser).
+   *
+   * @param file
+   * @param options
+   */
+  static fromFile(file: File, options: CSVConversionOption = this.defaultOptions): SKDelta  {
+    return this.fromParseResult(Papa.parse(file, this.papaParsingOptions), {
+      sourceLabel: file.name,
+      ...options
     })
-  })
-  .then((data : Papa.ParseResult) => {
+  }
+
+  /**
+   * Parse from an URL.
+   *
+   * @param url
+   * @param options
+   */
+  static fromURL(url: string, options: CSVConversionOption = this.defaultOptions): Promise<SKDelta> {
+    let p = new Promise<Papa.ParseResult>((resolve, reject) => {
+      const papaOptions = {
+        ...this.papaParsingOptions,
+        download: true,
+        complete: resolve,
+        error: reject
+      }
+      Papa.parse(url, papaOptions)
+    })
+    return this.fromParseResultPromise(p, {
+      sourceLabel: url,
+      ...options
+    })
+  }
+
+
+  static fromParseResultPromise(promise: Promise<Papa.ParseResult>, options: CSVConversionOption = this.defaultOptions)
+            : Promise<SKDelta> {
+    return promise.then((data : Papa.ParseResult) => {
+      return this.fromParseResult(data, options)
+    })
+  }
+
+  static fromParseResult(data: Papa.ParseResult, options: CSVConversionOption = this.defaultOptions): SKDelta {
+    let conversion : CSVConversion
+    if (typeof options.conversion === 'string') {
+      conversion = new ExpeditionFormatConversion()
+    } else {
+      conversion = options.conversion
+    }
+
+    let skSource = new SKSource(options.sourceLabel ? options.sourceLabel : 'signalk-babel/csvloader')
+
     // Map each line to a SKUpdate
     let updates = data.data.map((csvLine) => {
       const time = conversion.timeConverter(csvLine)
@@ -82,7 +122,5 @@ export function signalKFromCSV(data: string,
     delta.context = options.context
     delta.updates = <SKUpdate[]>updates
     return delta
-  })
-
-  return promise
+  }
 }

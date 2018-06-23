@@ -4,6 +4,7 @@
   "description": "A library to convert marine log files to SignalK.",
   "license": "MIT",
   "main": "dist/index.js",
+  "bin": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
@@ -30,6 +31,8 @@
   "dependencies": {
     "@aldis/strongly-signalk": ">0.0.0",
     "@signalk/nmea0183-utilities": "^0.6.0",
+    "@types/commander": "^2.12.2",
+    "commander": "^2.15.1",
     "papaparse": "^4.5.0"
   }
 }

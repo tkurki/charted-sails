@@ -1,4 +1,4 @@
-import { signalKFromCSV } from "./CSVLoader";
+import { CSVLoader } from "./CSVLoader";
 
 const expeditionCsvData =
 `Utc,Bsp,Awa,Aws,Twa,Tws,Twd,Rudder2,Leeway,Set,Drift,Hdg,AirTmp,SeaTmp,Baro,Depth,Heel,Trim,Rudder,Tab,Forestay,Downhaul,MastAng,FrstyLen,MastButt,StbJmpr,PrtJmpr,Rake,Volts,ROT,GpsQual,PDOP,GpsNum,GpsAge,GpsGeoHt,GpsAntHt,GpsPosFx,Lat,Lon,Cog,Sog
@@ -8,33 +8,33 @@ const expeditionCsvData =
 38249.70142,1.23,-65,11.6,-100.9,11.4,247,,5,229,49.9,319,,16,,1.92,1.1,,,,,,,,,,,,12.89,,,,,,,,,37.806633,-122.44595,145.8,0
 `
 
-it('skips line with invalid timestamps', async () => {
+it('skips line with invalid timestamps', () => {
   const bogusData = `Utc,Bsp,Awa,Aws\n,0.67,0,1`
-  const skdelta = await signalKFromCSV(bogusData)
+  const skdelta = CSVLoader.fromString(bogusData)
   expect(skdelta.updates).toHaveLength(0)
 })
 
-it('can load a CSV from a string', async () => {
-  const skdelta = await signalKFromCSV(expeditionCsvData)
+it('can load a CSV from a string', () => {
+  const skdelta = CSVLoader.fromString(expeditionCsvData)
   expect(skdelta.updates).toHaveLength(4)
 })
 
-it('converts data units to SignalK SI units', async () => {
-  const skdelta = await signalKFromCSV(expeditionCsvData)
+it('converts data units to SignalK SI units', () => {
+  const skdelta = CSVLoader.fromString(expeditionCsvData)
   const sogValues = skdelta.updates[0].values.filter(x => x.path === 'navigation.speedThroughWater')
   expect(sogValues).toHaveLength(1)
   expect(sogValues[0]).toHaveProperty('value')
   expect(sogValues[0].value).toBeCloseTo(0.3446778)
 })
 
-it('does not include SKValues that have no values', async () => {
-  const skdelta = await signalKFromCSV(expeditionCsvData)
+it('does not include SKValues that have no values', () => {
+  const skdelta = CSVLoader.fromString(expeditionCsvData)
   const sogValues = skdelta.updates[0].values.filter(x => x.path === 'navigation.speedOverGround')
   expect(sogValues).toHaveLength(0)
 })
 
-it('converts Lat/Lon', async () => {
-  const skdelta = await signalKFromCSV(expeditionCsvData)
+it('converts Lat/Lon', () => {
+  const skdelta = CSVLoader.fromString(expeditionCsvData)
   const positionValues = skdelta.updates[0].values.filter(x => x.path === 'navigation.position')
   expect(positionValues).toHaveLength(1)
   expect(positionValues[0]).toHaveProperty('value.latitude', 37.806633)
