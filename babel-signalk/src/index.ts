@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 export * from './CSVLoader'
 export * from './ExpeditionFormatConversion'
