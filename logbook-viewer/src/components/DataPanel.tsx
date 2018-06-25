@@ -7,7 +7,7 @@ import './DataPanel.css'
 
 const alwaysOnFields = ['Sog', 'Cog', 'Twa', 'Tws', 'Awa', 'Aws']
 const hiddenFields = ['time', 'coordinates', 'previousCoordinates']
-const fieldConfiguration = {
+const fieldConfiguration : { [index:string]: { 'unit'?: string, fractionDigits?: number }} = {
   'Sog': { unit: 'kts' },
   'Bsp': { unit: 'kts' },
   'Twa': { fractionDigits: 0, unit: 'kts' },
@@ -20,7 +20,8 @@ export interface DataPanelProps {
 
 export default function DataPanel(props : DataPanelProps) {
   const segment = props.segment
-  const values : SKValues = segment ? segment.values : {}
+  const emptyValues : { [index:string]: number } = {}
+  const values : SKValues = segment ? segment.values : emptyValues
 
   // Make sure default fields appear - with null by default
   alwaysOnFields.forEach(key => {

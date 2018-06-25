@@ -10,7 +10,7 @@ export type GPSCoordinates = [number, number]
  *
  * The key is a signalk path.
  */
-export type SKValues = object
+export interface SKValues { [path:string] : number|null|string }
 
 /**
  * A point in time with a some data measured at this point. Nothing required here.
@@ -138,7 +138,7 @@ export default class Trip {
 }
 
 
-export function convertExpeditionLineToTimedData(logLine : object) : TimedData {
+export function convertExpeditionLineToTimedData(logLine : {[index:string]:any}) : TimedData {
   const LONGITUDE_FIELD = 'Lon'
   const LATITUDE_FIELD = 'Lat'
   const TIME_FIELD = 'Utc'
@@ -164,7 +164,7 @@ export function convertExpeditionLineToTimedData(logLine : object) : TimedData {
   return td
 }
 
-function convertExpeditionFieldsToSignalKValues(expeditionFields : object) : SKValues {
+function convertExpeditionFieldsToSignalKValues(expeditionFields : {[index:string]: any}) : SKValues {
   const excludedProperties = ['Utc', 'Lat', 'Lon'];
   const values : SKValues = {}
 
@@ -221,7 +221,7 @@ export function convertTimedDataToSegments(timedDatas : TimedData[]) : Segment[]
 export function aggregateTimedDataValues(timedDatas : TimedData[]) : SKValues {
   const values : SKValues = {}
 
-  const valuesArray = {};
+  const valuesArray: {[index:string]: any[]} = {};
   for (const sample of timedDatas) {
     // tslint:disable-next-line:forin
     for (const key of Object.keys(sample.values)) {
@@ -236,15 +236,17 @@ export function aggregateTimedDataValues(timedDatas : TimedData[]) : SKValues {
   const directionFields = ['Twd', 'Cog']
 
   for (const key of Object.keys(valuesArray)) {
+    let aggregatedValue
     if (angleFields.includes(key) || directionFields.includes(key)) {
-      values[key] = aggregateByAveragingAngles(valuesArray[key])
+      aggregatedValue = aggregateByAveragingAngles(valuesArray[key])
       if (directionFields.includes(key)) {
-        values[key] = values[key] < 0 ? 360 + values[key] : values[key]
+        aggregatedValue = aggregatedValue < 0 ? 360 + aggregatedValue : aggregatedValue
       }
     }
     else {
-      values[key] = aggregateByAveraging(valuesArray[key])
+      aggregatedValue = aggregateByAveraging(valuesArray[key])
     }
+    values[key] = aggregatedValue
   }
   return values
 }

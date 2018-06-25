@@ -1,4 +1,4 @@
-import { withKnobs, number } from '@storybook/addon-knobs';
+import { number, withKnobs } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
 import TimePanel from './TimePanel'
@@ -28,7 +28,7 @@ const buildTimePanelWithKnob = (start:Date, duration:number, progress: number) =
             endTime={end}
             startTime={start}
             selectedTime={myDateKnob('time', start, end, current)}
-            onSelectedTimeChange={ x => true }
+            onSelectedTimeChange={ () => true }
           />
 }
 

@@ -48,7 +48,7 @@ describe('Transforming time data into segments', () => {
     const results = convertTimedDataToSegments(data)
 
     expect(results.length).toEqual(expectedSegments.length)
-    for (const index of Object.keys(results)) {
+    for (let index = 0; index < results.length; index++) {
       expect(results[index]).toMatchObject(expectedSegments[index])
     }
   }

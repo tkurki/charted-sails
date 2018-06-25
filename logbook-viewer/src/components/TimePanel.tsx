@@ -19,7 +19,7 @@ export default function TimePanel({endTime, startTime, selectedTime, onSelectedT
   // Put a tick every hour and time every 6h.
   // We will need to be smarter with longer logs.
   // TODO: Do not do this math every time we render but keep it cached.
-  const tickList = {};
+  const tickList : {[index:number]: string} = { };
 
   let firstHourMark = new Date(startTime)
   firstHourMark.setMinutes(0)

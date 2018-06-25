@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "build/dist",
@@ -10,7 +10,8 @@
     "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDir": "src"
+    "rootDir": "src",
+    "noUnusedLocals": false
   },
   "exclude": [
     "node_modules",
