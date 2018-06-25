@@ -19,7 +19,7 @@ export class SKPosition {
   longitude: number
   altitude?: number
 
-  constructor(latitude: number, longitude: number, altitude: number) {
+  constructor(latitude: number, longitude: number, altitude?: number) {
     this.latitude = latitude
     this.longitude = longitude
     this.altitude = altitude
