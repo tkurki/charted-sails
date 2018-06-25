@@ -11,7 +11,11 @@ export class SKSource {
    * A label to identify the source bus, eg serial-COM1, eth-local,etc .
    * Can be anything but should follow a predicatable format.
    */
-  label: string
+  public label: string
+
+  constructor(label: string) {
+    this.label = label
+  }
 
   static fromJSON(json: string|SKSourceJSON): SKSource {
     if (typeof json === 'string') {

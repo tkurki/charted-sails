@@ -19,6 +19,12 @@ export class SKPosition {
   longitude: number
   altitude?: number
 
+  constructor(latitude: number, longitude: number, altitude: number) {
+    this.latitude = latitude
+    this.longitude = longitude
+    this.altitude = altitude
+  }
+
   static fromJSON(json:string|SKPositionJSON) {
     if (typeof json === 'string') {
       return JSON.parse(json, SKPosition.reviver)

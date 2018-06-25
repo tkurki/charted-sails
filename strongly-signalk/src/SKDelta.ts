@@ -15,6 +15,12 @@ export class SKDelta {
   context?: SKContext
   updates: SKUpdate[]
 
+  constructor(updates: SKUpdate[] = [], context: SKContext|null = null) {
+    this.updates = updates
+    if (context) {
+      this.context = context
+    }
+  }
 
   static fromJSON(json: string|SKDeltaJSON): SKDelta {
     if (typeof json === 'string') {

@@ -18,6 +18,12 @@ export class SKUpdate {
   source: SKSource
   values: SKValue[]
 
+  constructor(source : SKSource, timestamp: Date = new Date(), values: SKValue[] = []) {
+    this.timestamp = timestamp
+    this.source = source
+    this.values = values
+  }
+
   static fromJSON(json: string|SKUpdateJSON): SKUpdate {
     if (typeof json === 'string') {
       return JSON.parse(json, SKUpdate.reviver)
