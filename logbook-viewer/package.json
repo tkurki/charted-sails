@@ -28,7 +28,7 @@
     "lint": "tslint --project . --config tslint.prod.json",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "deploy": "react-scripts-ts build && surge build/ aldis.surge.sh"
+    "deploy": "react-scripts-ts build && surge build/ charted.aldislab.com"
   },
   "devDependencies": {
     "@storybook/addon-knobs": "4.0.0-alpha.9",
