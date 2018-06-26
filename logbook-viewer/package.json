@@ -6,6 +6,7 @@
     "@aldis/babel-signalk": ">=0.0.0",
     "@aldis/signalk-analysis": ">=0.0.0",
     "@aldis/strongly-signalk": ">=0.0.0",
+    "@signalk/nmea0183-utilities": "^0.6.0",
     "@types/papaparse": "^4.1.34",
     "@types/react-map-gl": "^3.2.2",
     "d3-ease": "^1.0.3",
@@ -26,7 +27,8 @@
     "eject": "react-scripts-ts eject",
     "lint": "tslint --project . --config tslint.prod.json",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "deploy": "react-scripts-ts build && surge build/ aldis.surge.sh"
   },
   "devDependencies": {
     "@storybook/addon-knobs": "4.0.0-alpha.9",

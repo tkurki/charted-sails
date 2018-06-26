@@ -24,11 +24,12 @@ stories.add('Showing the time only', () => {
 stories.add('Showing time and basic infos', () => {
   const testSelection = new TimeSelection(new Date())
   const testDataProvider : TripDataProvider = {
-    getAvailableValues: () => (['navigation.speedOverGround', 'navigation.courseOverGround' ]),
+    getAvailableValues: () => (['navigation.speedOverGround', 'navigation.courseOverGround', 'environment.wind.angleApparent' ]),
     getValueAtTime: () => null,
     getValuesAtTime: () => ({
-      'navigation.speedThroughWater': number('Sog', 3), /* m/s */
-      'navigation.courseOverGround': number('Cog', 30)/360*2*Math.PI
+      'navigation.speedOverGround': number('Sog (kts)', 3)*1852/3600, /* m/s */
+      'navigation.courseOverGround': number('Cog (deg)', 30)/360*2*Math.PI,
+      'environment.wind.angleApparent': number('AWA (deg)', -35)/360*2*Math.PI,
     })
   }
   return <DataPanel dataProvider={testDataProvider} hoveringMode={false} selection={testSelection}/>

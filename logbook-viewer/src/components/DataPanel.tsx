@@ -1,3 +1,4 @@
+import * as utils from '@signalk/nmea0183-utilities'
 import * as React from 'react';
 import { isNullOrUndefined, isNumber } from 'util';
 
@@ -8,15 +9,44 @@ import TripDataProvider from '../model/TripDataProvider';
 
 import './DataPanel.css'
 
-const fieldConfiguration : { [index:string]: { label: string, unit?: string, fractionDigits?: number }} = {
-  'navigation.speedOverGround': { label: 'SOG', unit: 'kts' },
-  'navigation.speedThroughWater': { label: 'BSP', unit: 'kts' },
-  'environment.wind.angleTrueGround': { label: 'TWA', fractionDigits: 0, unit: 'kts' },
-  'navigation.courseOverGround': { label: 'COG', fractionDigits: 0, unit: 'deg' },
-  'environment.wind.angleApparent': { label: 'AWA', fractionDigits: 0, unit: 'deg' },
-  'environment.wind.speedOverGround': { label: 'TWS', unit: 'kts' },
-  'environment.wind.speedApparent': { label: 'AWS', unit: 'kts' },
+/**
+ * FIXME: This does not belong here but it will do for now.
+ */
+const signalKSchema : {
+  [path: string]: {
+    unit: string
+    type: 'angle'|'direction'|'position'|'number'|'string'|'timestamp'
+  }
+} = {
+  'navigation.speedOverGround': { type: 'number', unit: 'ms'},
+  'navigation.speedThroughWater': { type: 'number', unit: 'ms'},
+  'navigation.courseOverGround': { type: 'direction', unit: 'rad'},
+  'navigation.headingMagnetic': { type: 'direction', unit: 'rad' },
+  'navigation.headingTrue': { type: 'direction', unit: 'rad' },
+  'environment.wind.angleTrueGround': { type: 'angle', unit: 'rad'},
+  'environment.wind.angleApparent': { type: 'angle', unit: 'rad'},
+  'environment.wind.speedOverGround': { type: 'number', unit: 'ms'},
+  'environment.wind.speedApparent': { type: 'number', unit: 'ms'},
 }
+
+const fieldConfiguration : { [index:string]: { label: string, unit: string, fractionDigits?: number }} = {
+  'navigation.speedOverGround': { label: 'SOG', unit: 'knots' },
+  'navigation.courseOverGround': { label: 'COG', fractionDigits: 0, unit: 'deg' },
+  'navigation.headingMagnetic': { label: 'HDGm', fractionDigits: 0, unit: 'deg' },
+  'navigation.headingTrue': { label: 'HDGt', fractionDigits: 0, unit: 'deg' },
+  'navigation.speedThroughWater': { label: 'BSP', unit: 'knots' },
+  'environment.wind.angleTrueGround': { label: 'TWA', fractionDigits: 0, unit: 'deg' },
+  'environment.wind.angleApparent': { label: 'AWA', fractionDigits: 0, unit: 'deg' },
+  'environment.wind.speedOverGround': { label: 'TWS', unit: 'knots' },
+  'environment.wind.speedApparent': { label: 'AWS', unit: 'knots' },
+}
+
+const fieldOrder = [
+  'navigation.speedOverGround', 'navigation.courseOverGround',
+  'navigation.speedThroughWater', 'navigation.headingTrue',
+  'environment.wind.speedApparent', 'environment.wind.angleApparent',
+  'environment.wind.speedOverGround', 'environment.wind.angleTrueGround'
+]
 
 export interface DataPanelProps {
   selection: TimeSelection
@@ -28,12 +58,34 @@ export default function DataPanel(props : DataPanelProps) {
   const availableFields = props.dataProvider.getAvailableValues()
   const values = props.dataProvider.getValuesAtTime(props.selection.getCenter())
 
-  const shownFields = availableFields.filter(x => x in fieldConfiguration)
+  // Convert unit to a format appropriate for display
+  Object.keys(values).map(path => {
+    if (path in signalKSchema && path in fieldConfiguration) {
+      if (signalKSchema[path].type === 'number' && typeof values[path] === 'number') {
+        values[path] = utils.transform(values[path] as number, signalKSchema[path].unit, fieldConfiguration[path].unit)
+      }
+      if ((signalKSchema[path].type === 'angle'||signalKSchema[path].type === 'direction')
+          && typeof values[path] === 'number') {
+        values[path] = utils.transform(values[path] as number, signalKSchema[path].unit, fieldConfiguration[path].unit)
 
-  const panelItems = shownFields.sort().map( (key) => (
+        if (signalKSchema[path].type === 'direction') {
+          values[path] = (values[path] as number + 360)%360
+        }
+      }
+    }
+  })
+
+  // Show ordered fields first and then anything else we have.
+  let shownFields = fieldOrder.filter(x => availableFields.includes(x) && x in fieldConfiguration)
+  console.log("filtered shownFields: ", shownFields)
+
+  shownFields = shownFields.concat(availableFields.filter(x => !fieldOrder.includes(x) && x in fieldConfiguration))
+
+  console.log(`shownFields: ${shownFields}`)
+  const panelItems = shownFields.map( (path) => (
     <DataPanelItem
-      key={ key } value={values[key]}
-      { ...fieldConfiguration[key] }
+      key={ path } value={values[path]}
+      { ...fieldConfiguration[path] }
     />
   ))
 
