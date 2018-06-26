@@ -1,100 +1,96 @@
 import * as React from 'react';
 import { isNullOrUndefined, isNumber } from 'util';
 
-import { Segment, SKValues } from '../model/Trip'
+import { SKValueType } from '@aldis/strongly-signalk';
+
+import TimeSelection from '../model/TimeSelection';
+import TripDataProvider from '../model/TripDataProvider';
 
 import './DataPanel.css'
 
-const alwaysOnFields = ['Sog', 'Cog', 'Twa', 'Tws', 'Awa', 'Aws']
-const hiddenFields = ['time', 'coordinates', 'previousCoordinates']
-const fieldConfiguration : { [index:string]: { 'unit'?: string, fractionDigits?: number }} = {
-  'Sog': { unit: 'kts' },
-  'Bsp': { unit: 'kts' },
-  'Twa': { fractionDigits: 0, unit: 'kts' },
-  'Cog': { fractionDigits: 0 },
-  'Awa': { fractionDigits: 0 }
+const fieldConfiguration : { [index:string]: { label: string, unit?: string, fractionDigits?: number }} = {
+  'navigation.speedOverGround': { label: 'SOG', unit: 'kts' },
+  'navigation.speedThroughWater': { label: 'BSP', unit: 'kts' },
+  'environment.wind.angleTrueGround': { label: 'TWA', fractionDigits: 0, unit: 'kts' },
+  'navigation.courseOverGround': { label: 'COG', fractionDigits: 0, unit: 'deg' },
+  'environment.wind.angleApparent': { label: 'AWA', fractionDigits: 0, unit: 'deg' },
+  'environment.wind.speedOverGround': { label: 'TWS', unit: 'kts' },
+  'environment.wind.speedApparent': { label: 'AWS', unit: 'kts' },
 }
+
 export interface DataPanelProps {
-  segment: Segment | null
+  selection: TimeSelection
+  dataProvider: TripDataProvider
+  hoveringMode: boolean
 }
 
 export default function DataPanel(props : DataPanelProps) {
-  const segment = props.segment
-  const emptyValues : { [index:string]: number } = {}
-  const values : SKValues = segment ? segment.values : emptyValues
+  const availableFields = props.dataProvider.getAvailableValues()
+  const values = props.dataProvider.getValuesAtTime(props.selection.getCenter())
 
-  // Make sure default fields appear - with null by default
-  alwaysOnFields.forEach(key => {
-    if (! (key in values)) {
-      values[key] = null
-    }
-  })
+  const shownFields = availableFields.filter(x => x in fieldConfiguration)
 
-  const alwaysOnItems = alwaysOnFields.reduce( (p : JSX.Element[], key) => {
-    p.push(
-      <DataPanelItem
-        key={ key }
-        data={ key }
-        unit="-"
-        value={values[key]}
-        { ...(key in fieldConfiguration ? fieldConfiguration[key] : {}) }
-      />
-    )
-    return p
-  }, [])
-
-  const otherPanelItems = Object.keys(values).sort().reduce( (p : JSX.Element[], key) => {
-    if (!alwaysOnFields.includes(key) && !hiddenFields.includes(key)) {
-      p.push(
-        <DataPanelItem
-          key={ key } data={ key } unit="-" value={values[key]}
-          { ...(key in fieldConfiguration ? fieldConfiguration[key] : {}) }
-        />
-      )
-    }
-    return p
-  }, [])
+  const panelItems = shownFields.sort().map( (key) => (
+    <DataPanelItem
+      key={ key } value={values[key]}
+      { ...fieldConfiguration[key] }
+    />
+  ))
 
   return (
     <div className="data-window">
-      <DataPanelGrid>
-        <DataPanelItem data="Time" unit="Locale" value={segment ? segment.end.time : '-' } type="date" large={true} />
-        { alwaysOnItems }
-        { otherPanelItems }
-      </DataPanelGrid>
+      <div className="data-panel">
+        <DataPanelItem label="Time" unit="Locale" value={ props.selection.getCenter() } large={true} />
+        { panelItems }
+      </div>
     </div>
   );
 }
 
-export function DataPanelGrid(props : any) {
-  return (
-    <div className="data-panel">
-      {props.children}
-    </div>
-  )
+interface DataPanelItemProps {
+  /**
+   * Make this a wider field.
+   */
+  large?: boolean
+
+  /**
+   * Label to show next to the value.
+   */
+  label: string
+
+  /**
+   * The unit to display next to the value.
+   */
+  unit?: string
+
+  /**
+   * The actual value to show.
+   */
+  value: SKValueType
+
+  /**
+   * How many digits to show on a number.
+   */
+  fractionDigits?: number
 }
 
-export function DataPanelItem(props : any) {
-  let value = props.value;
-  let unit = props.unit;
-  const data = props.data;
-
+export function DataPanelItem({label, value, unit, fractionDigits, large} : DataPanelItemProps) {
   if (value instanceof Date) {
-    value = props.value.toLocaleTimeString();
+    value = value.toLocaleTimeString();
     unit = new Date().toLocaleTimeString('en-us',{timeZoneName:'short'}).split(' ')[2];
   }
   else if (isNumber(value)) {
-    const fractionDigits = 'fractionDigits' in props ? props.fractionDigits : 1;
-    value = props.value.toFixed(fractionDigits);
-  }
-  else {
-    if (isNullOrUndefined(value)) {
-      value = "-";
+    if (isNullOrUndefined(fractionDigits)) {
+      fractionDigits = 1
     }
+    value = value.toFixed(fractionDigits);
+  }
+  else if (isNullOrUndefined(value)) {
+    value = "-";
   }
   return (
-    <div className={ props.large ? "data-panel-item data-panel-item-large" : "data-panel-item" }>
-      <span className="data">{data}</span>
+    <div className={ large ? "data-panel-item data-panel-item-large" : "data-panel-item" }>
+      <span className="data">{label}</span>
       <span className="value">{value}</span>
       <span className="unit">{unit}</span>
     </div>

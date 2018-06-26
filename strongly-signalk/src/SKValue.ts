@@ -5,7 +5,7 @@ import { SKPosition } from "./SKPosition";
  */
 export type Timestamp = string
 
-export type SKValueType = number|string|SKPosition
+export type SKValueType = number|string|SKPosition|Date
 
 export interface SKValueJSON {
   path: string

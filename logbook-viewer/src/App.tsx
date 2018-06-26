@@ -1,12 +1,15 @@
-import * as Papa from 'papaparse'
+import {CSVLoader} from '@aldis/babel-signalk'
+import { SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
-import ReactMapGL from 'react-map-gl';
+import ReactMapGL, { FlyToInterpolator } from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 
 import DataPanel from './components/DataPanel';
-import DeckGLOverlay from './components/DeckGLOverlay';
 import TimePanel from './components/TimePanel';
-import Trip, { GPSCoordinates, Segment } from './model/Trip'
+import TripOverlay from './components/TripOverlay';
+import InteractiveTrip from './model/InteractiveTrip';
+import { SKDeltaDataProvider } from './model/SKDeltaDataProvider';
+import TimeSelection from './model/TimeSelection';
 
 import './App.css'
 import SAMPLE_DATA_SFTRIP from './sample-data/expedition-sanfrancisco.csv'
@@ -26,8 +29,7 @@ export interface AppProps {
 
 export interface AppState {
   viewport : any
-  trip : Trip|null,
-  selectedSegment: Segment | null,
+  trip: InteractiveTrip|null,
   hoveredObject?: any
 }
 
@@ -36,7 +38,6 @@ export default class App extends React.Component<AppProps, AppState> {
     super(props);
 
     this.state = {
-      selectedSegment: null,
       trip: null,
       viewport: {
         height: window.innerHeight,
@@ -53,13 +54,18 @@ export default class App extends React.Component<AppProps, AppState> {
   public render() {
     return (
       <div>
-        <DataPanel segment={this.state.hoveredObject ? this.state.hoveredObject : this.state.selectedSegment} />
+        {this.state.trip &&
+          <DataPanel
+            dataProvider={ this.state.trip.getDataProvider() }
+            hoveringMode={ this.state.hoveredObject ? true : false }
+            selection={ this.state.trip.getSelection() } />
+        }
         {this.state.trip &&
           <TimePanel
             endTime={ this.state.trip.getEndTime() }
             startTime={ this.state.trip.getStartTime() }
             // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
-            selectedTime={ this.state.selectedSegment ? this.state.selectedSegment.start.time : this.state.trip.segments[0].start.time }
+            selectedTime={ this.state.trip.getSelection().getCenter() }
             onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
           />
         }
@@ -70,7 +76,7 @@ export default class App extends React.Component<AppProps, AppState> {
           mapboxApiAccessToken={MAPBOX_TOKEN}
           onViewportChange={viewport => this._onViewportChange(viewport)}
         >
-          <DeckGLOverlay
+          <TripOverlay
             viewport={this.state.viewport}
             trip={this.state.trip != null ? this.state.trip : undefined }
             onHover={(hover : any) => this._onHover(hover)}
@@ -113,45 +119,33 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   public _processData() {
-    let trip : Trip|null = null
-
     const dataUrl = window.location.origin + SAMPLE_DATA_SFTRIP
-    Papa.parse(dataUrl, {
-      header: true,
-      download: true,
-      complete: (parseResult) => {
-        if (parseResult.errors.length > 0) {
-          console.log("CSV parser threw errors:", parseResult.errors)
-        }
-        if (parseResult.data) {
-          trip = Trip.fromExpeditionData(parseResult.data)
-          if (trip && trip.segments.length > 0) {
-            const viewport = {
-              ...this.state.viewport,
-              ...this._calculateViewportForPoints(trip.getBoundingCoordinates()!),
-              /*
-              transitionDuration: 1000,
-              transitionInterpolator: new FlyToInterpolator(),
-              transitionEasing: easeCubic*/
-            };
-            this.setState({viewport, trip});
-          }
-          else {
-            console.log("setting state.trip - with no data");
-            this.setState({trip});
-          }
-        }
+
+    CSVLoader.fromURL(dataUrl).then(delta => {
+      const trip = new InteractiveTrip(delta, new SKDeltaDataProvider(delta))
+
+      const viewport = {
+        ...this.state.viewport,
+        ...this._calculateViewportBounding(trip.getBounds()),
+        transitionDuration: 1000,
+        transitionInterpolator: new FlyToInterpolator(),
+        /*transitionEasing: easeCubic*/
       }
+      this.setState({viewport, trip})
+    })
+    .catch(error => {
+      console.log("Unable to log trip", error)
+      this.setState({trip: null})
     })
   }
 
-  private _calculateViewportForPoints(bc:[GPSCoordinates, GPSCoordinates]) {
+  private _calculateViewportBounding(boundingPositions: [SKPosition, SKPosition]) {
     const newViewport = new WebMercatorViewport({
       ...this.state.viewport
     });
 
     const bounds = newViewport.fitBounds(
-      [bc[0], bc[1]],
+      [boundingPositions[0].asArray(), boundingPositions[1].asArray()],
       {padding: {left: 230 + 20, top: 20, bottom: 20, right: 20}}
     );
     return bounds;
@@ -162,15 +156,9 @@ export default class App extends React.Component<AppProps, AppState> {
    * @param t new time selected
    */
   private _onSelectedTimeChange(t : Date) {
-    console.log("time changed to ", t)
-    if (this.state.trip === null) {
-      this.setState({selectedSegment: null})
-    }
-    else {
-      const s = this.state.trip.getSegmentAtTime(t)
-      if (s) {
-        this.setState({selectedSegment: s})
-      }
+    if (this.state.trip) {
+      this.state.trip.setSelection(new TimeSelection(t))
+      this.setState({trip: this.state.trip})
     }
   }
 

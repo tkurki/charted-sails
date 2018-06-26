@@ -49,6 +49,8 @@ it('can extract info from super small delta', () => {
     {'latitude': 42, 'longitude': -122},
     {'latitude': 42, 'longitude': -122}
   ])
+  // Make sure it actually returns an SKPosition object
+  expect(SignalKTripAnalyzer.getBounds(skdelta)![0]).toHaveProperty('asArray')
 })
 
 it('can extract bounds from trip with multiple points', () => {

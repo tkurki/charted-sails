@@ -43,8 +43,8 @@ export class SignalKTripAnalyzer {
     if (points.length < 1)
       return null
 
-    const nwPoint = Object.assign({}, points[0])
-    const sePoint = Object.assign({}, points[0])
+    const nwPoint = new SKPosition(points[0].latitude, points[0].longitude)
+    const sePoint = new SKPosition(points[0].latitude, points[0].longitude)
 
     points.forEach(point => {
       // West most longitude

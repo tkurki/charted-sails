@@ -11,7 +11,8 @@
     "jsx": "react",
     "moduleResolution": "node",
     "rootDir": "src",
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "exclude": [
     "node_modules",

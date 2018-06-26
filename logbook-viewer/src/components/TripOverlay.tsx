@@ -1,14 +1,14 @@
 import DeckGL, { LineLayer } from 'deck.gl';
 import * as React from 'react';
-import Trip, { Segment } from '../model/Trip';
+import InteractiveTrip, { InteractiveTripSegment } from '../model/InteractiveTrip';
 
-export interface DeckGLOverlayProps {
+export interface TripOverlayProps {
   onHover?: (info:any) => void,
-  trip?: Trip,
+  trip?: InteractiveTrip,
   viewport: any
 }
 
-export default class DeckGLOverlay extends React.Component<DeckGLOverlayProps> {
+export default class TripOverlay extends React.Component<TripOverlayProps> {
   public render() {
     if (!this.props.trip) {
       return null;
@@ -17,11 +17,11 @@ export default class DeckGLOverlay extends React.Component<DeckGLOverlayProps> {
     const layers = [
       new LineLayer({
         autoHighlight: true,
-        data: this.props.trip.segments.slice(1),
+        data: this.props.trip.getPathSegments(),
         getColor: () => [30, 150, 100],
-        getSourcePosition: (segment : Segment) => segment.start.coordinates,
+        getSourcePosition: (segment : InteractiveTripSegment) => segment.startPosition.asArray(),
         getStrokeWidth: 5,
-        getTargetPosition: (segment : Segment) => segment.end.coordinates,
+        getTargetPosition: (segment : InteractiveTripSegment) => segment.endPosition.asArray(),
         highlightColor: [200, 150, 100, 200],
         id: 'line-layer',
         pickable: true
