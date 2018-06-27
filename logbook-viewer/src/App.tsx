@@ -30,6 +30,7 @@ export interface AppProps {
 
 export interface AppState {
   animating: boolean
+  animationTarget: number
   viewport : any
   trip: InteractiveTrip|null,
   hoveredObject?: any
@@ -43,6 +44,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
     this.state = {
       animating: true,
+      animationTarget: 0,
       trip: null,
       viewport: {
         height: window.innerHeight,
@@ -64,6 +66,10 @@ export default class App extends React.Component<AppProps, AppState> {
   public render() {
     return (
       <div>
+        {this.state.trip &&
+          <button type="button" className="pt-button pt-minimal pt-icon-globe close-button"
+            onClick={ () => this.onCloseTrip() } />
+        }
         {this.state.trip &&
           <DataPanel
             dataProvider={ this.state.trip.getDataProvider() }
@@ -155,7 +161,7 @@ export default class App extends React.Component<AppProps, AppState> {
       this.setState({viewport, trip, animating: false})
     })
     .catch(error => {
-      console.log("Unable to log trip", error)
+      console.log("Unable to load trip", error)
       this.setState({trip: null})
     })
     console.log(`Trip selected: ${t}`)
@@ -163,18 +169,30 @@ export default class App extends React.Component<AppProps, AppState> {
 
   private animateMap() {
     if (this.state.animating) {
+      const newTarget = (this.state.animationTarget + 1) % sampleDataTripOverviews.length
       this.setState({
         viewport: {
           ...this.state.viewport,
-          longitude: this.state.viewport.longitude + Math.random() * 30 + 30,
-          latitude: Math.random() * 70 -35,
-          zoom: Math.random() * 3 + 2,
+          longitude: sampleDataTripOverviews[newTarget].path[0][0],
+          latitude: sampleDataTripOverviews[newTarget].path[0][1],
+          zoom: 3,
           transitionInterpolator: new FlyToInterpolator(),
           transitionDuration: 3000
-        }
+        },
+        animationTarget: newTarget
       })
-      setTimeout(x => this.animateMap(), 3000)
+      if (newTarget !== 0) {
+        // Only animate to all points once and then stop.
+        setTimeout(x => this.animateMap(), 3000)
+      }
     }
+  }
+
+  private onCloseTrip() {
+    this.setState({trip: null, animating: true, animationTarget: 0})
+    setImmediate(() => {
+      this.animateMap()
+    })
   }
 
   private _calculateViewportBounding(boundingPositions: [SKPosition, SKPosition]) {

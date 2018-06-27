@@ -77,11 +77,9 @@ export default function DataPanel(props : DataPanelProps) {
 
   // Show ordered fields first and then anything else we have.
   let shownFields = fieldOrder.filter(x => availableFields.includes(x) && x in fieldConfiguration)
-  console.log("filtered shownFields: ", shownFields)
 
   shownFields = shownFields.concat(availableFields.filter(x => !fieldOrder.includes(x) && x in fieldConfiguration))
 
-  console.log(`shownFields: ${shownFields}`)
   const panelItems = shownFields.map( (path) => (
     <DataPanelItem
       key={ path } value={values[path]}

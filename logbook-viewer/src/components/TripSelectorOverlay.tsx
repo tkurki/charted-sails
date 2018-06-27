@@ -12,7 +12,6 @@ export interface TripSelectorOverlayProps {
 
 export default class TripSelectorOverlay extends React.Component<TripSelectorOverlayProps> {
   public render() {
-    console.log("rendering selector overlay", this.props.tripOverviews)
     const layers = [
       new PathLayer({
         autoHighlight: true,
