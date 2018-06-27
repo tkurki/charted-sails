@@ -4,5 +4,7 @@ declare module '@signalk/nmea0183-utilities' {
 
 declare module 'jest-matcher-deep-close-to'
 
+declare module 'simplify-path'
+
 // Allows us to load our package.json
 declare module "*.json"
