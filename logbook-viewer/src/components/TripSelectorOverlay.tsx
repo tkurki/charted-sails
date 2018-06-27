@@ -1,5 +1,5 @@
-import { SKPosition } from '@aldis/strongly-signalk';
 import DeckGL, { PathLayer } from 'deck.gl'
+import * as moment from 'moment'
 import * as React from 'react'
 import { Marker } from 'react-map-gl';
 import { TripOverview } from '../model/TripOverview'
@@ -20,7 +20,7 @@ export default class TripSelectorOverlay extends React.Component<TripSelectorOve
         pickable: true,
         widthScale: 20,
         widthMinPixels: 3,
-        getPath: (d:TripOverview) => d.path.map((point:SKPosition) => point.asArray()),
+        getPath: (d:TripOverview) => d.path,
         getColor: () => [30, 150, 100],
         highlightColor: [200, 150, 100, 200],
         id: 'path-layer'
@@ -32,9 +32,18 @@ export default class TripSelectorOverlay extends React.Component<TripSelectorOve
       if (trip.path.length > 0) {
         overviewMarkers.push(<Marker
           key={index}
-          latitude={trip.path[0].latitude}
-          longitude={trip.path[0].longitude}>
-          <div>{trip.label}</div>
+          latitude={trip.path[0][1]}
+          longitude={trip.path[0][0]}
+          >
+          <div className="pt-card pt-elevation-2" >
+            <a onClick={ () => this.props.onTripOverviewSelected(trip) }>{trip.label}</a>
+            <div>
+              { moment(trip.startTime).calendar() } - { moment(trip.startTime).from(trip.endTime, true)}
+            </div>
+            <div>
+              {trip.description}
+            </div>
+          </div>
         </Marker>)
       }
     })

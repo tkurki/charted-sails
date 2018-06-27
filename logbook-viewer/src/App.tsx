@@ -1,4 +1,3 @@
-import {CSVLoader} from '@aldis/babel-signalk'
 import { SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
 import ReactMapGL, { FlyToInterpolator } from 'react-map-gl';
@@ -15,11 +14,7 @@ import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
 
 import './App.css'
-
-import SAMPLE_DATA_AUCKLAND from './sample-data/expedition-auckland.csv'
-import SAMPLE_DATA_SF from './sample-data/expedition-sanfrancisco.csv'
-import SAMPLE_DATA_SOLENT from './sample-data/expedition-solent.csv'
-import SAMPLE_DATA_VALENCIA from './sample-data/expedition-valencia.csv'
+import { sampleDataTripOverviews } from './sample-data/SampleData';
 
 // const MAPBOX_STYLE = 'mapbox://styles/mapbox/dark-v9';
 const MAPBOX_STYLE = 'mapbox://styles/sarfata/cjhz42qo83ycz2rpn6f1smby1'
@@ -29,49 +24,6 @@ if (!MAPBOX_TOKEN) {
   alert('The mapbox token is not defined.');
 }
 
-const tripOverviews : TripOverview[] = [
-  {
-    label: 'Expedition - San Francisco',
-    startTime: new Date("19790401T091012Z"),
-    endTime: new Date("19790401T091013Z"),
-    path: [
-      new SKPosition(37.806633,-122.445967),
-      new SKPosition(37.8197,-122.4053),
-      new SKPosition(37.806467,-122.445767)
-    ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_SF)
-  },
-  {
-    label: 'Expedition - Valencia',
-    startTime: new Date("19790403T091012Z"),
-    endTime: new Date("19790411T091012Z"),
-    path: [
-      new SKPosition(39.400246,-0.299097),
-      new SKPosition(39.378036,-0.281803)
-    ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_VALENCIA)
-  },
-  {
-    label: 'Expedition - Auckland',
-    startTime: new Date("19790403T091012Z"),
-    endTime: new Date("19790411T091012Z"),
-    path: [
-      new SKPosition(-36.731609,174.904436),
-      new SKPosition(-36.81844,174.853202)
-    ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_AUCKLAND)
-  },
-  {
-    label: 'Expedition - Solent',
-    startTime: new Date("19790403T091012Z"),
-    endTime: new Date("19790411T091012Z"),
-    path: [
-      new SKPosition(50.76229,-1.36405),
-      new SKPosition(50.767278,-1.350746)
-    ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_SOLENT)
-  }
-]
 // tslint:disable-next-line:no-empty-interface
 export interface AppProps {
 }
@@ -144,7 +96,7 @@ export default class App extends React.Component<AppProps, AppState> {
           }
           {!this.state.trip &&
             <TripSelectorOverlay
-              tripOverviews={tripOverviews}
+              tripOverviews={sampleDataTripOverviews}
               viewport={this.state.viewport}
               onTripOverviewSelected={x => this.tripOverviewSelected(x) }
             />

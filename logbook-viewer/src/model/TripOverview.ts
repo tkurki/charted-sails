@@ -1,7 +1,7 @@
-import { SKDelta, SKPosition } from "@aldis/strongly-signalk";
+import { SKDelta } from "@aldis/strongly-signalk";
 
 export interface TripOverview {
-  path: SKPosition[]
+  path: Array<[number, number]>
   label: string
   description?: string
   startTime: Date
