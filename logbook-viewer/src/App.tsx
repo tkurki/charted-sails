@@ -96,7 +96,7 @@ export default class App extends React.Component<AppProps, AppState> {
           {this.state.trip &&
             <TripOverlay
               viewport={this.state.viewport}
-              trip={this.state.trip != null ? this.state.trip : undefined }
+              trip={this.state.trip}
               onHover={(hover : any) => this._onHover(hover)}
             />
           }
