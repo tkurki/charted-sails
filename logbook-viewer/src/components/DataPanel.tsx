@@ -57,19 +57,21 @@ export interface DataPanelProps {
 export default function DataPanel(props : DataPanelProps) {
   const availableFields = props.dataProvider.getAvailableValues()
   const values = props.dataProvider.getValuesAtTime(props.selection.getCenter())
+  const convertedValues : { [path:string]: SKValueType } = {}
 
   // Convert unit to a format appropriate for display
   Object.keys(values).map(path => {
     if (path in signalKSchema && path in fieldConfiguration) {
+      convertedValues[path] = values[path]
       if (signalKSchema[path].type === 'number' && typeof values[path] === 'number') {
-        values[path] = utils.transform(values[path] as number, signalKSchema[path].unit, fieldConfiguration[path].unit)
+        convertedValues[path] = utils.transform(values[path] as number, signalKSchema[path].unit, fieldConfiguration[path].unit)
       }
       if ((signalKSchema[path].type === 'angle'||signalKSchema[path].type === 'direction')
           && typeof values[path] === 'number') {
-        values[path] = utils.transform(values[path] as number, signalKSchema[path].unit, fieldConfiguration[path].unit)
+            convertedValues[path] = utils.transform(values[path] as number, signalKSchema[path].unit, fieldConfiguration[path].unit)
 
         if (signalKSchema[path].type === 'direction') {
-          values[path] = (values[path] as number + 360)%360
+          convertedValues[path] = (values[path] as number + 360)%360
         }
       }
     }
@@ -82,7 +84,7 @@ export default function DataPanel(props : DataPanelProps) {
 
   const panelItems = shownFields.map( (path) => (
     <DataPanelItem
-      key={ path } value={values[path]}
+      key={ path } value={convertedValues[path]}
       { ...fieldConfiguration[path] }
     />
   ))

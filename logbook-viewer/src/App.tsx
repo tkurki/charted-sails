@@ -8,6 +8,7 @@ import MyMapControls from './components/MyMapControls';
 import TimePanel from './components/TimePanel';
 import TripOverlay from './components/TripOverlay';
 import TripSelectorOverlay from './components/TripSelectorOverlay';
+import { CachingDataProvider } from './model/CachingDataProvider';
 import InteractiveTrip from './model/InteractiveTrip';
 import { SKDeltaDataProvider } from './model/SKDeltaDataProvider';
 import TimeSelection from './model/TimeSelection';
@@ -149,7 +150,8 @@ export default class App extends React.Component<AppProps, AppState> {
 
   private tripOverviewSelected(t: TripOverview) {
     t.getSKDelta().then(delta => {
-      const trip = new InteractiveTrip(delta, new SKDeltaDataProvider(delta))
+      const provider = new CachingDataProvider(new SKDeltaDataProvider(delta), 500)
+      const trip = new InteractiveTrip(delta, provider)
 
       const viewport = {
         ...this.state.viewport,
