@@ -18,8 +18,7 @@ import aldisLogo from './aldis-logo.png'
 import './App.css'
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
-// const MAPBOX_STYLE = 'mapbox://styles/mapbox/dark-v9';
-const MAPBOX_STYLE = 'mapbox://styles/sarfata/cjhz42qo83ycz2rpn6f1smby1'
+const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2FyZmF0YSIsImEiOiJjamh6NDFpdXMwdGRoM3FvMWp4bXc3bnAzIn0.29zQaAsB4kd3s2QABMkA3Q'
 
 if (!MAPBOX_TOKEN) {
@@ -67,7 +66,7 @@ export default class App extends React.Component<AppProps, AppState> {
         <img className="aldisLogo" src={aldisLogo} />
 
         {this.state.trip &&
-          <button type="button" className="pt-button pt-minimal pt-icon-globe close-button"
+          <button type="button" className="pt-button pt-minimal pt-icon-cross close-button"
             onClick={ () => this.onCloseTrip() } />
         }
         {this.state.trip &&
@@ -155,7 +154,7 @@ export default class App extends React.Component<AppProps, AppState> {
       const viewport = {
         ...this.state.viewport,
         ...this._calculateViewportBounding(trip.getBounds()),
-        transitionDuration: 1000,
+        transitionDuration: 3000,
         transitionInterpolator: new FlyToInterpolator(),
         /*transitionEasing: easeCubic*/
       }
