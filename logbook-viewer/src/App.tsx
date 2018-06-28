@@ -14,6 +14,7 @@ import { SKDeltaDataProvider } from './model/SKDeltaDataProvider';
 import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
 
+import aldisLogo from './aldis-logo.png'
 import './App.css'
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
@@ -30,8 +31,6 @@ export interface AppProps {
 }
 
 export interface AppState {
-  animating: boolean
-  animationTarget: number
   viewport : any
   trip: InteractiveTrip|null,
   hoveredObject?: any
@@ -44,22 +43,20 @@ export default class App extends React.Component<AppProps, AppState> {
     super(props);
 
     this.state = {
-      animating: true,
-      animationTarget: 0,
       trip: null,
       viewport: {
         height: window.innerHeight,
         width: window.innerWidth,
-        longitude: -130.4,
-        latitude: 37.8,
-        zoom: 1,
-        maxZoom: 16
+        longitude: 0,
+        latitude: 0,
+        zoom: 0,
+        maxZoom: 32
       }
     }
     this._resize = this._resize.bind(this);
 
     this.mapControls.setOptions({ onUserInteraction: () => {
-        this.setState({ animating: false })
+        this.setState({})
       }
     })
   }
@@ -67,6 +64,8 @@ export default class App extends React.Component<AppProps, AppState> {
   public render() {
     return (
       <div>
+        <img className="aldisLogo" src={aldisLogo} />
+
         {this.state.trip &&
           <button type="button" className="pt-button pt-minimal pt-icon-globe close-button"
             onClick={ () => this.onCloseTrip() } />
@@ -160,7 +159,7 @@ export default class App extends React.Component<AppProps, AppState> {
         transitionInterpolator: new FlyToInterpolator(),
         /*transitionEasing: easeCubic*/
       }
-      this.setState({viewport, trip, animating: false})
+      this.setState({viewport, trip})
     })
     .catch(error => {
       console.log("Unable to load trip", error)
@@ -170,28 +169,20 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   private animateMap() {
-    if (this.state.animating) {
-      const newTarget = (this.state.animationTarget + 1) % sampleDataTripOverviews.length
-      this.setState({
-        viewport: {
-          ...this.state.viewport,
-          longitude: sampleDataTripOverviews[newTarget].path[0][0],
-          latitude: sampleDataTripOverviews[newTarget].path[0][1],
-          zoom: 3,
-          transitionInterpolator: new FlyToInterpolator(),
-          transitionDuration: 3000
-        },
-        animationTarget: newTarget
-      })
-      if (newTarget !== 0) {
-        // Only animate to all points once and then stop.
-        setTimeout(x => this.animateMap(), 3000)
+    this.setState({
+      viewport: {
+        ...this.state.viewport,
+        longitude: sampleDataTripOverviews[0].path[0][0],
+        latitude: sampleDataTripOverviews[0].path[0][1],
+        zoom: 1,
+        transitionInterpolator: new FlyToInterpolator(),
+        transitionDuration: 3000
       }
-    }
+    })
   }
 
   private onCloseTrip() {
-    this.setState({trip: null, animating: true, animationTarget: 0})
+    this.setState({trip: null})
     setImmediate(() => {
       this.animateMap()
     })
