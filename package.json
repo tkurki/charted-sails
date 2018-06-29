@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
     "test": "yarn run jest"
   },
   "workspaces": [
