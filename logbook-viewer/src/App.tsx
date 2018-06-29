@@ -14,8 +14,6 @@ import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
-
-
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2FyZmF0YSIsImEiOiJjamh6NDFpdXMwdGRoM3FvMWp4bXc3bnAzIn0.29zQaAsB4kd3s2QABMkA3Q'
 
@@ -146,8 +144,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
   private tripOverviewSelected(t: TripOverview) {
     t.getSKDelta().then(delta => {
-      const provider = new CachingDataProvider(new SKDeltaDataProvider(delta), 1000)
-      //const provider = new BetterDataProvider(delta)
+      const provider = new BetterDataProvider(delta)
       const trip = new InteractiveTrip(delta, provider)
 
       // Initialize the cache.
