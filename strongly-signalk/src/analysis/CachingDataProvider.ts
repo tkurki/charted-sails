@@ -1,5 +1,5 @@
-import { SKValueType } from "@aldis/strongly-signalk";
-import TripDataProvider from "./TripDataProvider";
+import { TripDataProvider } from "./TripDataProvider";
+import { SKValueType } from "../model";
 
 export class CachingDataProvider implements TripDataProvider {
   private dataProvider: TripDataProvider

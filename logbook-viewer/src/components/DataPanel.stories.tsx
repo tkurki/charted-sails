@@ -1,12 +1,13 @@
+
+import { TripDataProvider } from '@aldis/strongly-signalk';
+import { number, withKnobs } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
-import DataPanel from './DataPanel'
-
-import { number, withKnobs } from '@storybook/addon-knobs';
-
-import '../index.css'
+import '../index.css';
 import TimeSelection from '../model/TimeSelection';
-import TripDataProvider from '../model/TripDataProvider';
+import DataPanel from './DataPanel';
+
+
 
 const stories = storiesOf('Components/DataPanel', module)
 stories.addDecorator(withKnobs)

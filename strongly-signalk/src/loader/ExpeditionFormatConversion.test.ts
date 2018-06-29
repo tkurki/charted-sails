@@ -1,8 +1,8 @@
 import { ExpeditionFormatConversion } from './ExpeditionFormatConversion'
 import * as utils from '@signalk/nmea0183-utilities'
-import { SKValue } from '@aldis/strongly-signalk';
 import { columnConvertersForLine } from './CSVConversion';
 import {toBeDeepCloseTo,toMatchCloseTo} from 'jest-matcher-deep-close-to';
+import { SKValue } from '../model';
 
 // This little dance is needed to avoid Typescript errors when adding new matchers.
 // Thanks to: https://github.com/kentcdodds/react-testing-library/issues/36

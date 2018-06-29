@@ -1,5 +1,5 @@
-import { SKDelta } from "@aldis/strongly-signalk";
 import { SKDeltaDataProvider } from "./SKDeltaDataProvider";
+import { SKDelta } from "../model";
 
 describe('getAvailableValues()', () => {
   it('with one update and one path', () => {

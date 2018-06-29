@@ -1,7 +1,5 @@
-import {SignalKTripAnalyzer} from '@aldis/signalk-analysis'
-import { SKDelta, SKPosition } from '@aldis/strongly-signalk';
-import TimeSelection from './TimeSelection'
-import TripDataProvider from './TripDataProvider';
+import { SignalKTripAnalyzer, SKDelta, SKPosition, TripDataProvider } from '@aldis/strongly-signalk';
+import TimeSelection from './TimeSelection';
 
 export interface InteractiveTripSegment {
   startPosition: SKPosition

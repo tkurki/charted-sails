@@ -1,6 +1,5 @@
-import { SKDelta } from "@aldis/strongly-signalk";
+import { SKDelta, TripDataProvider } from "@aldis/strongly-signalk";
 import InteractiveTrip from "./InteractiveTrip";
-import TripDataProvider from "./TripDataProvider";
 
 const mockDataProvider : TripDataProvider = {
   getAvailableValues: () => [],

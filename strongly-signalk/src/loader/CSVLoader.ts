@@ -1,8 +1,8 @@
-import { SKDelta, SKUpdate, SKSource } from '@aldis/strongly-signalk'
 import * as Papa from 'papaparse';
 import { ExpeditionFormatConversion } from './ExpeditionFormatConversion';
 import { isNull } from 'util';
 import { CSVConversion, columnConvertersForLine } from './CSVConversion';
+import { SKDelta, SKSource, SKUpdate } from '../model';
 
 export interface CSVConversionOption {
   /**

@@ -1,5 +1,4 @@
-import { SKValue } from "@aldis/strongly-signalk";
-
+import { SKValue } from "../model";
 
 /**
  * Type of a function that can extract a timestamp from a line of the logfile.

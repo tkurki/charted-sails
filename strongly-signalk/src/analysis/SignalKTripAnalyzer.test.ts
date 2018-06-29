@@ -1,4 +1,4 @@
-import { SKDelta } from "@aldis/strongly-signalk";
+import { SKDelta } from "../model/SKDelta";
 import { SignalKTripAnalyzer } from "./SignalKTripAnalyzer";
 
 it(`returns null when there is no data`, () => {

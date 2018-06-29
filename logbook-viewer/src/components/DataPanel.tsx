@@ -1,13 +1,10 @@
-import * as utils from '@signalk/nmea0183-utilities'
+import { SKValueType, TripDataProvider } from '@aldis/strongly-signalk';
+import * as utils from '@signalk/nmea0183-utilities';
 import * as React from 'react';
 import { isNullOrUndefined, isNumber } from 'util';
-
-import { SKValueType } from '@aldis/strongly-signalk';
-
 import TimeSelection from '../model/TimeSelection';
-import TripDataProvider from '../model/TripDataProvider';
+import './DataPanel.css';
 
-import './DataPanel.css'
 
 /**
  * FIXME: This does not belong here but it will do for now.

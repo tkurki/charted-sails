@@ -1,7 +1,8 @@
-import { SignalKTripAnalyzer } from "@aldis/signalk-analysis"
-import { SKDelta,  SKValueType } from "@aldis/strongly-signalk"
+
 import { isNull } from "util"
-import TripDataProvider from "./TripDataProvider"
+import { SignalKTripAnalyzer } from "./SignalKTripAnalyzer"
+import { TripDataProvider } from "./TripDataProvider"
+import { SKValueType, SKDelta } from "../model";
 
 export class SKDeltaDataProvider implements TripDataProvider {
   public static interpolate(path: string, time: Date, timeA: Date, valueA: SKValueType,

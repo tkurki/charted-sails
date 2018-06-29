@@ -1,10 +1,10 @@
-import { CSVLoader } from '@aldis/babel-signalk';
+import { CSVLoader } from '@aldis/strongly-signalk';
 import { TripOverview } from '../model/TripOverview';
+import SAMPLE_DATA_AUCKLAND from './expedition-auckland.csv';
+import SAMPLE_DATA_SF from './expedition-sanfrancisco.csv';
+import SAMPLE_DATA_SOLENT from './expedition-solent.csv';
+import SAMPLE_DATA_VALENCIA from './expedition-valencia.csv';
 
-import SAMPLE_DATA_AUCKLAND from './expedition-auckland.csv'
-import SAMPLE_DATA_SF from './expedition-sanfrancisco.csv'
-import SAMPLE_DATA_SOLENT from './expedition-solent.csv'
-import SAMPLE_DATA_VALENCIA from './expedition-valencia.csv'
 
 export const sampleDataTripOverviews : TripOverview[] = [
   {

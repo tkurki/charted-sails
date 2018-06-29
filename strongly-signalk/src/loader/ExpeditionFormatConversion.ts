@@ -1,7 +1,8 @@
-import { SKValue, SKPosition} from '@aldis/strongly-signalk'
+
 import * as utils from '@signalk/nmea0183-utilities'
 import { CSVConversion, ColumnConverter } from './CSVConversion';
 import { SimpleCSVColumnConversion, SimpleCSVColumnConverter } from './SimpleCSVColumnConverter';
+import { SKValue, SKPosition } from '../model';
 
 const excelStartOfTime = new Date("1900-01-01T00:00:00Z").getTime()
 

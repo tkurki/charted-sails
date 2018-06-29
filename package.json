@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "test": "lerna run test"
+    "test": "yarn run jest"
   },
   "workspaces": [
     "*"
@@ -13,15 +13,5 @@
     "@types/node": "^10.3.3",
     "lerna": "^2.11.0",
     "typescript": "^2.9.2"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "\\.ts$": "ts-jest"
-    },
-    "testRegex": "/src/.*\\.test\\.ts$"
   }
 }

@@ -1,4 +1,4 @@
-import { SKDelta, SKPosition, SKValueType } from "@aldis/strongly-signalk";
+import { SKPosition, SKDelta, SKValueType } from "../model";
 
 /**
  * Exposes a set of functions to look at a SKDelta like a complete trip.

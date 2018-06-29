@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "target": "es2015",
     "module": "commonjs",
     "sourceMap": true,
@@ -9,9 +10,5 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "lib": ["es2016", "dom"]
-  },
-  "exclude": [
-    "node_modules",
-    "*/dist"
-  ]
+  }
 }

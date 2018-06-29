@@ -1,9 +1,9 @@
-import {SignalKTripAnalyzer} from '@aldis/signalk-analysis'
 import * as commander from 'commander'
-import * as pkgInfo from '../package.json'
-import { CSVLoader, CSVConversionOption } from './CSVLoader';
-import { ExpeditionFormatConversion } from './ExpeditionFormatConversion';
+import * as pkgInfo from '../../package.json'
 import { readFileSync } from 'fs';
+import { CSVConversionOption, CSVLoader } from '../loader/CSVLoader';
+import { ExpeditionFormatConversion } from '../loader/ExpeditionFormatConversion';
+import { SignalKTripAnalyzer } from '../analysis/SignalKTripAnalyzer';
 
 let simplify = require('simplify-path')
 
@@ -55,4 +55,8 @@ export function babelSignalKCLI(args: string[]) {
   else {
     commander.outputHelp()
   }
+}
+
+if (require.main === module) {
+  babelSignalKCLI(process.argv)
 }

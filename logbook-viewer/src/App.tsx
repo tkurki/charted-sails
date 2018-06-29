@@ -1,22 +1,20 @@
-import { SKPosition } from '@aldis/strongly-signalk';
+import { BetterDataProvider, SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
 import ReactMapGL, { FlyToInterpolator } from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
-
+import aldisLogo from './aldis-logo.png';
+import './App.css';
 import DataPanel from './components/DataPanel';
 import MyMapControls from './components/MyMapControls';
 import TimePanel from './components/TimePanel';
 import TripOverlay from './components/TripOverlay';
 import TripSelectorOverlay from './components/TripSelectorOverlay';
-import { CachingDataProvider } from './model/CachingDataProvider';
 import InteractiveTrip from './model/InteractiveTrip';
-import { SKDeltaDataProvider } from './model/SKDeltaDataProvider';
 import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
-
-import aldisLogo from './aldis-logo.png'
-import './App.css'
 import { sampleDataTripOverviews } from './sample-data/SampleData';
+
+
 
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2FyZmF0YSIsImEiOiJjamh6NDFpdXMwdGRoM3FvMWp4bXc3bnAzIn0.29zQaAsB4kd3s2QABMkA3Q'
@@ -148,8 +146,16 @@ export default class App extends React.Component<AppProps, AppState> {
 
   private tripOverviewSelected(t: TripOverview) {
     t.getSKDelta().then(delta => {
-      const provider = new CachingDataProvider(new SKDeltaDataProvider(delta), 500)
+      const provider = new CachingDataProvider(new SKDeltaDataProvider(delta), 1000)
+      //const provider = new BetterDataProvider(delta)
       const trip = new InteractiveTrip(delta, provider)
+
+      // Initialize the cache.
+      for (let i = trip.getStartTime().getTime(); i < trip.getStartTime().getTime() + 1000*60*3; i += 1000) {
+        const d = new Date(i)
+        console.log(`${new Date()} => ${d}`)
+        provider.getValuesAtTime(d)
+      }
 
       const viewport = {
         ...this.state.viewport,

@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aldis/babel-signalk": ">=0.0.0",
-    "@aldis/signalk-analysis": ">=0.0.0",
     "@aldis/strongly-signalk": ">=0.0.0",
     "@blueprintjs/core": "^2.3.1",
     "@signalk/nmea0183-utilities": "^0.6.0",

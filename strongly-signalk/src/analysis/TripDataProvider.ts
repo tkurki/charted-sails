@@ -1,6 +1,7 @@
-import { SKValueType } from '@aldis/strongly-signalk'
+import { SKValueType } from "../model";
 
-export default interface TripDataProvider {
+
+export interface TripDataProvider {
   /**
    * Returns the list of all available values in this trip.
    */

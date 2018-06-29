@@ -1,5 +1,5 @@
 import {ColumnConverter} from './CSVConversion'
-import { SKValue } from '@aldis/strongly-signalk';
+import { SKValue } from '../model';
 
 /**
  * Configuration for a simple conversion.
