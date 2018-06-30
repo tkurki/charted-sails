@@ -1,0 +1,18 @@
+.intro-panel {
+  display: flex;
+}
+
+div.intro-logo {
+  float: left;
+  margin: 10px;
+  flex-shrink: 2;
+  min-width: 80px;
+  max-width: 122px;
+}
+.intro-logo > img {
+  width: 100%;
+}
+
+.intro-text {
+  flex-shrink: 1;
+}
