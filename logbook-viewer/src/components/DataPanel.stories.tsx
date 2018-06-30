@@ -32,3 +32,16 @@ stories.add('Showing time and basic infos', () => {
   }
   return <DataPanel dataProvider={testDataProvider} hoveringMode={false} selection={testSelection}/>
   })
+
+stories.add('Showing heading true', () => {
+  const testSelection = new TimeSelection(new Date())
+  const testDataProvider : TripDataProvider = {
+    getAvailableValues: () => (['navigation.headingTrue', 'navigation.courseOverGround' ]),
+    getValueAtTime: () => null,
+    getValuesAtTime: () => ({
+      'navigation.courseOverGround': number('Cog (deg)', 30)/360*2*Math.PI,
+      'navigation.headingTrue': number('HDGt (deg)', 30)/360*2*Math.PI,
+    })
+  }
+  return <DataPanel dataProvider={testDataProvider} hoveringMode={false} selection={testSelection}/>
+  })

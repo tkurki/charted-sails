@@ -35,9 +35,12 @@ let convertHelper = (csvLine: any):SKValue|null => {
   return null
 }
 
-
 it('converts BSP column', () => {
   myExpect(convertHelper({'Bsp': 6.2}))
     .toBeDeepCloseTo({'path': 'navigation.speedThroughWater', value: utils.transform(6.2, 'knots', 'ms')})
 })
 
+it('converts HDG column', () => {
+  myExpect(convertHelper({'Hdg': 243.2}))
+    .toBeDeepCloseTo({'path': 'navigation.headingTrue', value: utils.transform(243.2, 'deg', 'rad')})
+})

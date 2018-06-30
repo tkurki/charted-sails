@@ -69,7 +69,7 @@ export default function DataPanel(props : DataPanelProps) {
             convertedValues[path] = utils.transform(values[path] as number, signalKSchema[path].unit, fieldConfiguration[path].unit)
 
         if (signalKSchema[path].type === 'direction') {
-          convertedValues[path] = (values[path] as number + 360)%360
+          convertedValues[path] = (convertedValues[path] as number + 360)%360
         }
       }
     }
