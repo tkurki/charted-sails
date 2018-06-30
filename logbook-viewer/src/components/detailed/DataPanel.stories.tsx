@@ -2,8 +2,8 @@ import { TripDataProvider } from '@aldis/strongly-signalk';
 import { number, withKnobs } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
+import '../../index.css';
 import TimeSelection from '../../model/TimeSelection';
-import '../index.css';
 import DataPanel from './DataPanel';
 
 const stories = storiesOf('Components/DataPanel', module)

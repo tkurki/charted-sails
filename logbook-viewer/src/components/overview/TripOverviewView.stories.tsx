@@ -2,7 +2,7 @@ import { SKDelta } from '@aldis/strongly-signalk';
 import { storiesOf } from '@storybook/react';
 import * as moment from 'moment';
 import * as React from 'react';
-import '../index.css';
+import '../../index.css';
 import { TripOverviewView } from './TripOverviewView';
 
 storiesOf("Components/TripOverviewView", module)

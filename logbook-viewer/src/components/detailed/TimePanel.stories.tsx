@@ -1,9 +1,8 @@
 import { number, withKnobs } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
-import TimePanel from './TimePanel'
-
-import '../index.css'
+import '../../index.css';
+import TimePanel from './TimePanel';
 
 const myDateKnob = (name:string, start:Date, end:Date, defaultValue:Date) => {
   const numberTimestamp = number(name, defaultValue.getTime(), {
