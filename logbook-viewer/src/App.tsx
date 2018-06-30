@@ -1,6 +1,6 @@
 import { BetterDataProvider, SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
-import ReactMapGL, { FlyToInterpolator } from 'react-map-gl';
+import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import aldisLogo from './aldis-logo.png';
 import './App.css';
