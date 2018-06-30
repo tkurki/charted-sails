@@ -3,11 +3,11 @@ import { storiesOf } from '@storybook/react';
 import * as moment from 'moment';
 import * as React from 'react';
 import '../index.css';
-import { TripOverlayView } from './TripOverlayView';
+import { TripOverviewView } from './TripOverviewView';
 
-storiesOf("Components/TripOverlayView", module)
+storiesOf("Components/TripOverviewView", module)
   .add('simple marker', () => (
-    <TripOverlayView tripOverview={ {
+    <TripOverviewView tripOverview={ {
       startTime: moment("20180612T093301").toDate(),
       endTime: moment("20180612T130101").toDate(),
       description: "Just a basic trip overview",
