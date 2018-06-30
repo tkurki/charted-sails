@@ -59,28 +59,6 @@ export default class App extends React.Component<AppProps, AppState> {
   public render() {
     return (
       <div>
-        <img className="aldisLogo" src={aldisLogo} />
-
-        {this.state.trip &&
-          <button type="button" className="pt-button pt-minimal pt-icon-cross close-button"
-            onClick={ () => this.onCloseTrip() } />
-        }
-        {this.state.trip &&
-          <DataPanel
-            dataProvider={ this.state.trip.getDataProvider() }
-            hoveringMode={ this.state.hoveredObject ? true : false }
-            selection={ this.state.trip.getSelection() } />
-        }
-        {this.state.trip &&
-          <TimePanel
-            endTime={ this.state.trip.getEndTime() }
-            startTime={ this.state.trip.getStartTime() }
-            // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
-            selectedTime={ this.state.trip.getSelection().getCenter() }
-            onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
-          />
-        }
-
         <ReactMapGL
           {...this.state.viewport}
           mapControls={this.mapControls}
@@ -103,6 +81,36 @@ export default class App extends React.Component<AppProps, AppState> {
             />
           }
         </ReactMapGL>
+
+        { !this.state.trip && <img className="aldisLogo" src={aldisLogo} /> }
+
+        {this.state.trip &&
+          <button type="button" className="pt-button pt-minimal pt-icon-cross close-button"
+            onClick={ () => this.onCloseTrip() } />
+        }
+        {this.state.trip &&
+          <DataPanel
+            dataProvider={ this.state.trip.getDataProvider() }
+            hoveringMode={ this.state.hoveredObject ? true : false }
+            selection={ this.state.trip.getSelection() }
+            style={ { position: 'absolute', top: '20px', left: '20px' } }/>
+        }
+        {this.state.trip &&
+          <TimePanel
+            endTime={ this.state.trip.getEndTime() }
+            startTime={ this.state.trip.getStartTime() }
+            // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
+            selectedTime={ this.state.trip.getSelection().getCenter() }
+            onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
+            style={ {
+              position: 'absolute',
+              left: "50%",
+              bottom: "20px",
+              transform: "translate(-50%, 0)",
+              width: '75%'
+            } }
+          />
+        }
       </div>
     );
   }
@@ -157,8 +165,8 @@ export default class App extends React.Component<AppProps, AppState> {
       const viewport = {
         ...this.state.viewport,
         ...this._calculateViewportBounding(trip.getBounds()),
-        transitionDuration: 3000,
-        transitionInterpolator: new FlyToInterpolator(),
+        // transitionDuration: 3000,
+        // transitionInterpolator: new FlyToInterpolator(),
         /*transitionEasing: easeCubic*/
       }
       this.setState({viewport, trip})
@@ -176,9 +184,9 @@ export default class App extends React.Component<AppProps, AppState> {
         ...this.state.viewport,
         longitude: sampleDataTripOverviews[0].path[0][0],
         latitude: sampleDataTripOverviews[0].path[0][1],
-        zoom: 1,
-        transitionInterpolator: new FlyToInterpolator(),
-        transitionDuration: 3000
+        zoom: 1 // ,
+        // transitionInterpolator: new FlyToInterpolator(),
+        // transitionDuration: 3000
       }
     })
   }

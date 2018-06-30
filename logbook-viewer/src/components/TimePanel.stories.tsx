@@ -34,12 +34,23 @@ const buildTimePanelWithKnob = (start:Date, duration:number, progress: number) =
 
 storiesOf("Components/TimePanel", module)
   .addDecorator(withKnobs)
-  .add('Showing a day sail', () => {
-    return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 8.23*3600*1000, 0)
+  .add('Showing a super short log (3 sec)', () => {
+    return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 3*1000, 0)
   })
   .add('Showing a short log (10 min)', () => {
     return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 10*60*1000, 0)
   })
+  .add('Showing a day sail', () => {
+    return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 8.23*3600*1000, 0)
+  })
+  .add('Showing a medium log (3 days)', () => {
+    return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 3.7*24*3600*1000, 0)
+  })
   .add('Showing a long race (28 days)', () => {
     return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 28.23*24*3600*1000, 0)
-})
+  })
+  .add('Showing a super long log (3 years - moitessier style)', () => {
+    return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 3*365*24*3600*1000, 0)
+  })
+
+

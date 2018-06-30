@@ -49,6 +49,7 @@ export interface DataPanelProps {
   selection: TimeSelection
   dataProvider: TripDataProvider
   hoveringMode: boolean
+  style?: React.CSSProperties
 }
 
 export default function DataPanel(props : DataPanelProps) {
@@ -87,11 +88,9 @@ export default function DataPanel(props : DataPanelProps) {
   ))
 
   return (
-    <div className="data-window">
-      <div className="data-panel">
+    <div className="pt-card pt-elevation-2 data-panel" style={ props.style }>
         <DataPanelItem label="Time" unit="Locale" value={ props.selection.getCenter() } large={true} />
         { panelItems }
-      </div>
     </div>
   );
 }

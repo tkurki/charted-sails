@@ -37,9 +37,8 @@
 .aldisLogo {
   position: absolute;
   width: 100px;
-  left: 70px;
+  left: 20px;
   top: 20px;
-  z-index: 1;
 }
 
 @keyframes App-logo-spin {
