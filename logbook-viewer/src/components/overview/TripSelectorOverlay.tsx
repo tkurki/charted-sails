@@ -1,7 +1,7 @@
 import DeckGL, { PathLayer } from 'deck.gl';
 import * as React from 'react';
 import { Marker } from 'react-map-gl';
-import { TripOverview } from '../model/TripOverview';
+import { TripOverview } from '../../model/TripOverview';
 import { TripOverviewView } from './TripOverviewView';
 
 export interface TripSelectorOverlayProps {

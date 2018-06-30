@@ -1,7 +1,7 @@
 import DeckGL, { LineLayer } from 'deck.gl';
 import * as React from 'react';
 import { SVGOverlay } from 'react-map-gl';
-import InteractiveTrip, { InteractiveTripSegment } from '../model/InteractiveTrip';
+import InteractiveTrip, { InteractiveTripSegment } from '../../model/InteractiveTrip';
 import { DynamicBoatSVG } from './DynamicBoatSVG';
 
 export interface TripOverlayProps {
