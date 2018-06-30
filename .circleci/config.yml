@@ -35,6 +35,13 @@ jobs:
       - image: circleci/node:8
     working_directory: ~/repo
     steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+      - run: yarn install
+      - run: yarn bootstrap
+      - run: yarn build
       - run: yarn deploy
 
 workflows:
