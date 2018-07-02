@@ -22,8 +22,5 @@
     "webpack",
     "jest",
     "src/setupTests.ts"
-  ],
-  "paths": {
-    "@aldis/strongly-signalk": ["../src"]
-  }
+  ]
 }
