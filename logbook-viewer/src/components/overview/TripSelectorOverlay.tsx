@@ -28,7 +28,7 @@ export default class TripSelectorOverlay extends React.Component<TripSelectorOve
 
     const markers = this.props.tripOverviews.map((trip, index) => (
       // FIXME: If we ever change the list of tripOverviews dynamically we should use a real key and not the index!
-      <Marker longitude={trip.path[0][0]} latitude={trip.path[0][1]}>
+      <Marker key={index} longitude={trip.path[0][0]} latitude={trip.path[0][1]}>
         <TripOverviewView tripOverview={trip} onTripOverviewSelected={this.props.onTripOverviewSelected} />
       </Marker>
     ))
