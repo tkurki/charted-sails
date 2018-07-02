@@ -1,7 +1,12 @@
 import * as React from 'react';
-import Dropzone from 'react-dropzone';
 import aldisLogo from '../../aldis-logo.png';
 import './IntroductionPanel.css';
+
+/* tslint:disable-next-line */
+let Dropzone = require('react-dropzone')
+if ('default' in Dropzone) {
+  Dropzone = Dropzone.default
+}
 
 export interface IntroductionPanelProps {
   style?: React.CSSProperties
