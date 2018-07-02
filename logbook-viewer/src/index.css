@@ -1,9 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Titillium+Web');
 @import "~@blueprintjs/core/lib/css/blueprint.css";
 
-div#root {
+body {
   margin: 0;
   padding: 0;
+}
+
+div#root {
   font-family: 'Titillium Web', 'Open Sans', sans-serif;
   font-size: 11px;
 }
