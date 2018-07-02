@@ -1,4 +1,4 @@
-import { BetterDataProvider, SKPosition, SKDelta, CSVLoader } from '@aldis/strongly-signalk';
+import { BetterDataProvider, CSVLoader, SKDelta, SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
 import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
@@ -160,7 +160,8 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private openTrip(delta: SKDelta) {
+  private openTrip(deltaPromise: Promise<SKDelta>) {
+    deltaPromise.then(delta => {
       const provider = new BetterDataProvider(delta)
       const trip = new InteractiveTrip(delta, provider)
 
@@ -172,16 +173,15 @@ export default class App extends React.Component<AppProps, AppState> {
         /*transitionEasing: easeCubic*/
       }
       this.setState({viewport, trip})
+    })
+    .catch(error => {
+      console.log("Unable to load file", error)
+      this.setState({trip: null})
+    })
   }
 
   private tripOverviewSelected(t: TripOverview) {
-    t.getSKDelta().then(delta => {
-      this.openTrip(delta)
-    })
-    .catch(error => {
-      console.log("Unable to load trip", error)
-      this.setState({trip: null})
-    })
+    this.openTrip(t.getSKDelta())
   }
 
   private animateMap() {

@@ -48,8 +48,17 @@ export class CSVLoader {
    * @param file
    * @param options
    */
-  static fromFile(file: File, options: CSVConversionOption = this.defaultOptions): SKDelta  {
-    return this.fromParseResult(Papa.parse(file, this.papaParsingOptions), {
+  static fromFile(file: File, options: CSVConversionOption = this.defaultOptions): Promise<SKDelta>  {
+    let p = new Promise<Papa.ParseResult>((resolve, reject) => {
+      const papaOptions = {
+        ...this.papaParsingOptions,
+        download: true,
+        complete: resolve,
+        error: reject
+      }
+      Papa.parse(file, papaOptions)
+    })
+    return this.fromParseResultPromise(p, {
       sourceLabel: file.name,
       ...options
     })

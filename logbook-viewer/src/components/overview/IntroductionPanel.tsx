@@ -9,6 +9,13 @@ export interface IntroductionPanelProps {
 }
 
 export class IntroductionPanel extends React.Component<IntroductionPanelProps> {
+  private onDrop: (acceptedFiles: File[])=>void
+
+  constructor(props:IntroductionPanelProps) {
+    super(props)
+    this.onDrop = this._onDrop.bind(this)
+  }
+
   public render() {
     return (
       <div className="pt-card pt-elevation-2 intro-panel" style={ this.props.style }>
@@ -16,15 +23,14 @@ export class IntroductionPanel extends React.Component<IntroductionPanelProps> {
           <img src={ aldisLogo }/>
         </div>
         <div className='intro-text'>
-          <h3>Welcome to Charted!</h3>
+          <h3>Welcome to Charted Sails!</h3>
           <p>
-            To begin, select a trip on the map or drag and drop one of your log files <strong>here</strong>.
+            To begin, select a trip on the map or drag and drop one of your own log files.
           </p>
-          <div className="dropzone">
-            <Dropzone onDrop={this.onDrop.bind(this)}>
-             <p>Try dropping some files here, or click to select files to upload.</p>
-            </Dropzone>
-           </div>
+          <Dropzone onDrop={ this.onDrop } className='dropzone'
+            acceptClassName='dropzoneAccept' rejectClassName='dropzoneReject' >
+            <p>Try dropping some files here, or click to select files to upload.</p>
+          </Dropzone>
 
           <p>
             We currently only support Expedition log files in CSV format but we are quickly adding more formats.
@@ -36,7 +42,7 @@ export class IntroductionPanel extends React.Component<IntroductionPanelProps> {
     )
   }
 
-  private onDrop(files: File[]) {
+  private _onDrop(files: File[]) {
     if (files.length !== 1) {
       console.log(`Interesting, user dropped ${files.length} files.`)
     }

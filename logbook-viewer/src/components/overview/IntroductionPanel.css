@@ -16,3 +16,19 @@ div.intro-logo {
 .intro-text {
   flex-shrink: 1;
 }
+
+.dropzone {
+  width: 80%;
+  border: 2px dashed darkgrey;
+  border-radius: 4px;
+  padding: 5px;
+  margin: 15px;
+}
+
+.dropzoneAccept {
+  border-color: greenyellow;
+}
+
+.dropzoneReject {
+  border-color: orangered;
+}
