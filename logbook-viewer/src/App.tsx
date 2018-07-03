@@ -1,14 +1,14 @@
-import { BetterDataProvider, SKPosition } from '@aldis/strongly-signalk';
+import { BetterDataProvider, CSVLoader, SKDelta, SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
 import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
-import aldisLogo from './aldis-logo.png';
 import './App.css';
-import DataPanel from './components/DataPanel';
-import MyMapControls from './components/MyMapControls';
-import TimePanel from './components/TimePanel';
-import TripOverlay from './components/TripOverlay';
-import TripSelectorOverlay from './components/TripSelectorOverlay';
+import DataPanel from './components/detailed/DataPanel';
+import TimePanel from './components/detailed/TimePanel';
+import TripOverlay from './components/detailed/TripOverlay';
+import { IntroductionPanel } from './components/overview/IntroductionPanel';
+import MyMapControls from './components/overview/MyMapControls';
+import TripSelectorOverlay from './components/overview/TripSelectorOverlay';
 import InteractiveTrip from './model/InteractiveTrip';
 import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
@@ -82,34 +82,44 @@ export default class App extends React.Component<AppProps, AppState> {
           }
         </ReactMapGL>
 
-        { !this.state.trip && <img className="aldisLogo" src={aldisLogo} /> }
-
-        {this.state.trip &&
-          <button type="button" className="pt-button pt-minimal pt-icon-cross close-button"
-            onClick={ () => this.onCloseTrip() } />
+        {this.state.trip && (
+          <React.Fragment>
+            <button type="button" className="pt-button pt-minimal pt-icon-cross close-button"
+              onClick={ () => this.onCloseTrip() } />
+            <DataPanel
+              dataProvider={ this.state.trip.getDataProvider() }
+              hoveringMode={ this.state.hoveredObject ? true : false }
+              selection={ this.state.trip.getSelection() }
+              style={ { position: 'absolute', top: '20px', left: '20px' } }/>
+            <TimePanel
+              endTime={ this.state.trip.getEndTime() }
+              startTime={ this.state.trip.getStartTime() }
+              // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
+              selectedTime={ this.state.trip.getSelection().getCenter() }
+              onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
+              style={ {
+                position: 'absolute',
+                left: "50%",
+                bottom: "20px",
+                transform: "translate(-50%, 0)",
+                width: '75%'
+              } }
+            />
+          </React.Fragment>
+          )
         }
-        {this.state.trip &&
-          <DataPanel
-            dataProvider={ this.state.trip.getDataProvider() }
-            hoveringMode={ this.state.hoveredObject ? true : false }
-            selection={ this.state.trip.getSelection() }
-            style={ { position: 'absolute', top: '20px', left: '20px' } }/>
-        }
-        {this.state.trip &&
-          <TimePanel
-            endTime={ this.state.trip.getEndTime() }
-            startTime={ this.state.trip.getStartTime() }
-            // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
-            selectedTime={ this.state.trip.getSelection().getCenter() }
-            onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
-            style={ {
-              position: 'absolute',
-              left: "50%",
-              bottom: "20px",
-              transform: "translate(-50%, 0)",
-              width: '75%'
-            } }
-          />
+        {!this.state.trip &&
+        <React.Fragment>
+          <IntroductionPanel
+          onFileSelected={ (f:File) => this.openTrip(CSVLoader.fromFile(f)) }
+          style={ {
+            position: 'absolute',
+            left: "50%",
+            bottom: "20px",
+            transform: "translate(-50%, 0)",
+            width: '75%',
+          } } />
+        </React.Fragment>
         }
       </div>
     );
@@ -150,17 +160,10 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private tripOverviewSelected(t: TripOverview) {
-    t.getSKDelta().then(delta => {
+  private openTrip(deltaPromise: Promise<SKDelta>) {
+    deltaPromise.then(delta => {
       const provider = new BetterDataProvider(delta)
       const trip = new InteractiveTrip(delta, provider)
-
-      // Initialize the cache.
-      for (let i = trip.getStartTime().getTime(); i < trip.getStartTime().getTime() + 1000*60*3; i += 1000) {
-        const d = new Date(i)
-        console.log(`${new Date()} => ${d}`)
-        provider.getValuesAtTime(d)
-      }
 
       const viewport = {
         ...this.state.viewport,
@@ -172,10 +175,13 @@ export default class App extends React.Component<AppProps, AppState> {
       this.setState({viewport, trip})
     })
     .catch(error => {
-      console.log("Unable to load trip", error)
+      console.log("Unable to load file", error)
       this.setState({trip: null})
     })
-    console.log(`Trip selected: ${t}`)
+  }
+
+  private tripOverviewSelected(t: TripOverview) {
+    this.openTrip(t.getSKDelta())
   }
 
   private animateMap() {

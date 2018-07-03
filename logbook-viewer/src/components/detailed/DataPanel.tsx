@@ -2,7 +2,7 @@ import { SKValueType, TripDataProvider } from '@aldis/strongly-signalk';
 import * as utils from '@signalk/nmea0183-utilities';
 import * as React from 'react';
 import { isNullOrUndefined, isNumber } from 'util';
-import TimeSelection from '../model/TimeSelection';
+import TimeSelection from '../../model/TimeSelection';
 import './DataPanel.css';
 
 

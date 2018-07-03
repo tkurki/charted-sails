@@ -1,0 +1,34 @@
+.intro-panel {
+  display: flex;
+}
+
+div.intro-logo {
+  float: left;
+  margin: 10px;
+  flex-shrink: 2;
+  min-width: 80px;
+  max-width: 122px;
+}
+.intro-logo > img {
+  width: 100%;
+}
+
+.intro-text {
+  flex-shrink: 1;
+}
+
+.dropzone {
+  width: 80%;
+  border: 2px dashed darkgrey;
+  border-radius: 4px;
+  padding: 5px;
+  margin: 15px;
+}
+
+.dropzoneAccept {
+  border-color: greenyellow;
+}
+
+.dropzoneReject {
+  border-color: orangered;
+}

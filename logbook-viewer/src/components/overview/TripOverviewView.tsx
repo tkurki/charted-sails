@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import * as React from 'react';
-import { TripOverview } from "../model/TripOverview";
+import { TripOverview } from "../../model/TripOverview";
 import './TripOverviewView.css';
 
 export interface TripOverviewViewProps {

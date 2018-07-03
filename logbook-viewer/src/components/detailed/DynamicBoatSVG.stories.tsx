@@ -2,7 +2,7 @@ import { SKPosition } from '@aldis/strongly-signalk';
 import { boolean, number, withKnobs } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
-import '../index.css';
+import '../../index.css';
 import { DynamicBoatSVG } from './DynamicBoatSVG';
 
 const directionKnobOptions = {

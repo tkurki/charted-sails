@@ -33,15 +33,3 @@
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 3;
 }
-
-.aldisLogo {
-  position: absolute;
-  width: 100px;
-  left: 20px;
-  top: 20px;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
