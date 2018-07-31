@@ -12,9 +12,18 @@ export class SKSource {
    * Can be anything but should follow a predicatable format.
    */
   public label: string
+  public pgn?: number
+  public src?: string
+  public type?: string
 
-  constructor(label: string) {
+  constructor(label: string, opts?: { pgn?: number, src?: string, type?: string }) {
     this.label = label
+
+    if (opts) {
+      this.pgn = opts.pgn
+      this.src = opts.src
+      this.type = opts.type
+    }
   }
 
   static fromJSON(json: string|SKSourceJSON): SKSource {

@@ -19,7 +19,10 @@
     "ts-jest": "^22.4.6"
   },
   "dependencies": {
+    "@signalk/n2k-signalk": "git://github.com/sarfata/n2k-signalk#fcab400",
+    "@signalk/nmea0183-signalk": "git://github.com/sarfata/signalk-parser-nmea0183#76e62bcb",
     "@signalk/nmea0183-utilities": "^0.6.0",
+    "canboatjs": "git://github.com/sarfata/canboatjs.git#7d3a5d7",
     "commander": "^2.15.1",
     "papaparse": "^4.5.0",
     "simplify-path": "^1.1.0"

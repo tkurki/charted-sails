@@ -8,5 +8,6 @@ export * from './analysis/TripDataProvider'
 
 export * from './loader/ExpeditionFormatConversion'
 export * from './loader/CSVLoader'
+export * from './loader/SKLogLoader'
 
 export * from './model'

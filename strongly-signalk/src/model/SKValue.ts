@@ -35,6 +35,9 @@ export class SKValue {
           && 'latitude' in json.value && 'longitude' in json.value) {
         v.value = SKPosition.fromJSON(json.value)
       }
+      else if (v.path === 'navigation.datetime' && typeof json.value === 'string') {
+        v.value = new Date(json.value)
+      }
       else if (typeof json.value === 'number' || typeof json.value === 'string') {
         v.value = json.value
       }
