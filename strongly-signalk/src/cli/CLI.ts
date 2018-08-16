@@ -4,6 +4,8 @@ import { readFileSync } from 'fs';
 import { CSVConversionOption, CSVLoader } from '../loader/CSVLoader';
 import { ExpeditionFormatConversion } from '../loader/ExpeditionFormatConversion';
 import { SignalKTripAnalyzer } from '../analysis/SignalKTripAnalyzer';
+import { SKLogLoader } from '../loader/SKLogLoader';
+import { SKDelta } from '../model';
 
 let simplify = require('simplify-path')
 
@@ -15,41 +17,54 @@ export function babelSignalKCLI(args: string[]) {
   commander.parse(args)
 
   if (commander.args.length > 0) {
-    let options: CSVConversionOption = {
-      "sourceLabel": commander.args[0],
-      "conversion": new ExpeditionFormatConversion()
-    }
-
     let data = readFileSync(commander.args[0], { 'encoding': 'utf8'})
-    let delta = CSVLoader.fromString(data, options)
 
-    if (commander['summary']) {
-      const countUpdates = delta.updates.length
-      const countValues = delta.updates.reduce((count, update) => {
-        return count + update.values.length
-      }, 0)
-      const paths:{[index:string]: boolean} = delta.updates.reduce((paths:any, update) => {
-        update.values.forEach(v => { paths[v.path] = true })
-        return paths
-      }, {})
-
-      const tracePath : [number, number][] = SignalKTripAnalyzer.getPath(delta)
-        .map(position => [position.longitude, position.latitude] as [number,number])
-
-      const simplifiedPath = simplify(tracePath, 0.01)
-
-      console.log(`Log contains ${countUpdates} updates and ${countValues} values`)
-      console.log(`Included SignalK paths: ${Object.keys(paths).sort()}`)
-      const bounds = SignalKTripAnalyzer.getBounds(delta)
-      if (bounds) {
-        console.log(`Bounds: ${bounds[0].asArray()} ${bounds[1].asArray()}`)
+    const deltas : SKDelta[] = []
+    if (commander.args[0].endsWith('.csv')) {
+      let options: CSVConversionOption = {
+        "sourceLabel": commander.args[0],
+        "conversion": new ExpeditionFormatConversion()
       }
-      console.log(`Start: ${SignalKTripAnalyzer.getStartTime(delta)!.toISOString()}`)
-      console.log(`End: ${SignalKTripAnalyzer.getEndTime(delta)!.toISOString()}`)
-      console.log(`Path: ${JSON.stringify(simplifiedPath)}`)
+      deltas.push(CSVLoader.fromString(data, options))
+    }
+    else if (commander.args[0].endsWith('.log')) {
+      deltas.push(...SKLogLoader.fromString(data))
     }
     else {
-      console.log(JSON.stringify(delta, null, 2))
+      console.error(`Don't know how to open file ${commander.args[0]}`)
+    }
+
+    if (commander['summary']) {
+      deltas.forEach(delta => {
+        const countUpdates = delta.updates.length
+        const countValues = delta.updates.reduce((count, update) => {
+          return count + update.values.length
+        }, 0)
+        const paths:{[index:string]: boolean} = delta.updates.reduce((paths:any, update) => {
+          update.values.forEach(v => { paths[v.path] = true })
+          return paths
+        }, {})
+
+        const tracePath : [number, number][] = SignalKTripAnalyzer.getPath(delta)
+          .map(position => [position.longitude, position.latitude] as [number,number])
+
+        const simplifiedPath = simplify(tracePath, 0.01)
+
+        console.log(`Context: ${delta.context ? delta.context : '<null>'} - ${countUpdates} updates and ${countValues} values`)
+        console.log(`Included SignalK paths: ${Object.keys(paths).sort()}`)
+        const bounds = SignalKTripAnalyzer.getBounds(delta)
+        if (bounds) {
+          console.log(`Bounds: ${bounds[0].asArray()} ${bounds[1].asArray()}`)
+        }
+        console.log(`Start: ${SignalKTripAnalyzer.getStartTime(delta)!.toISOString()}`)
+        console.log(`End: ${SignalKTripAnalyzer.getEndTime(delta)!.toISOString()}`)
+        console.log(`Path: ${JSON.stringify(simplifiedPath)}`)
+      })
+    }
+    else {
+      deltas.forEach(delta => {
+        console.log(JSON.stringify(delta, null, 2))
+      })
     }
   }
   else {

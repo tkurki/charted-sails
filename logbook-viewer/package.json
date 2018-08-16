@@ -30,14 +30,13 @@
     "lint": "tslint --project . --config tslint.prod.json",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "deploy": "react-scripts-ts build && surge build/ charted.aldislab.com"
+    "deploy": "react-scripts-ts build && surge build/ www.chartedsails.com"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^4.0.0-alpha.10",
     "@storybook/addon-knobs": "^4.0.0-alpha.10",
     "@storybook/react": "^4.0.0-alpha.10",
     "@types/jest": "^23.1.0",
-    "@types/node": "^10.3.2",
     "@types/rc-slider": "^8.2.3",
     "@types/react": "^16.3.17",
     "@types/react-dom": "^16.0.6",

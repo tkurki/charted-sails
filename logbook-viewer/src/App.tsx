@@ -1,4 +1,4 @@
-import { BetterDataProvider, CSVLoader, SKDelta, SKPosition } from '@aldis/strongly-signalk';
+import { BetterDataProvider, CSVLoader, SKDelta, SKLogLoader, SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
 import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
@@ -111,7 +111,7 @@ export default class App extends React.Component<AppProps, AppState> {
         {!this.state.trip &&
         <React.Fragment>
           <IntroductionPanel
-          onFileSelected={ (f:File) => this.openTrip(CSVLoader.fromFile(f)) }
+          onFileSelected={ (f:File) => this.openFile(f) }
           style={ {
             position: 'absolute',
             left: "50%",
@@ -160,28 +160,47 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private openTrip(deltaPromise: Promise<SKDelta>) {
-    deltaPromise.then(delta => {
-      const provider = new BetterDataProvider(delta)
-      const trip = new InteractiveTrip(delta, provider)
+  private openFile(f: File) {
+    if (f.name.endsWith('.csv')) {
+      CSVLoader.fromFile(f).then(delta => {
+        this.openTrip(delta)
+      })
+      .catch(reason => {
+        console.log(`Unable to load CSV file ${f.name}: ${reason}`)
+        this.setState({trip: null})
+      })
+    }
+    else if (f.name.endsWith('.log')) {
+      SKLogLoader.fromFile(f).then(deltas => {
+        if (deltas.length > 0) {
+          this.openTrip(deltas[0])
+        }
+      })
+      .catch(reason => {
+        console.log(`Unable to load SK logfile ${f.name}: ${reason}`)
+        this.setState({trip: null})
+      })
+    }
+  }
 
-      const viewport = {
-        ...this.state.viewport,
-        ...this._calculateViewportBounding(trip.getBounds()),
-        // transitionDuration: 3000,
-        // transitionInterpolator: new FlyToInterpolator(),
-        /*transitionEasing: easeCubic*/
-      }
-      this.setState({viewport, trip})
-    })
-    .catch(error => {
-      console.log("Unable to load file", error)
-      this.setState({trip: null})
-    })
+  private openTrip(delta: SKDelta) {
+    const provider = new BetterDataProvider(delta)
+    const trip = new InteractiveTrip(delta, provider)
+
+    const viewport = {
+      ...this.state.viewport,
+      ...this._calculateViewportBounding(trip.getBounds()),
+      // transitionDuration: 3000,
+      // transitionInterpolator: new FlyToInterpolator(),
+      /*transitionEasing: easeCubic*/
+    }
+    this.setState({viewport, trip})
   }
 
   private tripOverviewSelected(t: TripOverview) {
-    this.openTrip(t.getSKDelta())
+    t.getSKDelta().then(delta => {
+      this.openTrip(delta)
+    })
   }
 
   private animateMap() {
