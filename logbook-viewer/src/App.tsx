@@ -1,5 +1,6 @@
 import { BetterDataProvider, CSVLoader, SKDelta, SKLogLoader, SKPosition } from '@aldis/strongly-signalk';
 import * as React from 'react';
+import ReactGA from 'react-ga';
 import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import './App.css';
@@ -141,6 +142,14 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   public componentDidMount() {
+    if (process.env.NODE_ENV === 'production') {
+      ReactGA.initialize('UA-124033119-1');
+    }
+    else {
+      ReactGA.initialize('UA-124033119-1', { testMode: true });
+    }
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     window.addEventListener('resize', this._resize);
     this._resize();
     this.animateMap()
@@ -161,12 +170,14 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   private openFile(f: File) {
+    ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
     if (f.name.endsWith('.csv')) {
       CSVLoader.fromFile(f).then(delta => {
         this.openTrip(delta)
       })
       .catch(reason => {
         console.log(`Unable to load CSV file ${f.name}: ${reason}`)
+        ReactGA.event({ category: 'Trip', action: 'Error CSV', label: `${f.name}: ${reason}` })
         this.setState({trip: null})
       })
     }
@@ -178,12 +189,14 @@ export default class App extends React.Component<AppProps, AppState> {
       })
       .catch(reason => {
         console.log(`Unable to load SK logfile ${f.name}: ${reason}`)
+        ReactGA.event({ category: 'Trip', action: 'Error SKLog', label: `${f.name}: ${reason}` })
         this.setState({trip: null})
       })
     }
   }
 
   private openTrip(delta: SKDelta) {
+    const timerStart = Date.now()
     const provider = new BetterDataProvider(delta)
     const trip = new InteractiveTrip(delta, provider)
 
@@ -195,9 +208,11 @@ export default class App extends React.Component<AppProps, AppState> {
       /*transitionEasing: easeCubic*/
     }
     this.setState({viewport, trip})
+    ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: Date.now() - timerStart })
   }
 
   private tripOverviewSelected(t: TripOverview) {
+    ReactGA.event({ category: 'Trip', action: 'Load trip', label: t.label })
     t.getSKDelta().then(delta => {
       this.openTrip(delta)
     })
@@ -217,6 +232,8 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   private onCloseTrip() {
+    ReactGA.event({ category: 'Trip', action: 'Close Trip' })
+
     this.setState({trip: null})
     setImmediate(() => {
       this.animateMap()
