@@ -22,7 +22,7 @@
     "@signalk/n2k-signalk": "git://github.com/sarfata/n2k-signalk#fcab400",
     "@signalk/nmea0183-signalk": "git://github.com/sarfata/signalk-parser-nmea0183#2499f59",
     "@signalk/nmea0183-utilities": "^0.6.0",
-    "canboatjs": "git://github.com/sarfata/canboatjs.git#9c7bc109",
+    "canboatjs": "git://github.com/sarfata/canboatjs.git#4b73662",
     "commander": "^2.15.1",
     "papaparse": "^4.5.0",
     "simplify-path": "^1.1.0"
