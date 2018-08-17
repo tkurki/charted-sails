@@ -1,4 +1,4 @@
-import * as commander from 'commander'
+import commander from 'commander'
 import * as pkgInfo from '../../package.json'
 import { readFileSync } from 'fs';
 import { CSVConversionOption, CSVLoader } from '../loader/CSVLoader';
