@@ -12,6 +12,9 @@ export default class InteractiveTrip {
   private trip : SKDelta
   private dataProvider: TripDataProvider
   private selection: TimeSelection
+  private segments: InteractiveTripSegment[]
+  private startTime: Date
+  private endTime: Date
 
   constructor(trip : SKDelta, dataProvider: TripDataProvider) {
     if (trip.updates.length < 1) {
@@ -21,9 +24,40 @@ export default class InteractiveTrip {
     this.trip = trip
     this.dataProvider = dataProvider
     this.selection = new TimeSelection(SignalKTripAnalyzer.getStartTime(this.trip)!)
+    this.segments = this.calculateSegments()
+    this.startTime = SignalKTripAnalyzer.getStartTime(this.trip)!
+    this.endTime = SignalKTripAnalyzer.getEndTime(this.trip)!
   }
 
   public getPathSegments(): InteractiveTripSegment[] {
+    return this.segments
+  }
+
+  public getBounds(): [SKPosition, SKPosition] {
+    return SignalKTripAnalyzer.getBounds(this.trip)!
+  }
+
+  public getStartTime(): Date {
+    return this.startTime
+  }
+
+  public getEndTime(): Date {
+    return this.endTime
+  }
+
+  public getDataProvider(): TripDataProvider {
+    return this.dataProvider
+  }
+
+  public getSelection(): TimeSelection {
+    return this.selection
+  }
+
+  public setSelection(ts: TimeSelection) {
+    this.selection = ts
+  }
+
+  private calculateSegments() {
     const segments:InteractiveTripSegment[] = []
 
     const positionValues = SignalKTripAnalyzer.getValuesForPath(this.trip, "navigation.position")
@@ -49,29 +83,5 @@ export default class InteractiveTrip {
       }
     }
     return segments
-  }
-
-  public getBounds(): [SKPosition, SKPosition] {
-    return SignalKTripAnalyzer.getBounds(this.trip)!
-  }
-
-  public getStartTime(): Date {
-    return SignalKTripAnalyzer.getStartTime(this.trip)!
-  }
-
-  public getEndTime(): Date {
-    return SignalKTripAnalyzer.getEndTime(this.trip)!
-  }
-
-  public getDataProvider(): TripDataProvider {
-    return this.dataProvider
-  }
-
-  public getSelection(): TimeSelection {
-    return this.selection
-  }
-
-  public setSelection(ts: TimeSelection) {
-    this.selection = ts
   }
 }
