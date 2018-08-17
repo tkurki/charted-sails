@@ -20,8 +20,13 @@ export default class TimePanel extends React.Component<TimePanelProps> {
     { stepSize: 1, renderer: (t:number) => moment(t).format('LTS') }
   ]
 
+  constructor(props: TimePanelProps) {
+    super(props)
+    this.onSelectedTimeChange = this.onSelectedTimeChange.bind(this)
+  }
+
   public render() {
-    const {endTime, startTime, selectedTime, onSelectedTimeChange} = this.props
+    const {endTime, startTime, selectedTime } = this.props
 
     if (!endTime || !startTime) {
       return (<div className="time-panel"/>);
@@ -37,7 +42,7 @@ export default class TimePanel extends React.Component<TimePanelProps> {
           min={ startTime.getTime() }
           max={ endTime.getTime() }
           value={ selectedTime.getTime() }
-          onChange={ e => { onSelectedTimeChange(new Date(e)) } }
+          onChange={ this.onSelectedTimeChange }
           showTrackFill={false}
           labelRenderer={range.renderer}
           labelStepSize={this.calculateLabelStepSize(rangeDuration, range.stepSize, 7)}
@@ -45,6 +50,10 @@ export default class TimePanel extends React.Component<TimePanelProps> {
           />
       </div>
     )
+  }
+
+  private onSelectedTimeChange(t:number) {
+    this.props.onSelectedTimeChange(new Date(t))
   }
 
   private calculateLabelStepSize(duration: number, intervalBetweenLabel:number, labelsCount: number) {
