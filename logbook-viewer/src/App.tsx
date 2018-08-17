@@ -8,7 +8,6 @@ import DataPanel from './components/detailed/DataPanel';
 import TimePanel from './components/detailed/TimePanel';
 import TripOverlay from './components/detailed/TripOverlay';
 import { IntroductionPanel } from './components/overview/IntroductionPanel';
-import MyMapControls from './components/overview/MyMapControls';
 import TripSelectorOverlay from './components/overview/TripSelectorOverlay';
 import InteractiveTrip from './model/InteractiveTrip';
 import TimeSelection from './model/TimeSelection';
@@ -33,8 +32,6 @@ export interface AppState {
 }
 
 export default class App extends React.Component<AppProps, AppState> {
-  private mapControls = new MyMapControls()
-
   constructor(props : AppProps) {
     super(props);
 
@@ -50,11 +47,6 @@ export default class App extends React.Component<AppProps, AppState> {
       }
     }
     this._resize = this._resize.bind(this);
-
-    this.mapControls.setOptions({ onUserInteraction: () => {
-        this.setState({})
-      }
-    })
   }
 
   public render() {
@@ -62,7 +54,6 @@ export default class App extends React.Component<AppProps, AppState> {
       <div>
         <ReactMapGL
           {...this.state.viewport}
-          mapControls={this.mapControls}
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_TOKEN}
           onViewportChange={viewport => this._onViewportChange(viewport)}
