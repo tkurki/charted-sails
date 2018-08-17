@@ -65,7 +65,7 @@ export function DynamicBoatSVG({data, project}:DynamicBoatSVGProps) {
           <line x1="100" y1="100" x2="100" y2="50" stroke='black' strokeWidth="2"/>
         </g>
       }
-      <g id="boat" transform={`rotate(${hdg} 100 100)`} opacity="1">
+      <g id="boat" transform={`rotate(${hdg !== undefined ? hdg : 0} 100 100)`} opacity="1">
         { awa!==undefined &&
         <g id="apparent-wind" transform={`rotate(${awa} 100 100)`} opacity="0.5">
           <line x1="100" y1="0" x2="100" y2="45" markerEnd="url(#triangle-apparent)" stroke={ apparentColor } strokeWidth="6"/>
