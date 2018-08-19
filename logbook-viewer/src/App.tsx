@@ -164,7 +164,7 @@ export default class App extends React.Component<AppProps, AppState> {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
     if (f.name.endsWith('.csv')) {
       CSVLoader.fromFile(f).then(delta => {
-        this.openTrip(delta)
+        this.openTrip(delta, f.name)
       })
       .catch(reason => {
         console.log(`Unable to load CSV file ${f.name}: ${reason}`)
@@ -175,7 +175,7 @@ export default class App extends React.Component<AppProps, AppState> {
     else if (f.name.endsWith('.log')) {
       SKLogLoader.fromFile(f).then(deltas => {
         if (deltas.length > 0) {
-          this.openTrip(deltas[0])
+          this.openTrip(deltas[0], f.name)
         }
       })
       .catch(reason => {
@@ -186,10 +186,10 @@ export default class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private openTrip(delta: SKDelta) {
+  private openTrip(delta: SKDelta, title: string) {
     const timerStart = Date.now()
     const provider = new BetterDataProvider(delta)
-    const trip = new InteractiveTrip(delta, provider)
+    const trip = new InteractiveTrip(delta, provider, title)
 
     const viewport = {
       ...this.state.viewport,
@@ -205,7 +205,7 @@ export default class App extends React.Component<AppProps, AppState> {
   private tripOverviewSelected(t: TripOverview) {
     ReactGA.event({ category: 'Trip', action: 'Load trip', label: t.label })
     t.getSKDelta().then(delta => {
-      this.openTrip(delta)
+      this.openTrip(delta, t.label)
     })
   }
 
