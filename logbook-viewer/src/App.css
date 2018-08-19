@@ -31,11 +31,3 @@
   top: 20px;
   z-index: 11;
 }
-
-.data-table {
-  width: 80%;
-}
-
-.data-table-backdrop {
-  visibility: hidden;
-}

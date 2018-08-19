@@ -6,6 +6,7 @@ import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import './App.css';
 import DataPanel from './components/detailed/DataPanel';
+import DataTable from './components/detailed/DataTable';
 import TimePanel from './components/detailed/TimePanel';
 import TripOverlay from './components/detailed/TripOverlay';
 import { IntroductionPanel } from './components/overview/IntroductionPanel';
@@ -30,6 +31,7 @@ export interface AppState {
   viewport : any
   trip: InteractiveTrip|null,
   hoveredObject?: any
+  showDataTable: boolean
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -45,9 +47,11 @@ export default class App extends React.Component<AppProps, AppState> {
         latitude: 0,
         zoom: 0,
         maxZoom: 32
-      }
+      },
+      showDataTable: false
     }
     this._resize = this._resize.bind(this);
+    this.setSelection = this.setSelection.bind(this)
   }
 
   public render() {
@@ -78,6 +82,7 @@ export default class App extends React.Component<AppProps, AppState> {
         {this.state.trip && (
           <React.Fragment>
             <ButtonGroup large={true} className='buttonGroupBar'>
+              <Button icon="th" onClick={ () => this.setState({ showDataTable: !this.state.showDataTable }) }/>
               <Button icon="cross" onClick={ () => this.onCloseTrip() }/>
             </ButtonGroup>
             <DataPanel
@@ -99,6 +104,25 @@ export default class App extends React.Component<AppProps, AppState> {
                 width: '75%'
               } }
             />
+            { this.state.showDataTable &&
+              <div className="bp3-dialog-container" style={ { position: 'absolute', top: '0px', left: '0px', width: '100%', height: '100%' } }>
+                <div className="bp3-dialog" style={ { width: '75%', height: '80%' } }>
+                  <div className="bp3-dialog-header">
+                    <span className="bp3-icon-large bp3-icon-th"/>
+                    <h4 className="bp3-heading">{ this.state.trip.getTitle() }</h4>
+                    <button aria-label="Close" className="bp3-dialog-close-button bp3-icon-small-cross"
+                      onClick={ () => this.setState({ showDataTable: false }) }/>
+                  </div>
+                  <div className="bp3-dialog-body" style={ { height: '80%' } }>
+                    <DataTable
+                      dataProvider={this.state.trip.getDataProvider()}
+                      selection={this.state.trip.getSelection()}
+                      onSelectionChange={ this.setSelection }
+                    />
+                  </div>
+                </div>
+              </div>
+            }
           </React.Fragment>
           )
         }
@@ -250,10 +274,14 @@ export default class App extends React.Component<AppProps, AppState> {
    * @param t new time selected
    */
   private _onSelectedTimeChange(t : Date) {
+    this.setSelection(new TimeSelection(t))
+  }
+
+  private setSelection(s: TimeSelection) {
     if (this.state.trip) {
-      this.state.trip.setSelection(new TimeSelection(t))
+      // FIXME: State should be immutable!
+      this.state.trip.setSelection(s)
       this.setState({trip: this.state.trip})
     }
   }
-
 }

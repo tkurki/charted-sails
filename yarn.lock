@@ -78,11 +78,13 @@
     classnames "^2.2"
     tslib "^1.9.0"
 
-"@blueprintjs/icons@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-2.2.1.tgz#1b4275fc67467218a8ffec6403c87c7af24532a5"
+"@blueprintjs/table@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/table/-/table-3.1.0.tgz#91e737f1ff9d80639eb9a11f38418c5e389a6ef7"
   dependencies:
+    "@blueprintjs/core" "^3.1.0"
     classnames "^2.2"
+    prop-types "^15.6.0"
     tslib "^1.9.0"
 
 "@deck.gl/core@^5.3.1":
