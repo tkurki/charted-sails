@@ -1,7 +1,12 @@
-import { SKValueType } from "../model";
+import { SKValueType, SKDelta } from "../model";
 
 
 export interface TripDataProvider {
+  /**
+   * Return the underlying SKDelta object.
+   */
+  getTripData(): SKDelta
+
   /**
    * Returns the list of all available values in this trip.
    */

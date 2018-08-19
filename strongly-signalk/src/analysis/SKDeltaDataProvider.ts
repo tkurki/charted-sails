@@ -30,6 +30,10 @@ export class SKDeltaDataProvider implements TripDataProvider {
     this.delta = delta
   }
 
+  public getTripData() {
+    return this.delta
+  }
+
   public getAvailableValues() : string[] {
     const paths : {[index:string]: boolean} = {}
     this.delta.updates.forEach(update => {

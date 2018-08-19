@@ -1,3 +1,4 @@
+import { Card } from '@blueprintjs/core';
 import moment from 'moment';
 import * as React from 'react';
 import { TripOverview } from "../../model/TripOverview";
@@ -10,7 +11,7 @@ export interface TripOverviewViewProps {
 
 export function TripOverviewView({tripOverview, onTripOverviewSelected}: TripOverviewViewProps) {
   return (
-    <div className="pt-card pt-elevation-2 trip-overview" >
+    <Card elevation={2} className="trip-overview">
       <a onClick={ () => onTripOverviewSelected(tripOverview) }>{tripOverview.label}</a>
       <div>
         { moment(tripOverview.startTime).calendar() } - { moment(tripOverview.startTime).from(tripOverview.endTime, true)}
@@ -18,6 +19,6 @@ export function TripOverviewView({tripOverview, onTripOverviewSelected}: TripOve
       <div>
         {tripOverview.description}
       </div>
-    </div>
+    </Card>
   )
 }

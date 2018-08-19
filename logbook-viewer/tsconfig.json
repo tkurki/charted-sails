@@ -12,7 +12,10 @@
     "moduleResolution": "node",
     "rootDir": "src",
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "paths":{
+      "@aldis/strong-signalk": ["../strongly-signalk/dist"]
+    }
   },
   "exclude": [
     "node_modules",

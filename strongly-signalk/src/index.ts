@@ -6,6 +6,8 @@ export * from './analysis/SKDeltaDataProvider'
 export * from './analysis/SignalKTripAnalyzer'
 export * from './analysis/TripDataProvider'
 
+export * from './display/IntelligibleSignalK'
+
 export * from './loader/ExpeditionFormatConversion'
 export * from './loader/CSVLoader'
 export * from './loader/SKLogLoader'

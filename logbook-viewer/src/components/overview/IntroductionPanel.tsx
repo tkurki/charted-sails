@@ -1,3 +1,4 @@
+import { Card } from '@blueprintjs/core';
 import * as React from 'react';
 import Dropzone from 'react-dropzone';
 import aldisLogo from '../../aldis-logo.png';
@@ -18,7 +19,7 @@ export class IntroductionPanel extends React.Component<IntroductionPanelProps> {
 
   public render() {
     return (
-      <div className="pt-card pt-elevation-2 intro-panel" style={ this.props.style }>
+      <Card elevation={2} className="intro-panel" style={this.props.style}>
         <div className='intro-logo'>
           <img src={ aldisLogo }/>
         </div>
@@ -38,7 +39,7 @@ export class IntroductionPanel extends React.Component<IntroductionPanelProps> {
           </p>
 
         </div>
-      </div>
+      </Card>
     )
   }
 

@@ -1,7 +1,7 @@
 import { isNull } from "util";
+import { SKDelta, SKValueType } from "../model";
 import { SignalKTripAnalyzer } from "./SignalKTripAnalyzer";
 import { TripDataProvider } from "./TripDataProvider";
-import { SKValueType, SKDelta } from "../model";
 
 export class BetterDataProvider implements TripDataProvider {
   public static interpolate(path: string, time: Date, timeA: Date, valueA: SKValueType,
@@ -44,6 +44,10 @@ export class BetterDataProvider implements TripDataProvider {
     })
   }
 
+  public getTripData() {
+    return this.delta
+  }
+
   public getAvailableValues() : string[] {
     return this.availableValues
   }
@@ -76,6 +80,42 @@ export class BetterDataProvider implements TripDataProvider {
       return low
     }
     else if (high >= 0 && high < low && items[high][0] < time) {
+      return high
+    }
+    else {
+      return -1
+    }
+  }
+
+  /**
+   * Given a time t, return the index of the update with latest timestamp and
+   * timestamp < t.
+   * @param time
+   */
+  public indexInDeltaForTimestamp(time: Date) {
+    // binary search inspired by
+    // http://rosettacode.org/wiki/Binary_search
+
+    let low  = 0
+    let high   = this.delta.updates.length - 1
+
+    while (low <= high) {
+      let middle = Math.floor((low + high)/2)
+
+      if (this.delta.updates[middle].timestamp > time) {
+        high = middle - 1
+      }
+      else if (this.delta.updates[middle].timestamp < time) {
+        low = middle + 1
+      }
+      else {
+        return middle
+      }
+    }
+    if (low < high && this.delta.updates[low].timestamp < time) {
+      return low
+    }
+    else if (high >= 0 && high < low && this.delta.updates[high].timestamp < time) {
       return high
     }
     else {

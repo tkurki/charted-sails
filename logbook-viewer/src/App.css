@@ -25,11 +25,9 @@
   font-size: large;
 }
 
-.close-button {
+.buttonGroupBar {
   position: absolute;
   right: 20px;
   top: 20px;
   z-index: 11;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 3;
 }

@@ -1,5 +1,5 @@
 import { TripDataProvider } from "./TripDataProvider";
-import { SKValueType } from "../model";
+import { SKValueType, SKDelta } from "../model";
 
 export class CachingDataProvider implements TripDataProvider {
   private dataProvider: TripDataProvider
@@ -11,6 +11,10 @@ export class CachingDataProvider implements TripDataProvider {
     this.dataProvider = realThing
     this.cachingResolution = cachingResolution
     this.valuesAtTime = {}
+  }
+
+  public getTripData(): SKDelta {
+    return this.dataProvider.getTripData()
   }
 
   public getAvailableValues() : string[] {

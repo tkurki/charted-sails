@@ -1,8 +1,8 @@
 
-import * as utils from '@signalk/nmea0183-utilities'
-import { CSVConversion, ColumnConverter } from './CSVConversion';
+import * as utils from '@signalk/nmea0183-utilities';
+import { SKPosition, SKValue } from '../model';
+import { ColumnConverter, CSVConversion } from './CSVConversion';
 import { SimpleCSVColumnConversion, SimpleCSVColumnConverter } from './SimpleCSVColumnConverter';
-import { SKValue, SKPosition } from '../model';
 
 const excelStartOfTime = new Date("1900-01-01T00:00:00Z").getTime()
 
@@ -32,7 +32,7 @@ export class ExpeditionFormatConversion implements CSVConversion {
   private _ratioConversion : SimpleCSVColumnConversion[] = [
     { columnName: 'Bsp', path: 'navigation.speedThroughWater', ratio: utils.transform(1, 'knots', 'ms')},
     { columnName: 'Sog', path: 'navigation.speedOverGround', ratio: utils.transform(1, 'knots', 'ms')},
-    { columnName: 'Cog', path: 'navigation.courseOverGround', ratio: utils.transform(1, 'deg', 'rad')},
+    { columnName: 'Cog', path: 'navigation.courseOverGroundTrue', ratio: utils.transform(1, 'deg', 'rad')},
     { columnName: 'Aws', path: 'environment.wind.speedApparent', ratio: utils.transform(1, 'knots', 'ms')},
     { columnName: 'Awa', path: 'environment.wind.angleApparent', ratio: utils.transform(1, 'deg', 'rad')},
     { columnName: 'Tws', path: 'environment.wind.speedOverGround', ratio: utils.transform(1, 'knots', 'ms')},
@@ -41,7 +41,7 @@ export class ExpeditionFormatConversion implements CSVConversion {
     // FIXME: True or magnetic heading??
     { columnName: 'Hdg', path: 'navigation.headingTrue', ratio: utils.transform(1, 'deg', 'rad')},
     // FIXME: In meter? BelowSurface?
-    { columnName: 'Depth', path: 'environment.depth.belowSurface', ratio: 1}
+    { columnName: 'Depth', path: 'environment.depth.belowTransducer', ratio: 1}
   ]
 
     //Rudder2,Leeway,Set,Drift,AirTmp,SeaTmp,Baro,Depth,Heel,Trim,Rudder,Tab,Forestay,Downhaul,MastAng,FrstyLen,MastButt,StbJmpr,PrtJmpr,Rake,Volts,ROT,GpsQual,PDOP,GpsNum,GpsAge,GpsGeoHt,GpsAntHt,GpsPosFx,Cog

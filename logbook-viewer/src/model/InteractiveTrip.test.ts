@@ -4,17 +4,18 @@ import InteractiveTrip from "./InteractiveTrip";
 const mockDataProvider : TripDataProvider = {
   getAvailableValues: () => [],
   getValueAtTime: () => null,
-  getValuesAtTime: () => ({})
+  getValuesAtTime: () => ({}),
+  getTripData: () => (new SKDelta())
 }
 
 describe('constructor', () => {
   it('refuses to instantiate an interactive trip without at least one update', () => {
     const delta = SKDelta.fromJSON(`{ "updates": [] }`)
-    expect (() => new InteractiveTrip(delta, mockDataProvider) ).toThrowError("Trip should have *at least* one update!")
+    expect (() => new InteractiveTrip(delta, mockDataProvider, "") ).toThrowError("Trip should have *at least* one update!")
   })
 })
-describe('Extracting segments', () => {
 
+describe('Extracting segments', () => {
   it('handles trip with one position', () => {
     const trip = new InteractiveTrip(SKDelta.fromJSON(`
     {
@@ -28,7 +29,7 @@ describe('Extracting segments', () => {
         }
       ]
     }
-    `), mockDataProvider)
+    `), mockDataProvider, "")
     expect(trip.getPathSegments()).toMatchObject([
       {
         startPosition:  { "longitude": -122, "latitude": 42},
@@ -70,7 +71,7 @@ describe('Extracting segments', () => {
         }
       ]
     }
-    `), mockDataProvider)
+    `), mockDataProvider, "")
     expect(trip.getPathSegments()).toMatchObject([
       {
         startPosition:  { "longitude": -122, "latitude": 42},

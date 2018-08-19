@@ -15,8 +15,9 @@ export default class InteractiveTrip {
   private segments: InteractiveTripSegment[]
   private startTime: Date
   private endTime: Date
+  private title: string
 
-  constructor(trip : SKDelta, dataProvider: TripDataProvider) {
+  constructor(trip : SKDelta, dataProvider: TripDataProvider, title: string) {
     if (trip.updates.length < 1) {
       throw new Error("Trip should have *at least* one update!")
     }
@@ -27,6 +28,7 @@ export default class InteractiveTrip {
     this.segments = this.calculateSegments()
     this.startTime = SignalKTripAnalyzer.getStartTime(this.trip)!
     this.endTime = SignalKTripAnalyzer.getEndTime(this.trip)!
+    this.title = title
   }
 
   public getPathSegments(): InteractiveTripSegment[] {
@@ -55,6 +57,10 @@ export default class InteractiveTrip {
 
   public setSelection(ts: TimeSelection) {
     this.selection = ts
+  }
+
+  public getTitle() {
+    return this.title
   }
 
   private calculateSegments() {

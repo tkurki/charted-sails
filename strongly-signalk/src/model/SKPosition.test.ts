@@ -13,3 +13,8 @@ it ("can ignore altitude", () => {
   expect(pos.longitude).toEqual(-123.2)
   expect(pos.altitude).toBeUndefined()
 })
+
+it('can serialize in DMS format', () => {
+  const pos = new SKPosition(17.00505555108625, -61.76250950023393)
+  expect(pos.asDMSString()).toEqual('N 17º0\'18.200" W 61º45\'45.034"')
+})
