@@ -16,11 +16,21 @@ export function DynamicBoatSVG({data, project}:DynamicBoatSVGProps) {
     return <g/>
   }
   const currentPosition = data['navigation.position'] as SKPosition
-  let cog = data['navigation.courseOverGround'] as number | undefined
-  let hdg = data['navigation.headingTrue'] as number | undefined
+
+  // FIXME: We should correct for magnetic variation before using magnetic values.
+  const cogm = data['navigation.courseOverGround'] as number | undefined
+  const cogt = data['navigation.courseOverGroundTrue'] as number | undefined
+  let cog = cogt !== undefined ? cogt : cogm
+
+  const hdgt = data['navigation.headingTrue'] as number | undefined
+  const hdgm = data['navigation.headingMagnetic'] as number | undefined
+  let hdg = hdgt !== undefined ? hdgt : hdgm
 
   let awa = data['environment.wind.angleApparent'] as number|undefined
-  let twa = data['environment.wind.angleTrueGround'] as number|undefined
+  let twa = data['environment.wind.angleTrueWater'] as number|undefined
+  if (twa === undefined) {
+    twa = data['environment.wind.angleTrueGround'] as number|undefined
+  }
 
   const pixelCoordinate = project([currentPosition.longitude, currentPosition.latitude])
   if (hdg !== undefined) {

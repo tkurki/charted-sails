@@ -1,3 +1,4 @@
+import { SKPosition } from "../model";
 import { IntelligibleSignalK } from "./IntelligibleSignalK";
 
 describe('sorting sk field names', () => {
@@ -48,4 +49,26 @@ describe('making data intelligible', () => {
     expect(formatter.unit).toBe('deg')
     expect(s).toBe("-30")
   })
+
+  it('converts temperature to celsius', () => {
+    const formatter = new IntelligibleSignalK().getFormatterForPath('environment.water.temperature')
+    const s = formatter.format(22 + 273.15)
+    expect(formatter.unit).toBe('ºC')
+    expect(s).toBe("22.0")
+  })
+
+  it('converts GPS Position to something readable', () => {
+    const formatter = new IntelligibleSignalK().getFormatterForPath('navigation.position')
+    const s = formatter.format(new SKPosition(17.00505555108625, -61.76250950023393))
+    expect(formatter.unit).toBe('')
+    expect(s).toBe('N 17º0\'18.200" W 61º45\'45.034"')
+  })
+
+  it('converts distance to nm', () => {
+    const formatter = new IntelligibleSignalK().getFormatterForPath('navigation.log')
+    const s = formatter.format(3.5 * 1852)
+    expect(formatter.unit).toBe('nm')
+    expect(s).toBe('3.50')
+  })
+
 })

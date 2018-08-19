@@ -27,8 +27,11 @@ export default function DataPanel(props : DataPanelProps) {
   const panelItems = shownFields.map( (path) => (
     <DataPanelItem
       key={ path }
-      value={ path in values ? skFormatters[path].format(values[path]) : '-' }
+      value={
+        path in values ? skFormatters[path].format(values[path]) : '-'
+      }
       unit={skFormatters[path].unit} label={skFormatters[path].label}
+      special={ path === 'navigation.position' ? 'position' : undefined }
     />
   ))
 
@@ -38,7 +41,7 @@ export default function DataPanel(props : DataPanelProps) {
         label="Time"
         unit={skFormatter.getUsedTimezoneShortName()}
         value={ skFormatter.formatTime(props.selection.getCenter()) }
-        large={true} />
+        special='time' />
       { panelItems }
   </Card>
   );
@@ -46,9 +49,9 @@ export default function DataPanel(props : DataPanelProps) {
 
 interface DataPanelItemProps {
   /**
-   * Make this a wider field.
+   * Request special treatment
    */
-  large?: boolean
+  special?: 'time' | 'position'
 
   /**
    * Label to show next to the value.
@@ -66,9 +69,29 @@ interface DataPanelItemProps {
   value: string
 }
 
-export function DataPanelItem({label, value, unit, large} : DataPanelItemProps) {
+export function DataPanelItem({label, value, unit, special} : DataPanelItemProps) {
+  if (special === 'time') {
+    return (
+      <div className={ "data-panel-item data-panel-item-time" }>
+        <span className="data">{label}</span>
+        <span className="value">{value}</span>
+      </div>
+    )
+  }
+  if (special === 'position') {
+    const fields = value.split(' ')
+    return (
+      <div className={ "data-panel-item data-panel-item-position" }>
+        <span className="data">{label}</span>
+        <span className="value">
+          {`${fields[0]} ${fields[1]}`} <br/>
+          {`${fields[2]} ${fields[3]}`}
+        </span>
+      </div>
+    )
+  }
   return (
-    <div className={ large ? "data-panel-item data-panel-item-large" : "data-panel-item" }>
+    <div className={ "data-panel-item" }>
       <span className="data">{label}</span>
       <span className="value">{value}</span>
       <span className="unit">{unit}</span>

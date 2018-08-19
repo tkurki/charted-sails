@@ -1,6 +1,6 @@
-import { SKValueType, SKPosition } from "../model";
 import * as utils from '@signalk/nmea0183-utilities';
 import { isNullOrUndefined } from "util";
+import { SKPosition, SKValueType } from "../model";
 
 export interface SKValueFormatter {
   /**
@@ -34,6 +34,9 @@ export interface SKValueFormatter {
  * and present it to the user in a friendly way.
  */
 export class IntelligibleSignalK {
+  private speedUnit = "knots"
+  private speedDecimals = 1
+
   constructor() {
     // In the future, we should allow users of this class to pass options to change
     // how we will convert the data. For example, preferred units, preferred fields, etc.
@@ -126,22 +129,20 @@ export class IntelligibleSignalK {
     if (path in signalKSchema && path in fieldConfiguration) {
       const fieldConfig = fieldConfiguration[path]
       intelligibleValue.display = true
-      intelligibleValue.unit = fieldConfig.unit
+      intelligibleValue.unit = fieldConfig.unit || ''
       intelligibleValue.label = fieldConfig.label
 
-      if (signalKSchema[path].type === 'number') {
+      if (signalKSchema[path].type === 'speed') {
         intelligibleValue.format = (x) => {
           if (typeof x !== 'number') return "-"
-          const convertedValue = utils.transform(x, signalKSchema[path].unit, fieldConfig.unit)
-
-          const digits = fieldConfig.fractionDigits !== undefined ? fieldConfig.fractionDigits : 1
-          return convertedValue.toFixed(digits)
+          const convertedValue = utils.transform(x, "ms", this.speedUnit)
+          return convertedValue.toFixed(this.speedDecimals)
         }
       }
       if ((signalKSchema[path].type === 'angle'||signalKSchema[path].type === 'direction')) {
         intelligibleValue.format = (x) => {
           if (typeof x !== 'number') return "-"
-          let angleInDegrees = utils.transform(x, signalKSchema[path].unit, fieldConfig.unit)
+          let angleInDegrees = utils.transform(x, 'rad', 'deg')
           if (signalKSchema[path].type === 'direction') {
             angleInDegrees = (angleInDegrees + 360) %360
           }
@@ -154,45 +155,110 @@ export class IntelligibleSignalK {
           return angleInDegrees.toFixed(fieldConfig.fractionDigits)
         }
       }
+      if (signalKSchema[path].type === 'temperature') {
+        intelligibleValue.unit = "ºC"
+        intelligibleValue.format = (x) => {
+          if (typeof x !== 'number') return "-"
+
+          let temp = x - 273.15
+          return temp.toFixed(fieldConfig.fractionDigits)
+        }
+      }
+      if (signalKSchema[path].type === 'distance') {
+        intelligibleValue.unit = 'nm'
+        intelligibleValue.format = (x) => {
+          if (typeof x !== 'number') return "-"
+
+          return (x/1852).toFixed(2)
+        }
+      }
+      if (signalKSchema[path].type === 'depth') {
+        intelligibleValue.unit = 'm'
+        intelligibleValue.format = (x) => {
+          if (typeof x !== 'number') return "-"
+
+          return x.toFixed(1)
+        }
+      }
+      if (signalKSchema[path].type === 'position') {
+        intelligibleValue.format = (x) => {
+          if (!(x instanceof SKPosition)) return "-"
+          return x.asDMSString()
+        }
+      }
     }
     return intelligibleValue
   }
 }
 
-
-
 const preferredFieldOrder = [
-  'navigation.speedOverGround', 'navigation.courseOverGround',
-  'navigation.speedThroughWater', 'navigation.headingTrue',
+  'navigation.speedOverGround', 'navigation.courseOverGround', 'navigation.courseOverGroundTrue',
+  'navigation.speedThroughWater', 'navigation.headingMagnetic', 'navigation.headingTrue',
+  'navigation.position',
   'environment.wind.speedApparent', 'environment.wind.angleApparent',
-  'environment.wind.speedOverGround', 'environment.wind.angleTrueGround'
+  'environment.wind.angleTrueWater', 'environment.wind.speedTrue',
+  'environment.wind.speedOverGround', 'environment.wind.angleTrueGround',
+  'environment.depth.belowTransducer', 'environment.water.temperature',
+  'navigation.log', 'navigation.trip.log'
 ]
 
 const signalKSchema : {
   [path: string]: {
-    unit: string
-    type: 'angle'|'direction'|'position'|'number'|'string'|'timestamp'
+    type: 'angle'|'depth'|'direction'|'distance'|'position'|'speed'|'string'|'timestamp'|'temperature'
+    unit?: string
   }
 } = {
-  'navigation.speedOverGround': { type: 'number', unit: 'ms'},
-  'navigation.speedThroughWater': { type: 'number', unit: 'ms'},
-  'navigation.courseOverGround': { type: 'direction', unit: 'rad'},
-  'navigation.headingMagnetic': { type: 'direction', unit: 'rad' },
-  'navigation.headingTrue': { type: 'direction', unit: 'rad' },
-  'environment.wind.angleTrueGround': { type: 'angle', unit: 'rad'},
-  'environment.wind.angleApparent': { type: 'angle', unit: 'rad'},
-  'environment.wind.speedOverGround': { type: 'number', unit: 'ms'},
-  'environment.wind.speedApparent': { type: 'number', unit: 'ms'},
+  'environment.depth.belowTransducer': { type: 'depth' },
+  'environment.water.temperature': { type: 'temperature' },
+
+  'environment.wind.angleTrueGround': { type: 'angle' },
+  'environment.wind.angleTrueWater': { type: 'angle' },
+  'environment.wind.angleApparent': { type: 'angle' },
+
+  'environment.wind.speedApparent': { type: 'speed' },
+  'environment.wind.speedTrue': { type: 'speed' },
+  'environment.wind.speedOverGround': { type: 'speed' },
+
+  'navigation.courseOverGround': { type: 'direction' },
+  'navigation.courseOverGroundTrue': { type: 'direction' },
+
+  'navigation.headingMagnetic': { type: 'direction' },
+  'navigation.headingTrue': { type: 'direction' },
+
+  'navigation.log': { type: 'distance' },
+
+  'navigation.position': { type: 'position' },
+
+  'navigation.trip.log': { type: 'distance'},
+
+  'navigation.speedOverGround': { type: 'speed' },
+  'navigation.speedThroughWater': { type: 'speed' },
 }
 
-const fieldConfiguration : { [index:string]: { label: string, unit: string, fractionDigits?: number }} = {
-  'navigation.speedOverGround': { label: 'SOG', unit: 'knots' },
-  'navigation.courseOverGround': { label: 'COG', fractionDigits: 0, unit: 'deg' },
+const fieldConfiguration : { [index:string]: { label: string, unit?: string, fractionDigits?: number }} = {
+  'environment.depth.belowTransducer': { label: 'DPT', unit: 'm' },
+  'environment.water.temperature': { label: 'TMP', unit: 'CELCIUS', fractionDigits: 1 },
+
+  'environment.wind.angleApparent': { label: 'AWA', fractionDigits: 0, unit: 'deg' },
+  'environment.wind.angleTrueGround': { label: 'TWAg', fractionDigits: 0, unit: 'deg' },
+  'environment.wind.angleTrueWater': { label: 'TWAw', fractionDigits: 0, unit: 'deg' },
+
+  'environment.wind.speedApparent': { label: 'AWS', unit: 'knots' },
+  'environment.wind.speedTrue': { label: 'TWSw', unit: 'knots' },
+  'environment.wind.speedOverGround': { label: 'TWSg', unit: 'knots' },
+
+  'navigation.courseOverGround': { label: 'COGm', fractionDigits: 0, unit: 'deg' },
+  'navigation.courseOverGroundTrue': { label: 'COGt', fractionDigits: 0, unit: 'deg' },
+
   'navigation.headingMagnetic': { label: 'HDGm', fractionDigits: 0, unit: 'deg' },
   'navigation.headingTrue': { label: 'HDGt', fractionDigits: 0, unit: 'deg' },
-  'navigation.speedThroughWater': { label: 'BSP', unit: 'knots' },
-  'environment.wind.angleTrueGround': { label: 'TWA', fractionDigits: 0, unit: 'deg' },
-  'environment.wind.angleApparent': { label: 'AWA', fractionDigits: 0, unit: 'deg' },
-  'environment.wind.speedOverGround': { label: 'TWS', unit: 'knots' },
-  'environment.wind.speedApparent': { label: 'AWS', unit: 'knots' },
+
+  'navigation.log': { label: 'LOG', fractionDigits: 0, unit: 'nm' },
+
+  'navigation.position': { label: 'POS' },
+
+  'navigation.trip.log': { label: 'TRIP', fractionDigits: 0, unit: 'nm' },
+
+  'navigation.speedOverGround': { label: 'SOG', unit: 'knots' },
+  'navigation.speedThroughWater': { label: 'BSP', unit: 'knots' }
 }

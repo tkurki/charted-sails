@@ -29,6 +29,15 @@ export class SKPosition {
     return [this.longitude, this.latitude]
   }
 
+  public asDMSString(): string {
+    const latitude = toDegreesMinutesAndSeconds(this.latitude)
+    const latitudeCardinal = Math.sign(this.latitude) >= 0 ? "N" : "S"
+    const longitude = toDegreesMinutesAndSeconds(this.longitude)
+    const longitudeCardinal = Math.sign(this.longitude) >= 0 ? "E" : "W"
+
+    return `${latitudeCardinal} ${latitude} ${longitudeCardinal} ${longitude}`
+  }
+
   static fromJSON(json:string|SKPositionJSON) {
     if (typeof json === 'string') {
       return JSON.parse(json, SKPosition.reviver)
@@ -46,3 +55,14 @@ export class SKPosition {
     return key === "" ? SKPosition.fromJSON(value) : value;
   }
 }
+
+function toDegreesMinutesAndSeconds(coordinate:number) {
+  var absolute = Math.abs(coordinate);
+  var degrees = Math.floor(absolute);
+  var minutesNotTruncated = (absolute - degrees) * 60;
+  var minutes = Math.floor(minutesNotTruncated);
+  var seconds = (minutesNotTruncated - minutes) * 60;
+
+  return `${degrees}º${minutes}'${seconds.toFixed(3)}"`;
+}
+

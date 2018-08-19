@@ -54,5 +54,66 @@ storiesOf("Components/DynamicBoatSVG", module)
       </svg>
     )
   })
+  .add('boat with just cogT', () => {
+    const toggle = boolean('show alignment grid', true)
+    return (
+      <svg height={200} width={200}>
+        <line x1={0} y1={100} x2={200} y2={100} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <line x1={100} y1={0} x2={100} y2={200} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <DynamicBoatSVG data={ {
+          'navigation.position': new SKPosition(42, 42),
+          'navigation.courseOverGroundTrue': number('COGt', 0, directionKnobOptions)*(2*Math.PI)/360
+        }} project={ () => ([100, 100]) }/>
+      </svg>
+    )
+  })
+  .add('boat with cogT and cog', () => {
+    const toggle = boolean('show alignment grid', true)
+    return (
+      <svg height={200} width={200}>
+        <line x1={0} y1={100} x2={200} y2={100} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <line x1={100} y1={0} x2={100} y2={200} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <DynamicBoatSVG data={ {
+          'navigation.position': new SKPosition(42, 42),
+          'navigation.courseOverGround': number('COG', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'navigation.courseOverGroundTrue': number('COGt', 0, directionKnobOptions)*(2*Math.PI)/360
+        }} project={ () => ([100, 100]) }/>
+      </svg>
+    )
+  })
 
+  .add('boat with wind over water', () => {
+    const toggle = boolean('show alignment grid', true)
+    return (
+      <svg height={200} width={200}>
+        <line x1={0} y1={100} x2={200} y2={100} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <line x1={100} y1={0} x2={100} y2={200} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <DynamicBoatSVG data={ {
+          'navigation.position': new SKPosition(42, 42),
+          'navigation.courseOverGround': number('COG', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'navigation.headingTrue': number('HDGt', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'environment.wind.angleTrueWater': number('TWAw', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'environment.wind.speedTrue': number('TWSw', 0, directionKnobOptions)*1852/3600
+        }} project={ () => ([100, 100]) }/>
+      </svg>
+    )
+  })
 
+  .add('boat with wind over water and ground', () => {
+    const toggle = boolean('show alignment grid', true)
+    return (
+      <svg height={200} width={200}>
+        <line x1={0} y1={100} x2={200} y2={100} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <line x1={100} y1={0} x2={100} y2={200} stroke='black' opacity={ toggle ? 1 : 0 }/>
+        <DynamicBoatSVG data={ {
+          'navigation.position': new SKPosition(42, 42),
+          'navigation.courseOverGround': number('COG', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'navigation.headingTrue': number('HDGt', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'environment.wind.angleTrueWater': number('TWAw', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'environment.wind.speedTrue': number('TWSw', 0, directionKnobOptions)*1852/3600,
+          'environment.wind.angleTrueGround': number('TWAg', 0, directionKnobOptions)*(2*Math.PI)/360,
+          'environment.wind.speedOverGround': number('TWSg', 0, directionKnobOptions)*1852/3600
+        }} project={ () => ([100, 100]) }/>
+      </svg>
+    )
+  })
