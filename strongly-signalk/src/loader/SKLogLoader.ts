@@ -1,7 +1,7 @@
-import NMEA0183Parser from '@signalk/nmea0183-signalk'
-import n2kSignalk from '@signalk/n2k-signalk'
+import n2kSignalk from '@signalk/n2k-signalk';
+import NMEA0183Parser from '@signalk/nmea0183-signalk';
+import { FromPgn } from 'canboatjs';
 import { SKDelta, SKSource, SKUpdate } from "../model";
-import { FromPgn } from 'canboatjs'
 
 export class SKLogLoader {
   static fromFile(f: File): Promise<SKDelta[]> {
@@ -107,7 +107,7 @@ export class SKLogLoader {
           return null
         }
       }
-      else if (type === 'P') {
+      else if (type === 'P' || type === 'A') {
         const canboatParser = new FromPgn({format: 1})
         let pgnData:any = null
         canboatParser.on('pgn', pgn => {
@@ -126,7 +126,7 @@ export class SKLogLoader {
           delta.updates.forEach(u => {
             u.timestamp = time
 
-            u.source.label = "PCDIN"
+            u.source.label = "NMEA2000"
             u.source.pgn = pgnData.pgn
             u.source.src = pgnData.src.toString()
             u.source.type = "NMEA2000"

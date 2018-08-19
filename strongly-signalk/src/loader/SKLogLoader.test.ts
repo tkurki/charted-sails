@@ -1,5 +1,5 @@
+import { SKDelta, SKPosition, SKSource, SKUpdate, SKValue } from "../model";
 import { SKLogLoader } from "./SKLogLoader";
-import { SKDelta, SKUpdate, SKSource, SKValue, SKPosition } from "../model";
 
 it('can parse a line in JSON format', () => {
   const delta = SKLogLoader.fromLine(`1526237642929;I;{"context":"vessels.self","updates":[{"source":{"label":"KBox.Barometer"},"values":[{"path":"environment.outside.pressure","value":101892.4}]}]}`)
@@ -40,7 +40,7 @@ it('can parse a line in NMEA0183 format', () => {
   )
 })
 
-it('can parse a line in NMEA2000 format', () => {
+it('can parse a line in PCDIN format', () => {
   const delta = SKLogLoader.fromLine(`1526239612483;P;$PCDIN,01F802,5AF8917C,7F,00FD65300000FFFF*28`)
   expect(delta).not.toBeNull()
   /*
@@ -50,10 +50,28 @@ it('can parse a line in NMEA2000 format', () => {
   */
   expect(delta).toMatchObject(
     new SKDelta([
-      new SKUpdate(new SKSource('PCDIN', { pgn: 129026, src: "127", type: "NMEA2000"}), new Date(1526239612483),
+      new SKUpdate(new SKSource('NMEA2000', { pgn: 129026, src: "127", type: "NMEA2000"}), new Date(1526239612483),
       [
         new SKValue('navigation.speedOverGround', 0),
         new SKValue('navigation.courseOverGroundMagnetic', 1.2389)
+      ]) ], 'vessels.self')
+  )
+})
+
+it('can parse a line in Actisense format', () => {
+  const delta = SKLogLoader.fromLine(`1531209600910;A;2018-07-10T08:00:00.909Z,2,130306,105,255,8,00,f4,02,bf,03,fa,ff,ff`)
+  expect(delta).not.toBeNull()
+  /*
+{"updates":[{"source":{"label":"","type":"NMEA2000","pgn":129026,"src":"127"},
+  "timestamp":"1970-01-18T15:57:19.612Z","values":[
+      {"path":"navigation.speedOverGround","value":0},{"path":"navigation.courseOverGroundMagnetic","value":1.2389}]}]}
+  */
+  expect(delta).toMatchObject(
+    new SKDelta([
+      new SKUpdate(new SKSource('NMEA2000', { pgn: 130306, src: "105", type: "NMEA2000"}), new Date(1531209600910),
+      [
+        new SKValue('environment.wind.speedApparent', 7.56),
+        new SKValue('environment.wind.angleApparent', 0.0959)
       ]) ], 'vessels.self')
   )
 })
