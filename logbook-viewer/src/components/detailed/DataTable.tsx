@@ -1,5 +1,5 @@
-import { IntelligibleSignalK, TripDataProvider } from '@aldis/strongly-signalk';
-import { Cell, Column, IRegion, SelectionModes, Table } from "@blueprintjs/table";
+import { BetterDataProvider, IntelligibleSignalK, TripDataProvider } from '@aldis/strongly-signalk';
+import { Cell, Column, IRegion, Regions, SelectionModes, Table } from "@blueprintjs/table";
 import * as React from 'react';
 import TimeSelection from '../../model/TimeSelection';
 import './DataTable.css';
@@ -19,6 +19,17 @@ export default class DataTable extends React.Component<DataTableProps> {
     this.intelligibleSK = new IntelligibleSignalK()
     this.setTableRef = this.setTableRef.bind(this)
     this.onSelection = this.onSelection.bind(this)
+  }
+
+  public componentDidMount() {
+    // Seems that the table needs a bit of time to be ready to scroll.
+    setTimeout( () => {
+      this.scrollToSelection()
+    }, 1)
+  }
+
+  public componentDidUpdate() {
+    this.scrollToSelection()
   }
 
   public render() {
@@ -85,6 +96,16 @@ export default class DataTable extends React.Component<DataTableProps> {
         const ts = new TimeSelection(delta.updates[begin].timestamp)
         this.props.onSelectionChange(ts)
       }
+    }
+  }
+
+  private scrollToSelection() {
+    if (this.props.dataProvider instanceof BetterDataProvider) {
+      // This API is not part of DataProvider interface so gotta hack a bit.
+      // FIXME: Will need to rethink all this
+      const index = this.props.dataProvider.indexInDeltaForTimestamp(this.props.selection.getCenter())
+      const region = Regions.row(index)
+      this.tableRef!.scrollToRegion(region)
     }
   }
 }
