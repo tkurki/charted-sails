@@ -82,7 +82,11 @@ export default class App extends React.Component<AppProps, AppState> {
         {this.state.trip && (
           <React.Fragment>
             <ButtonGroup large={true} className='buttonGroupBar'>
-              <Button icon="th" onClick={ () => this.setState({ showDataTable: !this.state.showDataTable }) }/>
+              <Button icon="th" onClick={ () => {
+                ReactGA.event({ category: 'ButtonGroup', action: `${ this.state.showDataTable ? 'Close ' : 'Open '} Table `})
+                this.setState({ showDataTable: !this.state.showDataTable })
+              }
+              }/>
               <Button icon="cross" onClick={ () => this.onCloseTrip() }/>
             </ButtonGroup>
             <DataPanel
@@ -188,6 +192,8 @@ export default class App extends React.Component<AppProps, AppState> {
 
   private openFile(f: File) {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
+
+
     if (f.name.endsWith('.csv')) {
       CSVLoader.fromFile(f).then(delta => {
         this.openTrip(delta, f.name)
