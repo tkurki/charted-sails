@@ -1,4 +1,5 @@
 import { BetterDataProvider, CSVLoader, SKDelta, SKLogLoader, SKPosition } from '@aldis/strongly-signalk';
+import { Button, ButtonGroup } from '@blueprintjs/core';
 import * as React from 'react';
 import ReactGA from 'react-ga';
 import ReactMapGL from 'react-map-gl';
@@ -76,8 +77,9 @@ export default class App extends React.Component<AppProps, AppState> {
 
         {this.state.trip && (
           <React.Fragment>
-            <button type="button" className="pt-button pt-minimal pt-icon-cross close-button"
-              onClick={ () => this.onCloseTrip() } />
+            <ButtonGroup large={true} className='buttonGroupBar'>
+              <Button icon="cross" onClick={ () => this.onCloseTrip() }/>
+            </ButtonGroup>
             <DataPanel
               dataProvider={ this.state.trip.getDataProvider() }
               hoveringMode={ this.state.hoveredObject ? true : false }
