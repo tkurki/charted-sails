@@ -9,5 +9,8 @@
     "*/node_modules": true,
     ".jest": true,
     "node_modules": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
   }
 }
