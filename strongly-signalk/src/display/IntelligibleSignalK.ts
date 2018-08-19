@@ -40,6 +40,14 @@ export class IntelligibleSignalK {
   }
 
   /**
+   * Returns a string with time formatted to users preferences.
+   * @param d a Date object
+   */
+  public formatTime(d:Date) {
+    return d.toLocaleTimeString()
+  }
+
+  /**
    * Return a short string representing the timezone used to display dates. For example "GMT+2".
    */
   public getUsedTimezoneShortName() {

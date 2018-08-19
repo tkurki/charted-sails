@@ -37,7 +37,7 @@ export default function DataPanel(props : DataPanelProps) {
       <DataPanelItem
         label="Time"
         unit={skFormatter.getUsedTimezoneShortName()}
-        value={ props.selection.getCenter().toLocaleTimeString() }
+        value={ skFormatter.formatTime(props.selection.getCenter()) }
         large={true} />
       { panelItems }
   </Card>
