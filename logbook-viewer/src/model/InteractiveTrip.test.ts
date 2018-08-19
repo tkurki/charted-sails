@@ -4,7 +4,8 @@ import InteractiveTrip from "./InteractiveTrip";
 const mockDataProvider : TripDataProvider = {
   getAvailableValues: () => [],
   getValueAtTime: () => null,
-  getValuesAtTime: () => ({})
+  getValuesAtTime: () => ({}),
+  getTripData: () => (new SKDelta())
 }
 
 describe('constructor', () => {

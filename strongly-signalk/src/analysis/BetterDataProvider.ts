@@ -44,6 +44,10 @@ export class BetterDataProvider implements TripDataProvider {
     })
   }
 
+  public getTripData() {
+    return this.delta
+  }
+
   public getAvailableValues() : string[] {
     return this.availableValues
   }
