@@ -1,4 +1,4 @@
-import { Slider } from '@blueprintjs/core';
+import { Card, Slider } from '@blueprintjs/core';
 import moment from 'moment';
 import * as React from "react";
 import './TimePanel.css';
@@ -37,7 +37,7 @@ export default class TimePanel extends React.Component<TimePanelProps> {
     const range = this.timeRanges.filter((r) => rangeDuration > r.stepSize )[0]
 
     return (
-      <div className="pt-card pt-elevation-2 time-panel" style={ this.props.style }>
+      <Card elevation={2} className="time-panel" style={ this.props.style}>
         <Slider
           min={ startTime.getTime() }
           max={ endTime.getTime() }
@@ -48,7 +48,7 @@ export default class TimePanel extends React.Component<TimePanelProps> {
           labelStepSize={this.calculateLabelStepSize(rangeDuration, range.stepSize, 7)}
           stepSize={100}
           />
-      </div>
+      </Card>
     )
   }
 

@@ -1,4 +1,5 @@
 import { IntelligibleSignalK, SKValueFormatter, TripDataProvider } from '@aldis/strongly-signalk';
+import { Card } from '@blueprintjs/core';
 import * as React from 'react';
 import TimeSelection from '../../model/TimeSelection';
 import './DataPanel.css';
@@ -32,10 +33,14 @@ export default function DataPanel(props : DataPanelProps) {
   ))
 
   return (
-    <div className="pt-card pt-elevation-2 data-panel" style={ props.style }>
-        <DataPanelItem label="Time" unit={skFormatter.getUsedTimezoneShortName()} value={ props.selection.getCenter().toLocaleTimeString() } large={true} />
-        { panelItems }
-    </div>
+    <Card elevation={2} style={ props.style } className="data-panel">
+      <DataPanelItem
+        label="Time"
+        unit={skFormatter.getUsedTimezoneShortName()}
+        value={ props.selection.getCenter().toLocaleTimeString() }
+        large={true} />
+      { panelItems }
+  </Card>
   );
 }
 
