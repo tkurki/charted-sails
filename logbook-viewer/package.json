@@ -32,7 +32,9 @@
     "lint": "tslint --project . --config tslint.prod.json",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "deploy": "react-scripts-ts build && surge build/ www.chartedsails.com"
+    "deploy-prod": "react-scripts-ts build && surge build/ www.chartedsails.com",
+    "deploy-beta": "react-scripts-ts build && surge build/ beta.chartedsails.com",
+    "deploy-testing": "react-scripts-ts build && surge build/ testing.chartedsails.com"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^4.0.0-alpha.10",
