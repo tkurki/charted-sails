@@ -39,6 +39,9 @@ jobs:
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
+      - run: yarn install
+      - run: yarn bootstrap
+      - run: yarn build
       - run: yarn run deploy-prod
 
 workflows:
