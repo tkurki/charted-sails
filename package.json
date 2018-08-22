@@ -6,7 +6,7 @@
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "test": "yarn run jest",
-    "deploy": "cd logbook-viewer && yarn deploy"
+    "deploy-prod": "cd logbook-viewer && yarn run deploy-prod"
   },
   "workspaces": [
     "*"
