@@ -96,7 +96,7 @@ module.exports = {
       '.jsx',
     ],
     alias: {
-      
+
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
@@ -140,12 +140,19 @@ module.exports = {
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
+
+          // Worker-loader
+          {
+            test: /\.worker\.ts$/,
+            use: { loader: 'worker-loader' }
+          },
+
           {
             test: /\.(js|jsx|mjs)$/,
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              
+
               compact: true,
             },
           },
