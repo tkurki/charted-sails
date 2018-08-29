@@ -1,7 +1,13 @@
 import { isNull } from "util";
-import { SKDelta, SKValueType } from "../model";
+import { SKDelta, SKDeltaJSON, SKValueType } from "../model";
 import { SignalKTripAnalyzer } from "./SignalKTripAnalyzer";
 import { TripDataProvider } from "./TripDataProvider";
+
+interface BetterDataProviderJSON {
+  delta: SKDeltaJSON
+  availableValues:string[]
+  valuesPerPath:{[path:string]: [Date,SKValueType][]}
+}
 
 export class BetterDataProvider implements TripDataProvider {
   public static interpolate(path: string, time: Date, timeA: Date, valueA: SKValueType,
@@ -21,6 +27,20 @@ export class BetterDataProvider implements TripDataProvider {
     else {
       return valueA
     }
+  }
+
+  /**
+   * Re-hydrate a betterDataProvider from just the fields in an Object.
+   *
+   * This is useful when reloading data that was serialized.
+   * @param jsonObject
+   */
+  static fromJSON(jsonObject: BetterDataProviderJSON) {
+    const provider = new BetterDataProvider(new SKDelta())
+    provider.delta = SKDelta.fromJSON(jsonObject.delta)
+    provider.availableValues = jsonObject.availableValues
+    provider.valuesPerPath = jsonObject.valuesPerPath
+    return provider
   }
 
   private delta: SKDelta
@@ -159,5 +179,4 @@ export class BetterDataProvider implements TripDataProvider {
     })
     return data
   }
-
 }

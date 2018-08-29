@@ -9,9 +9,17 @@ module.exports = (baseConfig, env, defaultConfig) => {
   defaultConfig.plugins.push(new TSDocgenPlugin());
   defaultConfig.resolve.extensions.push('.ts', '.tsx');
 
-  // ggencoder has a `if (runningAsMain) require(test)
-  // and the test requires a node library ('fs')
-  defaultConfig.module.noParse = /ggencoder\/test/
+  // Stolen from create-react-app webpack configuration (with the comment):
+  // Some libraries import Node modules but don't use them in the browser.
+  // Tell Webpack to provide empty mocks for them so importing them works.
+  defaultConfig.node = {
+    dgram: 'empty',
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty',
+    child_process: 'empty',
+  }
 
   return defaultConfig;
 };
+

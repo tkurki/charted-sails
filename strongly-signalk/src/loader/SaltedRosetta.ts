@@ -29,6 +29,6 @@ export class SaltedRosetta {
       return CSVLoader.fromFile(f).then((delta) => ([delta]))
     }
 
-    return Promise.reject(`Unrecognized file format (${f.name})`)
+    return Promise.reject(`Unrecognized file extension (${f.name})`)
   }
 }

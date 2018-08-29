@@ -1,4 +1,4 @@
-import { BetterDataProvider, CSVLoader, SKDelta, SKLogLoader, SKPosition } from '@aldis/strongly-signalk';
+import { BetterDataProvider, SKPosition } from '@aldis/strongly-signalk';
 import { Button, ButtonGroup } from '@blueprintjs/core';
 import * as React from 'react';
 import ReactGA from 'react-ga';
@@ -14,6 +14,7 @@ import TripSelectorOverlay from './components/overview/TripSelectorOverlay';
 import InteractiveTrip from './model/InteractiveTrip';
 import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
+import LogParser from './parsing/LogParser';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
@@ -193,36 +194,21 @@ export default class App extends React.Component<AppProps, AppState> {
   private openFile(f: File) {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
 
-
-    if (f.name.endsWith('.csv')) {
-      CSVLoader.fromFile(f).then(delta => {
-        this.openTrip(delta, f.name)
-      })
-      .catch(reason => {
-        console.log(`Unable to load CSV file ${f.name}: ${reason}`)
-        ReactGA.event({ category: 'Trip', action: 'Error CSV', label: `${f.name}: ${reason}` })
-        this.setState({trip: null})
-      })
-    }
-    else if (f.name.endsWith('.log')) {
-      SKLogLoader.fromFile(f).then(deltas => {
-        if (deltas.length > 0) {
-          this.openTrip(deltas[0], f.name)
-        }
-      })
-      .catch(reason => {
-        console.log(`Unable to load SK logfile ${f.name}: ${reason}`)
-        ReactGA.event({ category: 'Trip', action: 'Error SKLog', label: `${f.name}: ${reason}` })
-        this.setState({trip: null})
-      })
-    }
+    const logParser = new LogParser()
+    logParser.open(f).then(({trip, timeSpent}) => {
+      this.openTrip(trip)
+      if (timeSpent !== undefined) {
+        ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: timeSpent })
+      }
+    })
+    .catch(e => {
+      console.log(`Unable to load file ${f.name}: ${e}`)
+      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e.reason}` })
+      this.setState({trip: null})
+    })
   }
 
-  private openTrip(delta: SKDelta, title: string) {
-    const timerStart = Date.now()
-    const provider = new BetterDataProvider(delta)
-    const trip = new InteractiveTrip(delta, provider, title)
-
+  private openTrip(trip: InteractiveTrip) {
     const viewport = {
       ...this.state.viewport,
       ...this._calculateViewportBounding(trip.getBounds()),
@@ -231,13 +217,14 @@ export default class App extends React.Component<AppProps, AppState> {
       /*transitionEasing: easeCubic*/
     }
     this.setState({viewport, trip})
-    ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: Date.now() - timerStart })
   }
 
   private tripOverviewSelected(t: TripOverview) {
     ReactGA.event({ category: 'Trip', action: 'Load trip', label: t.label })
     t.getSKDelta().then(delta => {
-      this.openTrip(delta, t.label)
+      const provider = new BetterDataProvider(delta)
+      const trip = new InteractiveTrip(delta, provider, t.label)
+      this.openTrip(trip)
     })
   }
 
