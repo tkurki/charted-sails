@@ -1,10 +1,11 @@
 import { BetterDataProvider, SKPosition } from '@aldis/strongly-signalk';
-import { Button, ButtonGroup } from '@blueprintjs/core';
+import { Button, ButtonGroup, Intent, ProgressBar } from '@blueprintjs/core';
 import * as React from 'react';
 import ReactGA from 'react-ga';
 import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import './App.css';
+import { AppToaster } from './AppToaster';
 import DataPanel from './components/detailed/DataPanel';
 import DataTable from './components/detailed/DataTable';
 import TimePanel from './components/detailed/TimePanel';
@@ -194,17 +195,32 @@ export default class App extends React.Component<AppProps, AppState> {
   private openFile(f: File) {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
 
+    const loadingToastKey = AppToaster.show({
+      icon: "cloud-upload",
+      timeout: 0,
+      message: <ProgressBar intent='primary' className='toasted-progress-bar'/>
+    })
+
     const logParser = new LogParser()
     logParser.open(f).then(({trip, timeSpent}) => {
       this.openTrip(trip)
+      AppToaster.dismiss(loadingToastKey)
       if (timeSpent !== undefined) {
         ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: timeSpent })
       }
     })
     .catch(e => {
+      AppToaster.dismiss(loadingToastKey)
       console.log(`Unable to load file ${f.name}: ${e}`)
       ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e.reason}` })
       this.setState({trip: null})
+      AppToaster.show({
+        icon: 'warning-sign',
+        intent: Intent.DANGER,
+        message: <div>We were unable to load your file.&nbsp;
+          <a href='mailto:hello@aldislab.com?subject=Unable+to+load+logfile'>Please email it to us</a>.<br/><small>Error: {e}</small>
+        </div>
+      })
     })
   }
 
