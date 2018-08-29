@@ -57,6 +57,6 @@ export default class TimePanel extends React.Component<TimePanelProps> {
   }
 
   private calculateLabelStepSize(duration: number, intervalBetweenLabel:number, labelsCount: number) {
-    return Math.max(1000, Math.round(duration / (labelsCount * intervalBetweenLabel)) * intervalBetweenLabel)
+    return Math.max(intervalBetweenLabel, Math.round(duration / (labelsCount * intervalBetweenLabel)) * intervalBetweenLabel)
   }
 }

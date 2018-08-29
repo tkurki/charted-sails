@@ -36,6 +36,9 @@ storiesOf("Components/TimePanel", module)
   .add('Showing a super short log (3 sec)', () => {
     return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 3*1000, 0)
   })
+  .add('Showing a short log (2 min)', () => {
+    return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 2*60*1000, 0)
+  })
   .add('Showing a short log (10 min)', () => {
     return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 10*60*1000, 0)
   })
