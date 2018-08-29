@@ -17,7 +17,7 @@ export class BetterDataProvider implements TripDataProvider {
       throw new Error(`Values for path ${path} should have the same type (${typeof valueA} vs ${typeof valueB})`)
     }
     if (time < timeA || time > timeB) {
-      throw new Error(`Cannot interpolate for a time outside given bounds (${timeA} ${time} ${timeB}`)
+      throw new Error(`Cannot interpolate for a time outside given bounds (${timeA.toISOString()} ${time.toISOString()} ${timeB.toISOString()}`)
     }
     if (typeof valueA === 'number' && typeof valueB === 'number') {
       return valueA
@@ -178,5 +178,23 @@ export class BetterDataProvider implements TripDataProvider {
       }
     })
     return data
+  }
+
+  /**
+   * Returns the smallest timestamp that has all the paths existing in this
+   * dataset defined.
+   *
+   * This is useful when displaying data to select the first point that is fully defined.
+   */
+  public getSmallestTimestampWithAllPathsDefined() : Date {
+    const firstDateOfPaths = Object.keys(this.valuesPerPath)
+      .map(path => this.valuesPerPath[path])
+      // [Date, SKValueType][] => [Date, SKValueType][0]
+      .map(value => value[0])
+      // [Date, SKValueType] => Date
+      .map(value => value[0])
+      .sort()
+
+    return firstDateOfPaths[firstDateOfPaths.length - 1]
   }
 }

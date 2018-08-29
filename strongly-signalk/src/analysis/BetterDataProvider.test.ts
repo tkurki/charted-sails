@@ -182,6 +182,35 @@ describe('getValueAtTime()', () => {
       .toEqual("DEFG")
   })
 
+  it('should be able to find the first time with all paths set', () => {
+    const dataProvider = new BetterDataProvider(SKDelta.fromJSON(`
+    {
+      "context": "vessels.urn:mrn:imo:mmsi:234567890",
+      "updates": [
+        {
+          "timestamp": "2010-01-07T07:18:44Z", "source": { "label": "" },
+          "values": [
+            { "path": "navigation.speedOverGround", "value": 2 }
+          ]
+        },
+        {
+          "timestamp": "2010-01-07T07:18:46Z", "source": { "label": "" },
+          "values": [
+            { "path": "navigation.speedOverGround", "value": 4 },
+            { "path": "navigation.courseOverGround", "value": 4 }
+          ]
+        },
+        {
+          "timestamp": "2010-01-07T07:18:49Z", "source": { "label": "" },
+          "values": [
+            { "path": "navigation.speedOverGround", "value": 8 }
+          ]
+        }
+      ]
+    }`))
+    expect(dataProvider.getSmallestTimestampWithAllPathsDefined()).toEqual(new Date('2010-01-07T07:18:46Z'))
+  })
+
 /*  it('should interpolate positions', () => {
     expect(false).toBeTruthy()
   })
