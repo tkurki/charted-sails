@@ -31,4 +31,16 @@ export class SaltedRosetta {
 
     return Promise.reject(`Unrecognized file extension (${f.name})`)
   }
+
+  public static fromResponse(r: Response) {
+    const contentType = r.headers.get('Content-Type')
+
+    // FIXME: Would be much better to stream the data instead of loading it in memory.
+    return r.text().then(data => {
+      if (contentType && contentType.includes('text/csv')) {
+        return [ CSVLoader.fromString(data) ]
+      }
+      return SKLogLoader.fromString(data)
+    })
+  }
 }

@@ -1,11 +1,12 @@
 import commander from 'commander';
+import fetch from 'node-fetch';
 import * as pkgInfo from '../../package.json';
 import { SignalKTripAnalyzer } from '../analysis/SignalKTripAnalyzer';
 import { SaltedRosetta } from '../loader/SaltedRosetta';
 
 let simplify = require('simplify-path')
 
-export function babelSignalKCLI(args: string[]) {
+export async function babelSignalKCLI(args: string[]) {
   commander.version(pkgInfo.version)
   commander.usage("[options] <path>")
   commander.description("Convert Expedition logfile to SignalK")
@@ -13,9 +14,17 @@ export function babelSignalKCLI(args: string[]) {
   commander.parse(args)
 
   if (commander.args.length > 0) {
+    const urlOrFilename = commander.args[0]
     let deltas
     try {
-      deltas = SaltedRosetta.fromFilename(commander.args[0])
+      if (urlOrFilename.startsWith('http')) {
+        deltas = await fetch(urlOrFilename).then(response => {
+          return SaltedRosetta.fromResponse(response as unknown as Response)
+        })
+      }
+      else {
+        deltas = SaltedRosetta.fromFilename(urlOrFilename)
+      }
     }
     catch (e) {
       console.error(e.message)
