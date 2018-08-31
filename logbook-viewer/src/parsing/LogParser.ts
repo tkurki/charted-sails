@@ -12,15 +12,37 @@ interface LogParserOutput {
   timeSpent?: number
 }
 
+interface ParserWorkerCommandLoadFile {
+  label: string
+  file: File
+  command: 'parseFile'
+}
+
+interface ParserWorkerCommandLoadURL {
+  label: string
+  url: string
+  command: 'parseURL'
+}
+
+type ParserWorkerCommand = ParserWorkerCommandLoadFile | ParserWorkerCommandLoadURL
+
 /**
  * Promise based interface to load log files.
  *
  * Will use a WebWorker to load asynchronously.
  */
 export default class LogParser extends EventEmitter implements LogParserEventsEmitter {
-  public open(file: File) {
-    performance.mark('logparser-start')
-    const p = new Promise<LogParserOutput>((resolve, reject) => {
+  public openURL(url: string) {
+    return this.parseWithCommand({command:'parseURL', url, label: url})
+  }
+
+  public openFile(file: File) {
+    return this.parseWithCommand({command:'parseFile', file, label: file.name})
+  }
+
+  private parseWithCommand(workerCommand: ParserWorkerCommand) {
+    return new Promise<LogParserOutput>((resolve, reject) => {
+      performance.mark('logparser-start')
       const worker = new ParserWorker()
       performance.mark('worker-started')
 
@@ -35,12 +57,12 @@ export default class LogParser extends EventEmitter implements LogParserEventsEm
           worker.terminate()
           return reject(data.error)
         }
-        if ('delta' in data) {
+        if ('delta' in data && 'dataProvider' in data) {
           // rebuild the objects
           performance.mark('rehydrate-start')
           const provider = BetterDataProvider.fromJSON(data.dataProvider)
           performance.mark('rehydrate-end')
-          const trip = new InteractiveTrip(provider.getTripData(), provider, file.name)
+          const trip = new InteractiveTrip(provider.getTripData(), provider, workerCommand.label)
           performance.mark('interactive-end')
 
           // Collect some performance measurements
@@ -59,9 +81,8 @@ export default class LogParser extends EventEmitter implements LogParserEventsEm
       }
 
       // Start working
-      worker.postMessage({ file, command: 'parseFile' })
+      worker.postMessage(workerCommand)
       performance.mark('worker-running')
     })
-    return p
   }
 }

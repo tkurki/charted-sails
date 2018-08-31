@@ -1,4 +1,4 @@
-import { BetterDataProvider, SKPosition } from '@aldis/strongly-signalk';
+import { SKPosition } from '@aldis/strongly-signalk';
 import { Button, ButtonGroup, Intent, ProgressBar } from '@blueprintjs/core';
 import * as React from 'react';
 import ReactGA from 'react-ga';
@@ -175,7 +175,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
     window.addEventListener('resize', this._resize);
     this._resize();
-    this.animateMap()
+    this.animateMapToShowTripOverviews()
   }
 
   public componentWillUnmount() {
@@ -202,8 +202,8 @@ export default class App extends React.Component<AppProps, AppState> {
     })
 
     const logParser = new LogParser()
-    logParser.open(f).then(({trip, timeSpent}) => {
-      this.openTrip(trip)
+    logParser.openFile(f).then(({trip, timeSpent}) => {
+      this.showTrip(trip)
       AppToaster.dismiss(loadingToastKey)
       if (timeSpent !== undefined) {
         ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: timeSpent })
@@ -214,17 +214,68 @@ export default class App extends React.Component<AppProps, AppState> {
       console.log(`Unable to load file ${f.name}: ${e}`)
       ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e.reason}` })
       this.setState({trip: null})
+
+      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nFile: ${f.name}\nError: ${e}`
+      const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip from file')}&amp;`
+       + `body=${ encodeURIComponent(mailBody) }`
+
       AppToaster.show({
         icon: 'warning-sign',
         intent: Intent.DANGER,
-        message: <div>We were unable to load your file.&nbsp;
-          <a href='mailto:hello@aldislab.com?subject=Unable+to+load+logfile'>Please email it to us</a>.<br/><small>Error: {e}</small>
+        message: <div>We were unable to open this trip.&nbsp;
+          <a href={mailto}>Please let us know about this</a>.<br/>
+          <small>Error: {e}</small>
         </div>
       })
     })
   }
 
-  private openTrip(trip: InteractiveTrip) {
+  private openURL(url: string) {
+    ReactGA.event({ category: 'Trip', action: 'Load url', label: url })
+
+    const loadingToastKey = AppToaster.show({
+      icon: "cloud-upload",
+      timeout: 0,
+      message: <ProgressBar intent='primary' className='toasted-progress-bar'/>
+    })
+
+    const logParser = new LogParser()
+    logParser.openURL(url).then(({trip, timeSpent}) => {
+      this.showTrip(trip)
+      AppToaster.dismiss(loadingToastKey)
+      if (timeSpent !== undefined) {
+        ReactGA.timing({ category: 'Trip', variable: 'openTripFromURL', value: timeSpent })
+      }
+    })
+    .catch(e => {
+      AppToaster.dismiss(loadingToastKey)
+      console.log(`Unable to load URL ${url}: ${e}`)
+      ReactGA.event({ category: 'Trip', action: 'ParsingErrorFromURL', label: `${url}: ${e.reason}` })
+      this.setState({trip: null})
+
+      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nURL: ${url}\nError: ${e}`
+      const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip from URL')}&amp;`
+       + `body=${ encodeURIComponent(mailBody) }`
+
+      AppToaster.show({
+        icon: 'warning-sign',
+        intent: Intent.DANGER,
+        message: <div>We were unable to open this trip.&nbsp;
+          <a href={mailto}>
+            Please let us know about this
+          </a>.<br/>
+          <small>Error: {e}</small>
+        </div>
+      })
+    })
+  }
+
+  private tripOverviewSelected(t: TripOverview) {
+    ReactGA.event({ category: 'Trip', action: 'Load trip', label: t.label })
+    this.openURL(t.url)
+  }
+
+  private showTrip(trip: InteractiveTrip) {
     const viewport = {
       ...this.state.viewport,
       ...this._calculateViewportBounding(trip.getBounds()),
@@ -235,16 +286,7 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({viewport, trip})
   }
 
-  private tripOverviewSelected(t: TripOverview) {
-    ReactGA.event({ category: 'Trip', action: 'Load trip', label: t.label })
-    t.getSKDelta().then(delta => {
-      const provider = new BetterDataProvider(delta)
-      const trip = new InteractiveTrip(delta, provider, t.label)
-      this.openTrip(trip)
-    })
-  }
-
-  private animateMap() {
+  private animateMapToShowTripOverviews() {
     this.setState({
       viewport: {
         ...this.state.viewport,
@@ -262,7 +304,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
     this.setState({trip: null})
     setImmediate(() => {
-      this.animateMap()
+      this.animateMapToShowTripOverviews()
     })
   }
 

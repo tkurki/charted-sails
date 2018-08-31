@@ -4,20 +4,23 @@ const ctx: Worker = self as any;
 
 ctx.onmessage = ({data}) => {
   if (data.command === 'parseFile' && data.file !== undefined) {
-    parseFile(data.file)
+    parseAndAnalyze(SaltedRosetta.fromFile(data.file))
+  }
+  else if (data.command === 'parseURL' && data.url !== undefined) {
+    const p = fetch(data.url).then(response => SaltedRosetta.fromResponse(response))
+    parseAndAnalyze(p)
   }
   else {
     ctx.postMessage({error: 'Invalid worker command'})
   }
 }
 
-function parseFile(f:File) {
+function parseAndAnalyze(p:Promise<SKDelta[]>) {
   performance.mark('parsing-start')
-  SaltedRosetta.fromFile(f)
-  .then((deltas: SKDelta[]) => {
+  p.then((deltas: SKDelta[]) => {
     if (deltas.length > 0) {
       if (deltas.length > 1) {
-        console.warn(`File ${f.name} contains ${deltas.length} deltas. Loading first delta from file. Ignoring the rest.`)
+        console.warn(`Data contains ${deltas.length} deltas. Loading first delta from file. Ignoring the rest.`)
       }
       return deltas[0]
     }
@@ -28,7 +31,7 @@ function parseFile(f:File) {
     const dataProvider = new BetterDataProvider(delta)
     performance.mark('analysis-end')
 
-    ctx.postMessage({ filename: f.name, delta, dataProvider })
+    ctx.postMessage({ delta, dataProvider })
 
     performance.mark('transfer-end')
 

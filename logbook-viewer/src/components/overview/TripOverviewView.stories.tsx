@@ -1,4 +1,3 @@
-import { SKDelta } from '@aldis/strongly-signalk';
 import { storiesOf } from '@storybook/react';
 import moment from 'moment';
 import * as React from 'react';
@@ -15,7 +14,7 @@ storiesOf("Components/TripOverviewView", module)
       path: [
         [0, 0], [10, 10]
       ],
-      getSKDelta: () => new Promise<SKDelta>((resolve) => resolve(undefined) )
+      url: '/mytrip.log'
     } } onTripOverviewSelected={ () => true }/>
     )
   )

@@ -1,4 +1,3 @@
-import { CSVLoader } from '@aldis/strongly-signalk';
 import { TripOverview } from '../model/TripOverview';
 import SAMPLE_DATA_AUCKLAND from './expedition-auckland.csv';
 import SAMPLE_DATA_SF from './expedition-sanfrancisco.csv';
@@ -17,7 +16,7 @@ export const sampleDataTripOverviews : TripOverview[] = [
       [-122.387017,37.824467],[-122.445467,37.825433],[-122.4585,37.810217],[-122.4068,37.818683],
       [-122.445867,37.80655]
     ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_SF)
+    url: window.location.origin + SAMPLE_DATA_SF
   },
   {
     label: 'Expedition - Valencia',
@@ -29,7 +28,7 @@ export const sampleDataTripOverviews : TripOverview[] = [
       [-0.292261,39.387905],[-0.260461,39.369606],[-0.287819,39.379692],[-0.285,39.370037],
       [-0.255403,39.366417],[-0.297992,39.400982]
     ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_VALENCIA)
+    url: window.location.origin + SAMPLE_DATA_VALENCIA
   },
   {
     label: 'Expedition - Auckland',
@@ -43,7 +42,7 @@ export const sampleDataTripOverviews : TripOverview[] = [
       [174.899115,-36.802517],[174.833882,-36.827884],[174.000793,-36.828598],
       [174.832611,-36.828663],[174.806005,-36.842229],[174.750268,-36.837881]
     ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_AUCKLAND)
+    url: window.location.origin + SAMPLE_DATA_AUCKLAND
   },
   {
     label: 'Expedition - Solent',
@@ -53,6 +52,6 @@ export const sampleDataTripOverviews : TripOverview[] = [
     path: [
       [-1.36405,50.76229],[-1.348708,50.758006],[-1.351024,50.767958],[-1.3602,50.75735]
     ],
-    getSKDelta: () => CSVLoader.fromURL(window.location.origin + SAMPLE_DATA_SOLENT)
+    url: window.location.origin + SAMPLE_DATA_SOLENT
   }
 ]

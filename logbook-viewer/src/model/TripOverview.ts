@@ -1,4 +1,3 @@
-import { SKDelta } from "@aldis/strongly-signalk";
 
 export interface TripOverview {
   path: Array<[number, number]>
@@ -6,5 +5,5 @@ export interface TripOverview {
   description?: string
   startTime: Date
   endTime: Date
-  getSKDelta: () => Promise<SKDelta>
+  url: string
 }
