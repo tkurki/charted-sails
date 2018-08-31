@@ -1,4 +1,4 @@
-import { SKDelta } from '../model';
+import { SKDelta, SKPosition } from '../model';
 import { BetterDataProvider } from "./BetterDataProvider";
 
 describe('getAvailableValues()', () => {
@@ -211,10 +211,50 @@ describe('getValueAtTime()', () => {
     expect(dataProvider.getSmallestTimestampWithAllPathsDefined()).toEqual(new Date('2010-01-07T07:18:46Z'))
   })
 
-/*  it('should interpolate positions', () => {
-    expect(false).toBeTruthy()
+  // For now we just return the last known position.
+  // TODO: Interpolate positions.
+  it('does not interpolate positions (yet)', () => {
+    const dataProvider = new BetterDataProvider(SKDelta.fromJSON(`
+    {
+      "context": "vessels.urn:mrn:imo:mmsi:234567890",
+      "updates": [
+        {
+          "timestamp": "2010-01-07T07:18:44Z", "source": { "label": "" },
+          "values": [
+            { "path": "navigation.position", "value": { "longitude": -122, "latitude": 42} }
+          ]
+        },
+        {
+          "timestamp": "2010-01-07T07:18:46Z", "source": { "label": "" },
+          "values": [
+            { "path": "navigation.position", "value": { "longitude": -122, "latitude": 43} }
+          ]
+        },
+        {
+          "timestamp": "2010-01-07T07:18:49Z", "source": { "label": "" },
+          "values": [
+            { "path": "navigation.position", "value": { "longitude": -119, "latitude": 43} }
+          ]
+        }
+      ]
+    }`))
+    expect(dataProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:44Z")))
+      .toEqual(new SKPosition(42, -122))
+    expect(dataProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:45Z")))
+      .toEqual(new SKPosition(42, -122))
+    expect(dataProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:46Z")))
+      .toEqual(new SKPosition(43, -122))
+    expect(dataProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:47Z")))
+      .toEqual(new SKPosition(43, -122))
+    expect(dataProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:48Z")))
+      .toEqual(new SKPosition(43, -122))
+    expect(dataProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:49Z")))
+      .toEqual(new SKPosition(43, -119))
+    expect(dataProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:50Z")))
+      .toEqual(new SKPosition(43, -119))
   })
 
+  /*
   it('should interpolate times', () => {
     expect(false).toBeTruthy()
   })
@@ -222,7 +262,6 @@ describe('getValueAtTime()', () => {
   it('should interpolate angles properly', () => {
     expect(false).toBeTruthy()
   })
-
 
 function aggregateByAveragingAngles(values : number[]) : number {
   // We take the (x,y) cartesian coordinates of each angle and average them.
@@ -232,6 +271,29 @@ function aggregateByAveragingAngles(values : number[]) : number {
 
   return Math.atan2(y, x) * 360 / (2*Math.PI)
 }
-
 */
+})
+
+/*
+ Re-hydrating is important. It's what we use to do the maths in the WebWorker
+ and pass the result back to the browser.
+ */
+describe('rehydrating BetterDataProvider', () => {
+  it('properly re-hydrates SKPosition', () => {
+    const dataProvider = new BetterDataProvider(SKDelta.fromJSON(`
+    {
+      "context": "vessels.urn:mrn:imo:mmsi:234567890",
+      "updates": [
+        {
+          "timestamp": "2010-01-07T07:18:44Z", "source": { "label": "" },
+          "values": [
+            { "path": "navigation.position", "value": { "longitude": -122, "latitude": 42} }
+          ]
+        }
+      ]
+    }`))
+    let rehydratedProvider = BetterDataProvider.fromJSON(JSON.parse(JSON.stringify(dataProvider)))
+    expect(rehydratedProvider.getValueAtTime("navigation.position", new Date("2010-01-07T07:18:45Z")) instanceof SKPosition)
+      .toBeTruthy()
+  })
 })

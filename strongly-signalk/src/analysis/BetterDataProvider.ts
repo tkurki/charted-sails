@@ -1,5 +1,5 @@
 import { isNull } from "util";
-import { SKDelta, SKDeltaJSON, SKValueType } from "../model";
+import { SKDelta, SKDeltaJSON, SKPosition, SKPositionJSON, SKValueType } from "../model";
 import { SignalKTripAnalyzer } from "./SignalKTripAnalyzer";
 import { TripDataProvider } from "./TripDataProvider";
 
@@ -40,6 +40,20 @@ export class BetterDataProvider implements TripDataProvider {
     provider.delta = SKDelta.fromJSON(jsonObject.delta)
     provider.availableValues = jsonObject.availableValues
     provider.valuesPerPath = jsonObject.valuesPerPath
+
+    // We need to "re-hydrate" SKPosition objects in the cache.
+    // The other values are primitive types and do not need special treatment.
+    Object.keys(provider.valuesPerPath).map(path => {
+      if (provider.valuesPerPath[path].length > 0) {
+        const aValue = provider.valuesPerPath[path][0][1]
+
+        if (typeof aValue === 'object' && 'latitude' in aValue && 'longitude' in aValue) {
+          provider.valuesPerPath[path] = provider.valuesPerPath[path].map<[Date, SKValueType]>(element => {
+            return [element[0], SKPosition.fromJSON(element[1] as SKPositionJSON)]
+          })
+        }
+      }
+    })
     return provider
   }
 

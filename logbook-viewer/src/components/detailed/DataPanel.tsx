@@ -80,15 +80,27 @@ export function DataPanelItem({label, value, unit, special} : DataPanelItemProps
   }
   if (special === 'position') {
     const fields = value.split(' ')
-    return (
-      <div className={ "data-panel-item data-panel-item-position" }>
-        <span className="data">{label}</span>
-        <span className="value">
-          {`${fields[0]} ${fields[1]}`} <br/>
-          {`${fields[2]} ${fields[3]}`}
-        </span>
-      </div>
-    )
+    if (fields.length === 4) {
+      return (
+        <div className={ "data-panel-item data-panel-item-position" }>
+          <span className="data">{label}</span>
+          <span className="value">
+            {`${fields[0]} ${fields[1]}`} <br/>
+            {`${fields[2]} ${fields[3]}`}
+          </span>
+        </div>
+      )
+    }
+    else {
+      return (
+        <div className={ "data-panel-item data-panel-item-position" }>
+          <span className="data">{label}</span>
+          <span className="value">
+            { value }
+          </span>
+        </div>
+      )
+    }
   }
   return (
     <div className={ "data-panel-item" }>

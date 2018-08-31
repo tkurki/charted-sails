@@ -107,6 +107,7 @@ export class IntelligibleSignalK {
   public getFormatterForPath(path:string) {
     const intelligibleValue:SKValueFormatter = {
       path: path, unit: '', label: path, display: false,
+      // This is the default formatter. Customized below for some specific paths.
       format: (x:SKValueType) => {
         if (isNullOrUndefined(x)) {
           return "-"

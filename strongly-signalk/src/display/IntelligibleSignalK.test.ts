@@ -70,5 +70,4 @@ describe('making data intelligible', () => {
     expect(formatter.unit).toBe('nm')
     expect(s).toBe('3.50')
   })
-
 })
