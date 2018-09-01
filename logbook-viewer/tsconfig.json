@@ -14,7 +14,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths":{
-      "@aldis/strong-signalk": ["../strongly-signalk/dist"]
+      "@aldis/strong-signalk": ["../strongly-signalk"]
     }
   },
   "exclude": [
@@ -24,6 +24,7 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "config"
   ]
 }

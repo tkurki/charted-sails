@@ -1,4 +1,4 @@
-import { SignalKTripAnalyzer, SKDelta, SKPosition, TripDataProvider } from '@aldis/strongly-signalk';
+import { BetterDataProvider, SignalKTripAnalyzer, SKDelta, SKPosition, TripDataProvider } from '@aldis/strongly-signalk';
 import TimeSelection from './TimeSelection';
 
 export interface InteractiveTripSegment {
@@ -10,23 +10,23 @@ export interface InteractiveTripSegment {
 
 export default class InteractiveTrip {
   private trip : SKDelta
-  private dataProvider: TripDataProvider
+  private dataProvider: BetterDataProvider
   private selection: TimeSelection
   private segments: InteractiveTripSegment[]
   private startTime: Date
   private endTime: Date
   private title: string
 
-  constructor(trip : SKDelta, dataProvider: TripDataProvider, title: string) {
+  constructor(trip : SKDelta, dataProvider: BetterDataProvider, title: string) {
     if (trip.updates.length < 1) {
       throw new Error("Trip should have *at least* one update!")
     }
 
     this.trip = trip
     this.dataProvider = dataProvider
-    this.selection = new TimeSelection(SignalKTripAnalyzer.getStartTime(this.trip)!)
+    this.selection = new TimeSelection(this.dataProvider.getSmallestTimestampWithAllPathsDefined())
     this.segments = this.calculateSegments()
-    this.startTime = SignalKTripAnalyzer.getStartTime(this.trip)!
+    this.startTime = this.findStartTime()
     this.endTime = SignalKTripAnalyzer.getEndTime(this.trip)!
     this.title = title
   }
@@ -89,5 +89,30 @@ export default class InteractiveTrip {
       }
     }
     return segments
+  }
+
+  private findStartTime() {
+    const firstDate = SignalKTripAnalyzer.getStartTime(this.trip)
+    const lastDate = SignalKTripAnalyzer.getEndTime(this.trip)
+
+    if (firstDate && lastDate) {
+      // Very custom and hacky way to detect when initial samples are not properly
+      // timestamped: If the beginning is before 1980 and the trip lasts more than 10y then:
+      if (firstDate.getUTCFullYear() < 1980 && lastDate.getUTCFullYear() - firstDate.getUTCFullYear() > 10) {
+        // Use the first date that is less than 3yrs before the end, as the start date.
+        // In effect this limits the duration of trips we can show to 3y if they were started before 1980
+        // I think we can revisit if that is ever a problem.
+        const firstRealisticUpdate = this.trip.updates.find(update => {
+          return (lastDate.getTime() - update.timestamp.getTime() < 3 * 365 * 24 * 3600 * 1000)
+        })
+        if (firstRealisticUpdate) {
+          return firstRealisticUpdate.timestamp
+        }
+      }
+      return firstDate
+    }
+    else {
+      throw new Error('This trip does not have a beginning (probably no data).')
+    }
   }
 }

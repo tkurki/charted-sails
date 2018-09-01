@@ -1,12 +1,7 @@
-import { SKDelta, TripDataProvider } from "@aldis/strongly-signalk";
+import { BetterDataProvider, SKDelta } from "@aldis/strongly-signalk";
 import InteractiveTrip from "./InteractiveTrip";
 
-const mockDataProvider : TripDataProvider = {
-  getAvailableValues: () => [],
-  getValueAtTime: () => null,
-  getValuesAtTime: () => ({}),
-  getTripData: () => (new SKDelta())
-}
+const mockDataProvider = new BetterDataProvider(new SKDelta())
 
 describe('constructor', () => {
   it('refuses to instantiate an interactive trip without at least one update', () => {
@@ -92,5 +87,40 @@ describe('Extracting segments', () => {
         endTime: new Date("2010-01-07T07:18:47Z")
       }
     ])
+  })
+
+  it('ignores poorly timestamped data at the beginning of a file', () => {
+    const trip = new InteractiveTrip(SKDelta.fromJSON(`
+    {
+      "context": "vessels.urn:mrn:imo:mmsi:234567890",
+      "updates": [
+        {
+          "timestamp": "1970-01-01T07:18:44Z", "source": { "label": "" },
+          "values": [ {
+            "path": "navigation.position", "value": { "longitude": -122, "latitude": 42}
+          } ]
+        },
+        {
+          "timestamp": "1970-01-01T07:18:45Z", "source": { "label": "" },
+          "values": [ {
+            "path": "navigation.position", "value": { "longitude": -122, "latitude": 43}
+          } ]
+        },
+        {
+          "timestamp": "2010-01-07T17:18:46Z", "source": { "label": "" },
+          "values": [ {
+            "path": "navigation.position", "value": { "longitude": -122, "latitude": 44}
+          } ]
+        },
+        {
+          "timestamp": "2010-01-07T17:18:47Z", "source": { "label": "" },
+          "values": [ {
+            "path": "navigation.position", "value": { "longitude": -121, "latitude": 42}
+          } ]
+        }
+      ]
+    }
+    `), mockDataProvider, "")
+    expect(trip.getStartTime()).toEqual(new Date('2010-01-07T17:18:46Z'))
   })
 })

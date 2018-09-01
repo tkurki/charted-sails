@@ -1,10 +1,11 @@
-import { BetterDataProvider, CSVLoader, SKDelta, SKLogLoader, SKPosition } from '@aldis/strongly-signalk';
-import { Button, ButtonGroup } from '@blueprintjs/core';
+import { SKPosition } from '@aldis/strongly-signalk';
+import { Button, ButtonGroup, Intent, ProgressBar } from '@blueprintjs/core';
 import * as React from 'react';
 import ReactGA from 'react-ga';
 import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import './App.css';
+import { AppToaster } from './AppToaster';
 import DataPanel from './components/detailed/DataPanel';
 import DataTable from './components/detailed/DataTable';
 import TimePanel from './components/detailed/TimePanel';
@@ -14,6 +15,7 @@ import TripSelectorOverlay from './components/overview/TripSelectorOverlay';
 import InteractiveTrip from './model/InteractiveTrip';
 import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
+import LogParser from './parsing/LogParser';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
@@ -173,7 +175,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
     window.addEventListener('resize', this._resize);
     this._resize();
-    this.animateMap()
+    this.animateMapToShowTripOverviews()
   }
 
   public componentWillUnmount() {
@@ -193,36 +195,87 @@ export default class App extends React.Component<AppProps, AppState> {
   private openFile(f: File) {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
 
+    const loadingToastKey = AppToaster.show({
+      icon: "cloud-upload",
+      timeout: 0,
+      message: <ProgressBar intent='primary' className='toasted-progress-bar'/>
+    })
 
-    if (f.name.endsWith('.csv')) {
-      CSVLoader.fromFile(f).then(delta => {
-        this.openTrip(delta, f.name)
+    const logParser = new LogParser()
+    logParser.openFile(f).then(({trip, timeSpent}) => {
+      this.showTrip(trip)
+      AppToaster.dismiss(loadingToastKey)
+      if (timeSpent !== undefined) {
+        ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: timeSpent })
+      }
+    })
+    .catch(e => {
+      AppToaster.dismiss(loadingToastKey)
+      console.log(`Unable to load file ${f.name}: ${e}`)
+      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e.reason}` })
+      this.setState({trip: null})
+
+      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nFile: ${f.name}\nError: ${e}`
+      const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip from file')}&amp;`
+       + `body=${ encodeURIComponent(mailBody) }`
+
+      AppToaster.show({
+        icon: 'warning-sign',
+        intent: Intent.DANGER,
+        message: <div>We were unable to open this trip.&nbsp;
+          <a href={mailto}>Please let us know about this</a>.<br/>
+          <small>Error: {e}</small>
+        </div>
       })
-      .catch(reason => {
-        console.log(`Unable to load CSV file ${f.name}: ${reason}`)
-        ReactGA.event({ category: 'Trip', action: 'Error CSV', label: `${f.name}: ${reason}` })
-        this.setState({trip: null})
-      })
-    }
-    else if (f.name.endsWith('.log')) {
-      SKLogLoader.fromFile(f).then(deltas => {
-        if (deltas.length > 0) {
-          this.openTrip(deltas[0], f.name)
-        }
-      })
-      .catch(reason => {
-        console.log(`Unable to load SK logfile ${f.name}: ${reason}`)
-        ReactGA.event({ category: 'Trip', action: 'Error SKLog', label: `${f.name}: ${reason}` })
-        this.setState({trip: null})
-      })
-    }
+    })
   }
 
-  private openTrip(delta: SKDelta, title: string) {
-    const timerStart = Date.now()
-    const provider = new BetterDataProvider(delta)
-    const trip = new InteractiveTrip(delta, provider, title)
+  private openURL(url: string) {
+    ReactGA.event({ category: 'Trip', action: 'Load url', label: url })
 
+    const loadingToastKey = AppToaster.show({
+      icon: "cloud-upload",
+      timeout: 0,
+      message: <ProgressBar intent='primary' className='toasted-progress-bar'/>
+    })
+
+    const logParser = new LogParser()
+    logParser.openURL(url).then(({trip, timeSpent}) => {
+      this.showTrip(trip)
+      AppToaster.dismiss(loadingToastKey)
+      if (timeSpent !== undefined) {
+        ReactGA.timing({ category: 'Trip', variable: 'openTripFromURL', value: timeSpent })
+      }
+    })
+    .catch(e => {
+      AppToaster.dismiss(loadingToastKey)
+      console.log(`Unable to load URL ${url}: ${e}`)
+      ReactGA.event({ category: 'Trip', action: 'ParsingErrorFromURL', label: `${url}: ${e.reason}` })
+      this.setState({trip: null})
+
+      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nURL: ${url}\nError: ${e}`
+      const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip from URL')}&amp;`
+       + `body=${ encodeURIComponent(mailBody) }`
+
+      AppToaster.show({
+        icon: 'warning-sign',
+        intent: Intent.DANGER,
+        message: <div>We were unable to open this trip.&nbsp;
+          <a href={mailto}>
+            Please let us know about this
+          </a>.<br/>
+          <small>Error: {e}</small>
+        </div>
+      })
+    })
+  }
+
+  private tripOverviewSelected(t: TripOverview) {
+    ReactGA.event({ category: 'Trip', action: 'Load trip', label: t.label })
+    this.openURL(t.url)
+  }
+
+  private showTrip(trip: InteractiveTrip) {
     const viewport = {
       ...this.state.viewport,
       ...this._calculateViewportBounding(trip.getBounds()),
@@ -231,17 +284,9 @@ export default class App extends React.Component<AppProps, AppState> {
       /*transitionEasing: easeCubic*/
     }
     this.setState({viewport, trip})
-    ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: Date.now() - timerStart })
   }
 
-  private tripOverviewSelected(t: TripOverview) {
-    ReactGA.event({ category: 'Trip', action: 'Load trip', label: t.label })
-    t.getSKDelta().then(delta => {
-      this.openTrip(delta, t.label)
-    })
-  }
-
-  private animateMap() {
+  private animateMapToShowTripOverviews() {
     this.setState({
       viewport: {
         ...this.state.viewport,
@@ -259,7 +304,7 @@ export default class App extends React.Component<AppProps, AppState> {
 
     this.setState({trip: null})
     setImmediate(() => {
-      this.animateMap()
+      this.animateMapToShowTripOverviews()
     })
   }
 

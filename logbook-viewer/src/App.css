@@ -31,3 +31,7 @@
   top: 20px;
   z-index: 11;
 }
+
+.toasted-progress-bar {
+  margin-top: 5px;
+}

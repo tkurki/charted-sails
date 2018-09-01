@@ -1,7 +1,13 @@
 import { isNull } from "util";
-import { SKDelta, SKValueType } from "../model";
+import { SKDelta, SKDeltaJSON, SKPosition, SKPositionJSON, SKValueType } from "../model";
 import { SignalKTripAnalyzer } from "./SignalKTripAnalyzer";
 import { TripDataProvider } from "./TripDataProvider";
+
+interface BetterDataProviderJSON {
+  delta: SKDeltaJSON
+  availableValues:string[]
+  valuesPerPath:{[path:string]: [Date,SKValueType][]}
+}
 
 export class BetterDataProvider implements TripDataProvider {
   public static interpolate(path: string, time: Date, timeA: Date, valueA: SKValueType,
@@ -11,7 +17,7 @@ export class BetterDataProvider implements TripDataProvider {
       throw new Error(`Values for path ${path} should have the same type (${typeof valueA} vs ${typeof valueB})`)
     }
     if (time < timeA || time > timeB) {
-      throw new Error(`Cannot interpolate for a time outside given bounds (${timeA} ${time} ${timeB}`)
+      throw new Error(`Cannot interpolate for a time outside given bounds (${timeA.toISOString()} ${time.toISOString()} ${timeB.toISOString()}`)
     }
     if (typeof valueA === 'number' && typeof valueB === 'number') {
       return valueA
@@ -21,6 +27,34 @@ export class BetterDataProvider implements TripDataProvider {
     else {
       return valueA
     }
+  }
+
+  /**
+   * Re-hydrate a betterDataProvider from just the fields in an Object.
+   *
+   * This is useful when reloading data that was serialized.
+   * @param jsonObject
+   */
+  static fromJSON(jsonObject: BetterDataProviderJSON) {
+    const provider = new BetterDataProvider(new SKDelta())
+    provider.delta = SKDelta.fromJSON(jsonObject.delta)
+    provider.availableValues = jsonObject.availableValues
+    provider.valuesPerPath = jsonObject.valuesPerPath
+
+    // We need to "re-hydrate" SKPosition objects in the cache.
+    // The other values are primitive types and do not need special treatment.
+    Object.keys(provider.valuesPerPath).map(path => {
+      if (provider.valuesPerPath[path].length > 0) {
+        const aValue = provider.valuesPerPath[path][0][1]
+
+        if (typeof aValue === 'object' && 'latitude' in aValue && 'longitude' in aValue) {
+          provider.valuesPerPath[path] = provider.valuesPerPath[path].map<[Date, SKValueType]>(element => {
+            return [element[0], SKPosition.fromJSON(element[1] as SKPositionJSON)]
+          })
+        }
+      }
+    })
+    return provider
   }
 
   private delta: SKDelta
@@ -160,4 +194,21 @@ export class BetterDataProvider implements TripDataProvider {
     return data
   }
 
+  /**
+   * Returns the smallest timestamp that has all the paths existing in this
+   * dataset defined.
+   *
+   * This is useful when displaying data to select the first point that is fully defined.
+   */
+  public getSmallestTimestampWithAllPathsDefined() : Date {
+    const firstDateOfPaths = Object.keys(this.valuesPerPath)
+      .map(path => this.valuesPerPath[path])
+      // [Date, SKValueType][] => [Date, SKValueType][0]
+      .map(value => value[0])
+      // [Date, SKValueType] => Date
+      .map(value => value[0])
+      .sort()
+
+    return firstDateOfPaths[firstDateOfPaths.length - 1]
+  }
 }

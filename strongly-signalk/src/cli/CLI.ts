@@ -1,15 +1,12 @@
-import commander from 'commander'
-import * as pkgInfo from '../../package.json'
-import { readFileSync } from 'fs';
-import { CSVConversionOption, CSVLoader } from '../loader/CSVLoader';
-import { ExpeditionFormatConversion } from '../loader/ExpeditionFormatConversion';
+import commander from 'commander';
+import fetch from 'node-fetch';
+import * as pkgInfo from '../../package.json';
 import { SignalKTripAnalyzer } from '../analysis/SignalKTripAnalyzer';
-import { SKLogLoader } from '../loader/SKLogLoader';
-import { SKDelta } from '../model';
+import { SaltedRosetta } from '../loader/SaltedRosetta';
 
 let simplify = require('simplify-path')
 
-export function babelSignalKCLI(args: string[]) {
+export async function babelSignalKCLI(args: string[]) {
   commander.version(pkgInfo.version)
   commander.usage("[options] <path>")
   commander.description("Convert Expedition logfile to SignalK")
@@ -17,21 +14,21 @@ export function babelSignalKCLI(args: string[]) {
   commander.parse(args)
 
   if (commander.args.length > 0) {
-    let data = readFileSync(commander.args[0], { 'encoding': 'utf8'})
-
-    const deltas : SKDelta[] = []
-    if (commander.args[0].endsWith('.csv')) {
-      let options: CSVConversionOption = {
-        "sourceLabel": commander.args[0],
-        "conversion": new ExpeditionFormatConversion()
+    const urlOrFilename = commander.args[0]
+    let deltas
+    try {
+      if (urlOrFilename.startsWith('http')) {
+        deltas = await fetch(urlOrFilename).then(response => {
+          return SaltedRosetta.fromResponse(response as unknown as Response)
+        })
       }
-      deltas.push(CSVLoader.fromString(data, options))
+      else {
+        deltas = SaltedRosetta.fromFilename(urlOrFilename)
+      }
     }
-    else if (commander.args[0].endsWith('.log')) {
-      deltas.push(...SKLogLoader.fromString(data))
-    }
-    else {
-      console.error(`Don't know how to open file ${commander.args[0]}`)
+    catch (e) {
+      console.error(e.message)
+      return
     }
 
     if (commander['summary']) {
@@ -56,8 +53,10 @@ export function babelSignalKCLI(args: string[]) {
         if (bounds) {
           console.log(`Bounds: ${bounds[0].asArray()} ${bounds[1].asArray()}`)
         }
-        console.log(`Start: ${SignalKTripAnalyzer.getStartTime(delta)!.toISOString()}`)
-        console.log(`End: ${SignalKTripAnalyzer.getEndTime(delta)!.toISOString()}`)
+        if (delta.updates.length > 0) {
+          console.log(`Start: ${SignalKTripAnalyzer.getStartTime(delta)!.toISOString()}`)
+          console.log(`End: ${SignalKTripAnalyzer.getEndTime(delta)!.toISOString()}`)
+        }
         console.log(`Path: ${JSON.stringify(simplifiedPath)}`)
       })
     }

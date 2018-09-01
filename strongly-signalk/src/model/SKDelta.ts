@@ -1,7 +1,7 @@
-import { SKUpdateJSON, SKUpdate } from "./SKUpdate";
 import { SKContext } from "./SKContext";
+import { SKUpdate, SKUpdateJSON } from "./SKUpdate";
 
-interface SKDeltaJSON {
+export interface SKDeltaJSON {
   context?: any
   updates: SKUpdateJSON[]
 }
