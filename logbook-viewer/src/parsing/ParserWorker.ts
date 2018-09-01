@@ -40,6 +40,6 @@ function parseAndAnalyze(p:Promise<SKDelta[]>) {
     performance.measure('Worker: Transfer', 'analysis-end', 'transfer-end')
   })
   .catch(e => {
-    ctx.postMessage({error: e})
+    ctx.postMessage({error: e.toString()})
   })
 }
