@@ -28,32 +28,18 @@ jobs:
 
       # run tests!
       - run: yarn build
-      - run: yarn test
+      - run:
+          name: "Unit Tests"
+          command: yarn run jest --ci --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
 
-  deploy:
-    docker:
-      - image: circleci/node:8
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-      - run: yarn install
-      - run: yarn bootstrap
-      - run: yarn build
-      - run: yarn run deploy-prod
-
-workflows:
-  version: 2
-
-  -deploy:
-    jobs:
-      - build
       - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
-
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              yarn run deploy-prod
+            fi
