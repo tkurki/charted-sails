@@ -11,6 +11,7 @@ export async function babelSignalKCLI(args: string[]) {
   commander.usage("[options] <path>")
   commander.description("Convert Expedition logfile to SignalK")
   commander.option("-s --summary", "Print a summary of the log instead of the full SignalK Delta")
+  commander.option("-d --debug", "Be more verbose")
   commander.parse(args)
 
   if (commander.args.length > 0) {
@@ -21,12 +22,24 @@ export async function babelSignalKCLI(args: string[]) {
         deltas = await fetch(urlOrFilename).then(response => {
           return SaltedRosetta.fromResponse(response as unknown as Response)
         })
+        .catch(e => {
+          if (commander.debug) {
+            console.error(e)
+          }
+          else {
+            console.error(e.message)
+          }
+          return []
+        })
       }
       else {
         deltas = SaltedRosetta.fromFilename(urlOrFilename)
       }
     }
     catch (e) {
+      if (commander.debug) {
+        console.error(e)
+      }
       console.error(e.message)
       return
     }
