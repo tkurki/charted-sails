@@ -25,6 +25,7 @@
     "@signalk/nmea0183-utilities": "^0.6.0",
     "canboatjs": "git://github.com/sarfata/canboatjs.git#4b73662",
     "commander": "^2.15.1",
+    "fast-xml-parser": "^3.12.0",
     "node-fetch": "^2.2.0",
     "papaparse": "^4.5.0",
     "simplify-path": "^1.1.0"
