@@ -37,6 +37,7 @@
 }
 
 .data-panel-item > span.value {
+  font-family: 'Titillium Web', 'Open Sans', sans-serif;
   font-size: 1.6em;
   flex: 0 0;
   line-height: 100%;
