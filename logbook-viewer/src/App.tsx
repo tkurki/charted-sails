@@ -213,7 +213,7 @@ export default class App extends React.Component<AppProps, AppState> {
     .catch(e => {
       AppToaster.dismiss(loadingToastKey)
       console.log(`Unable to load file ${f.name}: ${e}`)
-      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e.reason}` })
+      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e}` })
       this.setState({trip: null})
 
       const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nFile: ${f.name}\nError: ${e}`
@@ -251,7 +251,7 @@ export default class App extends React.Component<AppProps, AppState> {
     .catch(e => {
       AppToaster.dismiss(loadingToastKey)
       console.log(`Unable to load URL ${url}: ${e}`)
-      ReactGA.event({ category: 'Trip', action: 'ParsingErrorFromURL', label: `${url}: ${e.reason}` })
+      ReactGA.event({ category: 'Trip', action: 'ParsingErrorFromURL', label: `${url}: ${e}` })
       this.setState({trip: null})
 
       const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nURL: ${url}\nError: ${e}`
