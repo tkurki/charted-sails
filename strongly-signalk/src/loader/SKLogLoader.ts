@@ -34,7 +34,16 @@ export class SKLogLoader {
     return [ { updates: updates } ]
     */
 
-    const deltas = lines.map(SKLogLoader.fromLine).filter(d => d !== null) as SKDelta[]
+    const deltas = lines.map(line => {
+      try {
+        return SKLogLoader.fromLine(line)
+      }
+      catch (e) {
+        // FIXME: Find a better way to do warning reporting
+        console.warn(`Warning: error parsing line ${line}: ${e.message}`)
+        return null
+      }
+    }).filter(d => d !== null) as SKDelta[]
 
     // Very naive implementation of SKDelta[] consolidation - see below for better to enable
     // when we have AIS sentences.
