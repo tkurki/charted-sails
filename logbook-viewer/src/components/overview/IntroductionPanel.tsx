@@ -67,7 +67,7 @@ export class IntroductionPanel extends React.Component<IntroductionPanelProps, I
                   <li>GPX tracks exported from iNavX, Garmin inReach or Velocitek. (Depending on the software generating the file
                     you will be limited to time and position; iNavX also records speed and course over ground).
                   </li>
-                  <li><span color="grey">Your format here</span>: We would love to add more format. Email us and send us
+                  <li><i>Your format here</i>: We would love to add support more formats. Email us and send us
                   sample log files so we can add them.</li>
                 </ul>
                 <h2>Work in progress</h2>
