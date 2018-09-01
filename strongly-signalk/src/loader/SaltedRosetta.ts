@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import { SKDelta } from "../model";
 import { CSVConversionOption, CSVLoader } from "./CSVLoader";
 import { ExpeditionFormatConversion } from "./ExpeditionFormatConversion";
+import { GPXLoader } from "./GPXLoader";
 import { SKLogLoader } from "./SKLogLoader";
 import { VCCLoader } from "./VCCLoader";
 
@@ -19,6 +20,10 @@ export class SaltedRosetta {
       let data = readFileSync(filename, { 'encoding': 'utf8'})
       return [ VCCLoader.fromString(data) ]
     }
+    else if (filename.endsWith('.gpx')) {
+      let data = readFileSync(filename, { 'encoding': 'utf8'})
+      return [ GPXLoader.fromString(data) ]
+    }
     else if (filename.endsWith('.log')) {
       let data = readFileSync(filename, { 'encoding': 'utf8'})
       return SKLogLoader.fromString(data)
@@ -34,8 +39,10 @@ export class SaltedRosetta {
       return CSVLoader.fromFile(f).then((delta) => ([delta]))
     }
     else if (f.name.endsWith('.vcc')) {
-
       return VCCLoader.fromFile(f).then((delta) => ([delta]))
+    }
+    else if (f.name.endsWith('.gpx')) {
+      return GPXLoader.fromFile(f).then((delta) => ([delta]))
     }
 
     return Promise.reject(`Unrecognized file extension (${f.name})`)
@@ -59,6 +66,9 @@ export class SaltedRosetta {
       }
       if (filename.toLowerCase().endsWith('.vcc')) {
         return [ VCCLoader.fromString(data) ]
+      }
+      if (filename.toLowerCase().endsWith('.gpx')) {
+        return [ GPXLoader.fromString(data) ]
       }
       // default to sklog
       return SKLogLoader.fromString(data)
