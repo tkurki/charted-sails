@@ -79,6 +79,10 @@ export class IntroductionPanel extends React.Component<IntroductionPanelProps, I
                 computer and is not transmitted to anyone.<br/>
                 We do use analytics to measure interest and usage of this service. In these analytics we collect the file name
                 of your logfiles so we can identify the most popular formats. It's the only piece of information sent to us.
+                <h2>Open Source</h2>
+                This project is open-source and shared under the MIT License. Source code is <a
+                href="https://github.com/sarfata/aldis-log-viewer">available on GitHub</a>,
+                and pull-requests are very welcomed!
                 <h2>Contact Information</h2>
                 Charted Sails is developed by Thomas Sarlandie. You can reach out via email to <a
                 href="mailto:hello@chartedsails.com">hello@chartedsails.com</a> - or come say hi on the <a
