@@ -19,10 +19,11 @@ import LogParser from './parsing/LogParser';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
-const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2FyZmF0YSIsImEiOiJjamh6NDFpdXMwdGRoM3FvMWp4bXc3bnAzIn0.29zQaAsB4kd3s2QABMkA3Q'
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN
+const GA_TRACKING_CODE = process.env.REACT_APP_GA_TRACKING_CODE
 
 if (!MAPBOX_TOKEN) {
-  alert('The mapbox token is not defined.');
+  alert('The mapbox token is not defined. Set a MAPBOX_TOKEN environment variable.');
 }
 
 // tslint:disable-next-line:no-empty-interface
@@ -165,11 +166,11 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   public componentDidMount() {
-    if (process.env.NODE_ENV === 'production') {
-      ReactGA.initialize('UA-124033119-1');
+    if (process.env.NODE_ENV === 'production' && GA_TRACKING_CODE) {
+      ReactGA.initialize(GA_TRACKING_CODE);
     }
     else {
-      ReactGA.initialize('UA-124033119-1', { testMode: true });
+      ReactGA.initialize(GA_TRACKING_CODE || '', { testMode: true });
     }
     ReactGA.pageview(window.location.pathname + window.location.search);
 
