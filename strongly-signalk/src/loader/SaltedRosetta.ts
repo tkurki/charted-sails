@@ -59,6 +59,13 @@ export class SaltedRosetta {
       }
     }
 
+    // Try to read the filename in URL if it was not in headers
+    if (filename === '' && typeof r.url === 'string') {
+      // nice: https://stackoverflow.com/questions/511761/js-function-to-get-filename-from-url#comment61576914_17143667
+      // we can add the '!' here because we have made sure the url is a string. split and shift will always return.
+      filename = r.url.split('#').shift()!.split('?').shift()!.split('/').pop()!
+    }
+
     // FIXME: Would be much better to stream the data instead of loading it in memory.
     return r.text().then(data => {
       if (contentType && contentType.includes('text/csv') || filename.toLowerCase().endsWith('.csv')) {
