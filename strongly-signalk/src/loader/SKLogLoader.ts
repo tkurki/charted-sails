@@ -4,6 +4,13 @@ import { FromPgn } from 'canboatjs';
 import { SKDelta, SKSource, SKUpdate } from "../model";
 
 export class SKLogLoader {
+  // Ignore all AIS and DSC messages because we do not know how to distinguish them
+  // from boat data at the moment. In the future we should return one SKDelta for each
+  // object on the water.
+  private static ignoredPGNs = [129038, 129039, 129040, 129041, 129792, 129793,
+  129794, 129795, 129796, 129797, 129798, 129800, 129801, 129802, 129803, 129804,
+  129805, 129806, 129807, 129808, 129809, 129810, 129811, 129812, 129813 ]
+
   static fromFile(f: File): Promise<SKDelta[]> {
     const p = new Promise<SKDelta[]>((resolve,reject) => {
       const fileReader = new FileReader()
@@ -34,7 +41,16 @@ export class SKLogLoader {
     return [ { updates: updates } ]
     */
 
-    const deltas = lines.map(SKLogLoader.fromLine).filter(d => d !== null) as SKDelta[]
+    const deltas = lines.map(line => {
+      try {
+        return SKLogLoader.fromLine(line)
+      }
+      catch (e) {
+        // FIXME: Find a better way to do warning reporting
+        console.warn(`Warning: error parsing line ${line}: ${e.message}`)
+        return null
+      }
+    }).filter(d => d !== null) as SKDelta[]
 
     // Very naive implementation of SKDelta[] consolidation - see below for better to enable
     // when we have AIS sentences.
@@ -116,6 +132,9 @@ export class SKLogLoader {
         canboatParser.parse(data)
 
         if (pgnData) {
+          if (SKLogLoader.ignoredPGNs.includes(pgnData.pgn)) {
+            return null
+          }
           let jsonDelta = n2kSignalk.toDelta(pgnData);
           let delta = SKDelta.fromJSON(jsonDelta)
           // By default, assume we are referring to 'self'
