@@ -2,7 +2,11 @@
   "name": "@aldis/strongly-signalk",
   "version": "0.0.1",
   "description": "A strongly typed library for interactive SignalK apps",
-  "license": "MIT",
+  "author": {
+    "name": "Thomas Sarlandie",
+    "email": "thomas@sarlandie.net"
+  },
+  "license": "Apache-2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": "dist/cli/CLI.js",

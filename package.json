@@ -1,5 +1,10 @@
 {
   "name": "charted-sails",
+  "author": {
+    "name": "Thomas Sarlandie",
+    "email": "thomas@sarlandie.net"
+  },
+  "license": "Apache-2.0",
   "description": "Libraries and tools for the marine world!",
   "private": true,
   "scripts": {
