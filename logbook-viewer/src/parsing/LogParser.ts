@@ -49,13 +49,13 @@ export default class LogParser extends EventEmitter implements LogParserEventsEm
       // Set up the worker
       worker.onerror = e => {
         worker.terminate()
-        return reject(e.message)
+        return reject(new Error(e.message))
       }
 
       worker.onmessage = ({data}) => {
         if ('error' in data) {
           worker.terminate()
-          return reject(data.error)
+          return reject(new Error(data.error))
         }
         if ('delta' in data && 'dataProvider' in data) {
           // rebuild the objects
@@ -77,7 +77,7 @@ export default class LogParser extends EventEmitter implements LogParserEventsEm
           return resolve({ trip, timeSpent: measure ? measure.duration : undefined })
         }
         worker.terminate()
-        return reject('invalid worker response :/')
+        return reject(new Error('invalid worker response :/'))
       }
 
       // Start working

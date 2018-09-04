@@ -210,13 +210,13 @@ export default class App extends React.Component<AppProps, AppState> {
         ReactGA.timing({ category: 'Trip', variable: 'openTrip', value: timeSpent })
       }
     })
-    .catch(e => {
+    .catch((e : Error) => {
       AppToaster.dismiss(loadingToastKey)
-      console.log(`Unable to load file ${f.name}: ${e}`)
-      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e}` })
+      console.log(`Unable to load file ${f.name}: ${e.message}`)
+      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e.message}` })
       this.setState({trip: null})
 
-      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nFile: ${f.name}\nError: ${e}`
+      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nFile: ${f.name}\nError: ${e.message}`
       const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip from file')}&amp;`
        + `body=${ encodeURIComponent(mailBody) }`
 
@@ -225,7 +225,7 @@ export default class App extends React.Component<AppProps, AppState> {
         intent: Intent.DANGER,
         message: <div>We were unable to open this trip.&nbsp;
           <a href={mailto}>Please let us know about this</a>.<br/>
-          <small>Error: {e}</small>
+          <small>Error: {e.message}</small>
         </div>
       })
     })
