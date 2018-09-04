@@ -1,5 +1,6 @@
 import { SKPosition } from '@aldis/strongly-signalk';
 import { Button, ButtonGroup, Intent, ProgressBar } from '@blueprintjs/core';
+import queryString from 'query-string';
 import * as React from 'react';
 import ReactGA from 'react-ga';
 import ReactMapGL from 'react-map-gl';
@@ -177,6 +178,11 @@ export default class App extends React.Component<AppProps, AppState> {
     window.addEventListener('resize', this._resize);
     this._resize();
     this.animateMapToShowTripOverviews()
+
+    const parsed = queryString.parse(location.search)
+    if (parsed.url !== undefined) {
+      this.openURL(parsed.url)
+    }
   }
 
   public componentWillUnmount() {
@@ -197,7 +203,7 @@ export default class App extends React.Component<AppProps, AppState> {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
 
     this.openLogParserPromise(new LogParser().openFile(f), `file-upload://${f.name}`)
-      }
+  }
 
   private openURL(url: string) {
     ReactGA.event({ category: 'Trip', action: 'Load url', label: url })
