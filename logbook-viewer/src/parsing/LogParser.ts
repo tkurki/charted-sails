@@ -7,7 +7,7 @@ declare interface LogParserEventsEmitter {
   on(event: 'progress', listener: (progress:number) => void): this
 }
 
-interface LogParserOutput {
+export interface LogParserOutput {
   trip: InteractiveTrip
   timeSpent?: number
 }

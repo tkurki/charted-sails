@@ -15,7 +15,7 @@ import TripSelectorOverlay from './components/overview/TripSelectorOverlay';
 import InteractiveTrip from './model/InteractiveTrip';
 import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
-import LogParser from './parsing/LogParser';
+import LogParser, { LogParserOutput } from './parsing/LogParser';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
@@ -196,14 +196,23 @@ export default class App extends React.Component<AppProps, AppState> {
   private openFile(f: File) {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
 
+    this.openLogParserPromise(new LogParser().openFile(f), `file-upload://${f.name}`)
+      }
+
+  private openURL(url: string) {
+    ReactGA.event({ category: 'Trip', action: 'Load url', label: url })
+
+    this.openLogParserPromise(new LogParser().openURL(url), url)
+  }
+
+  private openLogParserPromise(promise: Promise<LogParserOutput>, label: string) {
     const loadingToastKey = AppToaster.show({
       icon: "cloud-upload",
       timeout: 0,
       message: <ProgressBar intent='primary' className='toasted-progress-bar'/>
     })
 
-    const logParser = new LogParser()
-    logParser.openFile(f).then(({trip, timeSpent}) => {
+    promise.then(({trip, timeSpent}) => {
       this.showTrip(trip)
       AppToaster.dismiss(loadingToastKey)
       if (timeSpent !== undefined) {
@@ -212,12 +221,12 @@ export default class App extends React.Component<AppProps, AppState> {
     })
     .catch((e : Error) => {
       AppToaster.dismiss(loadingToastKey)
-      console.log(`Unable to load file ${f.name}: ${e.message}`)
-      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${f.name}: ${e.message}` })
+      console.log(`Unable to load ${label}: ${e.message}`)
+      ReactGA.event({ category: 'Trip', action: 'ParsingError', label: `${label}: ${e.message}` })
       this.setState({trip: null})
 
-      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nFile: ${f.name}\nError: ${e.message}`
-      const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip from file')}&amp;`
+      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\nURL: ${label}\nError: ${e.message}`
+      const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip')}&amp;`
        + `body=${ encodeURIComponent(mailBody) }`
 
       AppToaster.show({
@@ -226,46 +235,6 @@ export default class App extends React.Component<AppProps, AppState> {
         message: <div>We were unable to open this trip.&nbsp;
           <a href={mailto}>Please let us know about this</a>.<br/>
           <small>Error: {e.message}</small>
-        </div>
-      })
-    })
-  }
-
-  private openURL(url: string) {
-    ReactGA.event({ category: 'Trip', action: 'Load url', label: url })
-
-    const loadingToastKey = AppToaster.show({
-      icon: "cloud-upload",
-      timeout: 0,
-      message: <ProgressBar intent='primary' className='toasted-progress-bar'/>
-    })
-
-    const logParser = new LogParser()
-    logParser.openURL(url).then(({trip, timeSpent}) => {
-      this.showTrip(trip)
-      AppToaster.dismiss(loadingToastKey)
-      if (timeSpent !== undefined) {
-        ReactGA.timing({ category: 'Trip', variable: 'openTripFromURL', value: timeSpent })
-      }
-    })
-    .catch(e => {
-      AppToaster.dismiss(loadingToastKey)
-      console.log(`Unable to load URL ${url}: ${e}`)
-      ReactGA.event({ category: 'Trip', action: 'ParsingErrorFromURL', label: `${url}: ${e}` })
-      this.setState({trip: null})
-
-      const mailBody = `Hey,\nI ran into a problem with charted sails loading this:\n\nURL: ${url}\nError: ${e}`
-      const mailto = `mailto:hello@aldislab.com?subject=${encodeURIComponent('Unable to load trip from URL')}&amp;`
-       + `body=${ encodeURIComponent(mailBody) }`
-
-      AppToaster.show({
-        icon: 'warning-sign',
-        intent: Intent.DANGER,
-        message: <div>We were unable to open this trip.&nbsp;
-          <a href={mailto}>
-            Please let us know about this
-          </a>.<br/>
-          <small>Error: {e}</small>
         </div>
       })
     })
