@@ -145,6 +145,9 @@ export class SKLogLoader {
           delta.updates.forEach(u => {
             u.timestamp = time
 
+            if (u.source === undefined) {
+              u.source = new SKSource('NMEA2000')
+            }
             u.source.label = "NMEA2000"
             u.source.pgn = pgnData.pgn
             u.source.src = pgnData.src.toString()

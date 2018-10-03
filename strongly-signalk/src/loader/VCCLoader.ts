@@ -27,7 +27,7 @@ export class VCCLoader {
         new SKValue('navigation.headingTrue', trackpoint.a_heading * 2 * Math.PI / 360),
         new SKValue('navigation.position', new SKPosition(trackpoint.a_latitude, trackpoint.a_longitude))
       ]
-      return new SKUpdate(new SKSource('velocitek'), new Date(trackpoint.a_dateTime), values)
+      return new SKUpdate(new Date(trackpoint.a_dateTime), values, new SKSource('velocitek'))
     })
 
     return new SKDelta(updates)
