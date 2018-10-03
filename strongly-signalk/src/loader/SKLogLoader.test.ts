@@ -10,6 +10,17 @@ it('can parse a line in JSON format', () => {
   )
 })
 
+it('can parse \'derived-data\' in JSON format', () => {
+  const delta = SKLogLoader.fromLine(`1538139600485;derived-data;{"context":"vessels.urn:mrn:signalk:uuid:10ce5c19-541d-44ea-8810-094d1bafbe3c","updates":[{"timestamp":"2018-09-28T13:00:00.485Z","values":[{"path":"environment.wind.directionMagnetic","value":1.1919}]}]}`)
+
+  expect(delta).not.toBeNull()
+
+  const expected = new SKDelta([ new SKUpdate(new Date(1538139600485), [ new SKValue('environment.wind.directionMagnetic', 1.1919)], new SKSource('xx')) ], 'vessels.urn:mrn:signalk:uuid:10ce5c19-541d-44ea-8810-094d1bafbe3c')
+  delete(expected.updates[0].source)
+
+  expect(delta).toMatchObject(expected)
+})
+
 it('can parse a line in NMEA0183 format', () => {
   const delta = SKLogLoader.fromLine(`1367256704816;N;$GPRMC,185404.000,A,3243.5881,N,11712.5391,W,0.20,0.00,130518,,,A*74`)
   expect(delta).not.toBeNull()
@@ -51,9 +62,9 @@ it('can parse a line in PCDIN format', () => {
   expect(delta).toMatchObject(
     new SKDelta([
       new SKUpdate(new Date(1526239612483),
-      [
-        new SKValue('navigation.speedOverGround', 0),
-        new SKValue('navigation.courseOverGroundMagnetic', 1.2389)
+        [
+          new SKValue('navigation.speedOverGround', 0),
+          new SKValue('navigation.courseOverGroundMagnetic', 1.2389)
         ],
         new SKSource('NMEA2000', { pgn: 129026, src: "127", type: "NMEA2000"})) ],
       'vessels.self')
