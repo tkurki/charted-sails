@@ -13,6 +13,7 @@ export default class InteractiveTrip {
   private dataProvider: BetterDataProvider
   private selection: TimeSelection
   private segments: InteractiveTripSegment[]
+  private bounds: [SKPosition, SKPosition]
   private startTime: Date
   private endTime: Date
   private title: string
@@ -26,9 +27,14 @@ export default class InteractiveTrip {
     this.dataProvider = dataProvider
     this.selection = new TimeSelection(this.dataProvider.getSmallestTimestampWithAllPathsDefined())
     this.segments = this.calculateSegments()
+    this.bounds =  SignalKTripAnalyzer.getBounds(this.trip)!
     this.startTime = this.findStartTime()
     this.endTime = SignalKTripAnalyzer.getEndTime(this.trip)!
     this.title = title
+
+    if (this.segments.length === 0 || this.bounds === null) {
+      throw new Error("Logfile does not include enough data to build a trace.")
+    }
   }
 
   public getPathSegments(): InteractiveTripSegment[] {
@@ -36,7 +42,7 @@ export default class InteractiveTrip {
   }
 
   public getBounds(): [SKPosition, SKPosition] {
-    return SignalKTripAnalyzer.getBounds(this.trip)!
+    return this.bounds
   }
 
   public getStartTime(): Date {
