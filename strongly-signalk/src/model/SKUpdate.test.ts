@@ -20,9 +20,24 @@ it('can load from json', () => {
       }
     ]
   }`)
-  expect(v.source.label).toEqual('N2000-01')
+  expect(v.source!.label).toEqual('N2000-01')
   expect(v.timestamp).toEqual(new Date("2010-01-07T07:18:44Z"))
   expect(v.values).toHaveLength(2)
   expect(v.values[0].path).toEqual('navigation.speedOverGround')
   expect(v.values[0].value).toEqual(16.341667)
+})
+
+it('can load from json without a source', () => {
+  const v = SKUpdate.fromJSON(`{
+    "timestamp": "2010-01-07T07:18:44Z",
+    "values": [
+      {
+        "path": "navigation.courseOverGround",
+        "value": 3.1
+      }
+    ]
+  }`)
+  expect(v.timestamp).toEqual(new Date("2010-01-07T07:18:44Z"))
+  expect(v.source).toBeUndefined()
+  expect(v.values).toHaveLength(1)
 })

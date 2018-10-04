@@ -58,23 +58,29 @@ export default class LogParser extends EventEmitter implements LogParserEventsEm
           return reject(new Error(data.error))
         }
         if ('delta' in data && 'dataProvider' in data) {
-          // rebuild the objects
-          performance.mark('rehydrate-start')
-          const provider = BetterDataProvider.fromJSON(data.dataProvider)
-          performance.mark('rehydrate-end')
-          const trip = new InteractiveTrip(provider.getTripData(), provider, workerCommand.label)
-          performance.mark('interactive-end')
+          try {
+            // rebuild the objects
+            performance.mark('rehydrate-start')
+            const provider = BetterDataProvider.fromJSON(data.dataProvider)
+            performance.mark('rehydrate-end')
+            const trip = new InteractiveTrip(provider.getTripData(), provider, workerCommand.label)
+            performance.mark('interactive-end')
 
-          // Collect some performance measurements
-          performance.measure('CS: Open file', 'logparser-start', 'interactive-end')
-          performance.measure('CS: Worker start', 'logparser-start', 'worker-started')
-          performance.measure('CS: Rehydrate', 'rehydrate-start', 'rehydrate-end')
-          performance.measure('CS: I.Trip', 'rehydrate-end', 'interactive-end')
+            // Collect some performance measurements
+            performance.measure('CS: Open file', 'logparser-start', 'interactive-end')
+            performance.measure('CS: Worker start', 'logparser-start', 'worker-started')
+            performance.measure('CS: Rehydrate', 'rehydrate-start', 'rehydrate-end')
+            performance.measure('CS: I.Trip', 'rehydrate-end', 'interactive-end')
 
-          const measure = performance.getEntriesByName("CS: Open file").pop()
+            const measure = performance.getEntriesByName("CS: Open file").pop()
 
-          worker.terminate()
-          return resolve({ trip, timeSpent: measure ? measure.duration : undefined })
+            worker.terminate()
+            return resolve({ trip, timeSpent: measure ? measure.duration : undefined })
+          }
+          catch (e) {
+            worker.terminate()
+            return reject(e)
+          }
         }
         worker.terminate()
         return reject(new Error('invalid worker response :/'))

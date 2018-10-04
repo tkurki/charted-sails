@@ -85,14 +85,14 @@ export class SKLogLoader {
   }
 
   static fromLine(line: string): SKDelta|null {
-    const logLineRegexp = /(\d+);(\w+);(.*)/
+    const logLineRegexp = /(\d+);([\w-]+);(.*)/
     let results = line.match(logLineRegexp)
     if (results && results.length === 4) {
       let time = new Date(Number.parseInt(results[1]))
       let type = results[2]
       let data = results[3]
 
-      if (type === 'I') {
+      if (type === 'I' || type === 'derived-data') {
         let delta = SKDelta.fromJSON(data)
         delta.updates.forEach( u => {
           u.timestamp = time
@@ -145,6 +145,9 @@ export class SKLogLoader {
           delta.updates.forEach(u => {
             u.timestamp = time
 
+            if (u.source === undefined) {
+              u.source = new SKSource('NMEA2000')
+            }
             u.source.label = "NMEA2000"
             u.source.pgn = pgnData.pgn
             u.source.src = pgnData.src.toString()

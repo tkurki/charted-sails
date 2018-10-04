@@ -1,8 +1,8 @@
 import * as Papa from 'papaparse';
-import { ExpeditionFormatConversion } from './ExpeditionFormatConversion';
 import { isNull } from 'util';
-import { CSVConversion, columnConvertersForLine } from './CSVConversion';
 import { SKDelta, SKSource, SKUpdate } from '../model';
+import { columnConvertersForLine, CSVConversion } from './CSVConversion';
+import { ExpeditionFormatConversion } from './ExpeditionFormatConversion';
 
 export interface CSVConversionOption {
   /**
@@ -112,9 +112,7 @@ export class CSVLoader {
       if (time === null) {
         return null
       }
-      let update = new SKUpdate(skSource)
-      update.timestamp = time
-      update.values = []
+      let update = new SKUpdate(time, [], skSource)
 
       columnConvertersForLine(csvLine, conversion).forEach(colConverter => {
         let value = colConverter.convert(csvLine)

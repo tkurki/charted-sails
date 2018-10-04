@@ -6,8 +6,19 @@ it('can parse a line in JSON format', () => {
 
   expect(delta).not.toBeNull()
   expect(delta).toMatchObject(
-    new SKDelta([ new SKUpdate(new SKSource('KBox.Barometer'), new Date(1526237642929), [ new SKValue('environment.outside.pressure', 101892.4)]) ], 'vessels.self')
+    new SKDelta([ new SKUpdate(new Date(1526237642929), [ new SKValue('environment.outside.pressure', 101892.4)], new SKSource('KBox.Barometer')) ], 'vessels.self')
   )
+})
+
+it('can parse \'derived-data\' in JSON format', () => {
+  const delta = SKLogLoader.fromLine(`1538139600485;derived-data;{"context":"vessels.urn:mrn:signalk:uuid:10ce5c19-541d-44ea-8810-094d1bafbe3c","updates":[{"timestamp":"2018-09-28T13:00:00.485Z","values":[{"path":"environment.wind.directionMagnetic","value":1.1919}]}]}`)
+
+  expect(delta).not.toBeNull()
+
+  const expected = new SKDelta([ new SKUpdate(new Date(1538139600485), [ new SKValue('environment.wind.directionMagnetic', 1.1919)], new SKSource('xx')) ], 'vessels.urn:mrn:signalk:uuid:10ce5c19-541d-44ea-8810-094d1bafbe3c')
+  delete(expected.updates[0].source)
+
+  expect(delta).toMatchObject(expected)
 })
 
 it('can parse a line in NMEA0183 format', () => {
@@ -28,7 +39,7 @@ it('can parse a line in NMEA0183 format', () => {
   expect(delta).toMatchObject(
     new SKDelta([
       // The timestamp of the data - and the timestamp in the data are different on purpose
-      new SKUpdate(new SKSource('nmea'), new Date(1367256704816),
+      new SKUpdate(new Date(1367256704816),
       [
         new SKValue('navigation.position', new SKPosition(32.72646833333334, -117.208985)),
         new SKValue('navigation.courseOverGroundTrue', 0),
@@ -36,7 +47,7 @@ it('can parse a line in NMEA0183 format', () => {
         new SKValue('navigation.magneticVariation', 0),
         new SKValue('navigation.magneticVariationAgeOfService', 1526237644),
         new SKValue('navigation.datetime', new Date('2018-05-13T18:54:04.000Z'))
-      ]) ], 'vessels.self')
+      ], new SKSource('nmea')) ], 'vessels.self')
   )
 })
 
@@ -50,11 +61,13 @@ it('can parse a line in PCDIN format', () => {
   */
   expect(delta).toMatchObject(
     new SKDelta([
-      new SKUpdate(new SKSource('NMEA2000', { pgn: 129026, src: "127", type: "NMEA2000"}), new Date(1526239612483),
-      [
-        new SKValue('navigation.speedOverGround', 0),
-        new SKValue('navigation.courseOverGroundMagnetic', 1.2389)
-      ]) ], 'vessels.self')
+      new SKUpdate(new Date(1526239612483),
+        [
+          new SKValue('navigation.speedOverGround', 0),
+          new SKValue('navigation.courseOverGroundMagnetic', 1.2389)
+        ],
+        new SKSource('NMEA2000', { pgn: 129026, src: "127", type: "NMEA2000"})) ],
+      'vessels.self')
   )
 })
 
@@ -68,11 +81,13 @@ it('can parse a line in Actisense format', () => {
   */
   expect(delta).toMatchObject(
     new SKDelta([
-      new SKUpdate(new SKSource('NMEA2000', { pgn: 130306, src: "105", type: "NMEA2000"}), new Date(1531209600910),
+      new SKUpdate(new Date(1531209600910),
       [
         new SKValue('environment.wind.speedApparent', 7.56),
         new SKValue('environment.wind.angleApparent', 0.0959)
-      ]) ], 'vessels.self')
+      ],
+      new SKSource('NMEA2000', { pgn: 130306, src: "105", type: "NMEA2000"})) ],
+    'vessels.self')
   )
 })
 

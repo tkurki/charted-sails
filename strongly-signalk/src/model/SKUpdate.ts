@@ -15,13 +15,13 @@ export interface SKUpdateJSON {
  */
 export class SKUpdate {
   timestamp: Date
-  source: SKSource
+  source?: SKSource
   values: SKValue[]
 
-  constructor(source : SKSource, timestamp: Date = new Date(), values: SKValue[] = []) {
+  constructor(timestamp: Date = new Date(), values: SKValue[] = [], source?: SKSource) {
     this.timestamp = timestamp
-    this.source = source
     this.values = values
+    this.source = source
   }
 
   static fromJSON(json: string|SKUpdateJSON): SKUpdate {
@@ -31,8 +31,10 @@ export class SKUpdate {
     else {
       let update : SKUpdate = Object.create(SKUpdate.prototype)
       update.timestamp = new Date(json.timestamp)
-      update.source = SKSource.fromJSON(json.source)
       update.values = json.values.map(v => SKValue.fromJSON(v))
+      if (json.source) {
+        update.source = SKSource.fromJSON(json.source)
+      }
       return update
     }
   }

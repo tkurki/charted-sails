@@ -48,7 +48,7 @@ export class GPXLoader {
     if (p.speed !== undefined) {
       values.push(new SKValue('navigation.speedOverGround', p.speed))
     }
-    return new SKUpdate(new SKSource('velocitek'), new Date(p.time), values)
+    return new SKUpdate(new Date(p.time), values, new SKSource('gpx'))
   }
 
   public static fromString(data: string): SKDelta {

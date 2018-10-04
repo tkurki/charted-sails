@@ -1,4 +1,4 @@
-import {SKDelta} from "./SKDelta"
+import { SKDelta } from "./SKDelta";
 
 const signalkdelta = `
 {
@@ -37,7 +37,7 @@ describe("SKDelta Loading from JSON", () => {
     const update = skdelta.updates[0]
 
     expect(update.timestamp).toEqual(new Date("2010-01-07T07:18:44Z"))
-    expect(update.source.label).toEqual('N2000-01')
+    expect(update.source!.label).toEqual('N2000-01')
 
     expect(update.values).toHaveLength(2)
 
