@@ -19,7 +19,8 @@ import { TripOverview } from './model/TripOverview';
 import LogParser, { LogParserOutput } from './parsing/LogParser';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
-const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v9';
+const MAPBOX_STYLE_SATELLITE = 'mapbox://styles/mapbox/satellite-v9'
+const MAPBOX_STYLE_MAP = 'mapbox://styles/mapbox/light-v9';
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN
 const GA_TRACKING_CODE = process.env.REACT_APP_GA_TRACKING_CODE
 
@@ -39,6 +40,7 @@ export interface AppState {
   editing: boolean
   newStartBoundTime?: Date
   newEndBoundTime?: Date
+  satelliteView: boolean
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -56,7 +58,8 @@ export default class App extends React.Component<AppProps, AppState> {
         maxZoom: 32
       },
       showDataTable: false,
-      editing: false
+      editing: false,
+      satelliteView: false
     }
     this._resize = this._resize.bind(this);
     this.setSelection = this.setSelection.bind(this)
@@ -67,7 +70,7 @@ export default class App extends React.Component<AppProps, AppState> {
       <div>
         <ReactMapGL
           {...this.state.viewport}
-          mapStyle={MAPBOX_STYLE}
+          mapStyle={this.state.satelliteView ? MAPBOX_STYLE_SATELLITE : MAPBOX_STYLE_MAP }
           mapboxApiAccessToken={MAPBOX_TOKEN}
           onViewportChange={viewport => this._onViewportChange(viewport)}
         >
@@ -92,6 +95,10 @@ export default class App extends React.Component<AppProps, AppState> {
         {this.state.trip && (
           <React.Fragment>
             <ButtonGroup large={true} className='buttonGroupBar'>
+              <Button icon="satellite" active={ this.state.satelliteView } onClick={ () => {
+                ReactGA.event({ category: 'ButtonGroup', action: `Satellite ${ this.state.satelliteView ? 'Off' : 'On' }`})
+                this.setState({ satelliteView: !this.state.satelliteView })
+              }} />
               <Button icon="annotation" active={ this.state.editing } onClick={ () => {
                 ReactGA.event({ category: 'ButtonGroup', action: `Edit ${ this.state.editing ? 'End' : 'Start' }`})
                 if (this.state.editing) {
@@ -298,7 +305,7 @@ export default class App extends React.Component<AppProps, AppState> {
   private onCloseTrip() {
     ReactGA.event({ category: 'Trip', action: 'Close Trip' })
 
-    this.setState({trip: null})
+    this.setState({trip: null, satelliteView: false, editing: false, showDataTable: false})
     setImmediate(() => {
       this.animateMapToShowTripOverviews()
     })
