@@ -19,8 +19,8 @@ import { TripOverview } from './model/TripOverview';
 import LogParser, { LogParserOutput } from './parsing/LogParser';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
 
-const MAPBOX_STYLE_SATELLITE = 'mapbox://styles/mapbox/satellite-v9'
-const MAPBOX_STYLE_MAP = 'mapbox://styles/mapbox/light-v9';
+const MAPBOX_STYLE_SATELLITE = 'https://maps.tilehosting.com/styles/hybrid/style.json?key=KEY'
+const MAPBOX_STYLE_MAP = 'https://maps.tilehosting.com/styles/positron/style.json?key=KEY';
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN
 const GA_TRACKING_CODE = process.env.REACT_APP_GA_TRACKING_CODE
 
