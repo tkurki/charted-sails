@@ -26,10 +26,10 @@ export default class InteractiveTrip {
     this.trip = trip
     this.dataProvider = dataProvider
     this.selection = new TimeSelection(this.dataProvider.getSmallestTimestampWithAllPathsDefined())
-    this.segments = this.calculateSegments()
     this.bounds =  SignalKTripAnalyzer.getBounds(this.trip)!
     this.startTime = this.findStartTime()
     this.endTime = SignalKTripAnalyzer.getEndTime(this.trip)!
+    this.segments = this.calculateSegments()
     this.title = title
 
     if (this.segments.length === 0 || this.bounds === null) {
@@ -69,10 +69,20 @@ export default class InteractiveTrip {
     return this.title
   }
 
+  public trimBounds(newStartTime: Date, newEndTime: Date) {
+    this.startTime = newStartTime
+    this.endTime = newEndTime
+    // Recalculate segments
+    this.segments = this.calculateSegments()
+  }
+
   private calculateSegments() {
     const segments:InteractiveTripSegment[] = []
 
+    // Get all position values and only keep them if they are within time bounds.
     const positionValues = SignalKTripAnalyzer.getValuesForPath(this.trip, "navigation.position")
+      .filter(value => value[0] >= this.getStartTime() && value[0] <= this.getEndTime() )
+
     if (positionValues.length === 0) {
       return []
     }

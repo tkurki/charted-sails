@@ -50,8 +50,9 @@ export function DynamicBoatSVG({data, project}:DynamicBoatSVGProps) {
   if (twa !== undefined) {
     twa = 180 * twa / Math.PI
   }
-  const apparentColor = awa && awa > 0 ? 'green' : 'red'
-  const trueColor = twa && twa > 0 ? 'green' : 'red'
+  // blueprint js colors: green1/green3 red1/red3
+  const apparentColor = awa && awa > 0 ? '#0F9960' : '#A82A2A'
+  const trueColor = twa && twa > 0 ? '#3DCC91' : '#DB3737'
   return (
     // 200x200 surface with boat centered and wind arrow
     <g transform={ `translate(${pixelCoordinate[0]-100} ${pixelCoordinate[1]-100})`}>

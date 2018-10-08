@@ -55,4 +55,16 @@ storiesOf("Components/TimePanel", module)
     return buildTimePanelWithKnob(new Date("2018-06-23T09:03:12"), 3*365*24*3600*1000, 0)
   })
 
+  .add('Showing an editable time panel', () => {
+    return <TimePanel
+      startTime={new Date("2018-06-23T09:03:12")}
+      endTime={new Date("2018-06-23T19:03:12")}
+      selectedTime={myDateKnob('selected', new Date("2018-06-23T12:00:00"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T10:03:12"))}
+      onSelectedTimeChange={ () => true }
+      editableBounds={true}
+      startBoundTime={myDateKnob('startBound', new Date("2018-06-23T09:03:12"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T10:03:12")) }
+      endBoundTime={myDateKnob('endBound', new Date("2018-06-23T09:03:12"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T18:03:12")) }
+      onBoundsChanged={ () => true }
+    />
+})
 

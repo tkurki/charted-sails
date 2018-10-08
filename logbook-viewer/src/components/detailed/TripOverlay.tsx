@@ -8,9 +8,18 @@ export interface TripOverlayProps {
   onHover?: (info:any) => void,
   trip: InteractiveTrip,
   viewport: any
+  coloringMode: 'solid' | 'selection'
+  trackColor: [number, number, number] | [number, number, number, number]
+  selectionStart?: Date
+  selectionEnd?: Date
 }
 
 export default class TripOverlay extends React.Component<TripOverlayProps> {
+  constructor(props : TripOverlayProps) {
+    super(props)
+    this.segmentColorPerSelection = this.segmentColorPerSelection.bind(this)
+  }
+
   public render() {
     if (!this.props.trip) {
       return null;
@@ -18,15 +27,16 @@ export default class TripOverlay extends React.Component<TripOverlayProps> {
 
     const layers = [
       new LineLayer({
-        autoHighlight: true,
         data: this.props.trip.getPathSegments(),
-        getColor: () => [30, 150, 100],
-        getSourcePosition: (segment : InteractiveTripSegment) => segment.startPosition.asArray(),
+        getColor: this.props.coloringMode === 'solid' ? this.props.trackColor : this.segmentColorPerSelection,
         getStrokeWidth: 5,
+        getSourcePosition: (segment : InteractiveTripSegment) => segment.startPosition.asArray(),
         getTargetPosition: (segment : InteractiveTripSegment) => segment.endPosition.asArray(),
-        highlightColor: [200, 150, 100, 200],
         id: 'line-layer',
-        pickable: true
+        pickable: true,
+        updateTriggers: {
+          getColor: [this.props.coloringMode, this.props.trackColor, this.props.selectionStart, this.props.selectionEnd]
+      }
       })
     ];
 
@@ -53,5 +63,15 @@ export default class TripOverlay extends React.Component<TripOverlayProps> {
     const boatData = this.props.trip.getDataProvider()
       .getValuesAtTime(this.props.trip.getSelection().getCenter())
     return <DynamicBoatSVG data={boatData} project={redrawContext.project} />
+  }
+
+  private segmentColorPerSelection(segment: InteractiveTripSegment) {
+    if ((this.props.selectionStart && segment.startTime >= this.props.selectionStart) &&
+        (this.props.selectionEnd && segment.endTime <= this.props.selectionEnd)) {
+      return this.props.trackColor
+    }
+    else {
+      return [223, 226, 229]
+    }
   }
 }
