@@ -59,13 +59,14 @@ export default class TimePanel extends React.Component<TimePanelProps> {
             labelRenderer={range.renderer}
             labelStepSize={this.calculateLabelStepSize(rangeDuration, range.stepSize, 7)}
             stepSize={100}
+            defaultTrackIntent={Intent.PRIMARY}
           >
             <MultiSlider.Handle value={ startBoundValue } onChange={ this.onStartBoundChanged }
-              type={HandleType.START} intentBefore={Intent.DANGER}
+              type={HandleType.START} intentBefore={Intent.NONE}
             />
-            <MultiSlider.Handle value={ selectedTime.getTime() } onChange={ this.onSelectedTimeChange }  interactionKind={HandleInteractionKind.PUSH}/>
+            <MultiSlider.Handle value={ selectedTime.getTime() } onChange={ this.onSelectedTimeChange } interactionKind={HandleInteractionKind.PUSH}/>
             <MultiSlider.Handle value={ endBoundValue } onChange={ this.onEndBoundChanged }
-              type={HandleType.END} intentAfter={Intent.DANGER}
+              type={HandleType.END} intentAfter={Intent.NONE}
             />
           </MultiSlider>
         </Card>

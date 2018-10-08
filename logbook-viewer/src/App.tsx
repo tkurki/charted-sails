@@ -76,6 +76,8 @@ export default class App extends React.Component<AppProps, AppState> {
               viewport={this.state.viewport}
               trip={this.state.trip}
               onHover={(hover : any) => this._onHover(hover)}
+              coloringMode={ this.state.editing ? 'selection' : 'solid'} trackColor={[53, 123, 184]}
+              selectionStart={this.state.newStartBoundTime} selectionEnd={this.state.newEndBoundTime}
             />
           }
           {!this.state.trip &&
