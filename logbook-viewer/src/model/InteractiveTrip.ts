@@ -6,6 +6,8 @@ export interface InteractiveTripSegment {
   endPosition: SKPosition
   startTime: Date
   endTime: Date
+  // We include this here for color-coding the map.
+  speed?: number
 }
 
 export default class InteractiveTrip {
@@ -87,20 +89,24 @@ export default class InteractiveTrip {
       return []
     }
     else if (positionValues.length === 1) {
+      const speed = this.dataProvider.getValueAtTime('navigation.speedOverGround', positionValues[0][0])
       segments.push({
         startPosition: positionValues[0][1] as SKPosition,
         endPosition: positionValues[0][1] as SKPosition,
         startTime: positionValues[0][0],
-        endTime: positionValues[0][0]
+        endTime: positionValues[0][0],
+        speed: typeof speed === 'number' ? speed : undefined
       })
     }
     else {
       for (let i = 1; i < positionValues.length; i++) {
+        const speed = this.dataProvider.getValueAtTime('navigation.speedOverGround', positionValues[i - 1][0])
         segments.push({
           startPosition: positionValues[i-1][1] as SKPosition,
           endPosition: positionValues[i][1] as SKPosition,
           startTime: positionValues[i-1][0],
-          endTime: positionValues[i][0]
+          endTime: positionValues[i][0],
+          speed: typeof speed === 'number' ? speed : undefined
         })
       }
     }
