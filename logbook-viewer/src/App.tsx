@@ -36,6 +36,9 @@ export interface AppState {
   trip: InteractiveTrip|null,
   hoveredObject?: any
   showDataTable: boolean
+  editing: boolean
+  newStartBoundTime?: Date
+  newEndBoundTime?: Date
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -52,7 +55,8 @@ export default class App extends React.Component<AppProps, AppState> {
         zoom: 0,
         maxZoom: 32
       },
-      showDataTable: false
+      showDataTable: false,
+      editing: false
     }
     this._resize = this._resize.bind(this);
     this.setSelection = this.setSelection.bind(this)
@@ -86,7 +90,17 @@ export default class App extends React.Component<AppProps, AppState> {
         {this.state.trip && (
           <React.Fragment>
             <ButtonGroup large={true} className='buttonGroupBar'>
-              <Button icon="th" onClick={ () => {
+              <Button icon="annotation" active={ this.state.editing } onClick={ () => {
+                ReactGA.event({ category: 'ButtonGroup', action: `Edit ${ this.state.editing ? 'End' : 'Start' }`})
+                if (this.state.editing) {
+                  this.endEditing()
+                }
+                else {
+                  this.startEditing()
+                }
+                this.setState({ editing: !this.state.editing })
+              }} />
+              <Button icon="th" active={ this.state.showDataTable } onClick={ () => {
                 ReactGA.event({ category: 'ButtonGroup', action: `${ this.state.showDataTable ? 'Close ' : 'Open '} Table `})
                 this.setState({ showDataTable: !this.state.showDataTable })
               }
@@ -104,6 +118,10 @@ export default class App extends React.Component<AppProps, AppState> {
               // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
               selectedTime={ this.state.trip.getSelection().getCenter() }
               onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
+              editableBounds={ this.state.editing }
+              startBoundTime={ this.state.newStartBoundTime }
+              endBoundTime={ this.state.newEndBoundTime }
+              onBoundsChanged={ (start, end) => { this.setState({ newStartBoundTime: start, newEndBoundTime: end } ) }}
               style={ {
                 position: 'absolute',
                 left: "50%",
@@ -309,6 +327,25 @@ export default class App extends React.Component<AppProps, AppState> {
       // FIXME: State should be immutable!
       this.state.trip.setSelection(s)
       this.setState({trip: this.state.trip})
+    }
+  }
+
+  private startEditing() {
+    if (this.state.trip) {
+      this.setState({
+        newStartBoundTime: this.state.trip.getStartTime(),
+        newEndBoundTime: this.state.trip.getEndTime()
+       })
+    }
+  }
+
+  private endEditing() {
+    if (this.state.trip) {
+      if (this.state.newStartBoundTime && this.state.newEndBoundTime) {
+        // FIXME: State should be immutable!
+        this.state.trip.trimBounds(this.state.newStartBoundTime, this.state.newEndBoundTime)
+      }
+      this.setState({ trip: this.state.trip })
     }
   }
 }
