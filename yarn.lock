@@ -292,12 +292,12 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.0.tgz#50c1e2260ac0ed9439a181de3725a0168d59c48a"
 
-"@signalk/n2k-signalk@git://github.com/sarfata/n2k-signalk#991a033b":
+"@signalk/n2k-signalk@git://github.com/sarfata/n2k-signalk#574047f0c":
   version "1.3.1"
-  resolved "git://github.com/sarfata/n2k-signalk#991a033b3348939ef12a495c270d05c3d31abd67"
+  resolved "git://github.com/sarfata/n2k-signalk#574047f0c5a151abda4788133a6e174592b09f22"
   dependencies:
     JSONStream "~1.3.0"
-    debug "^3.0.0"
+    debug "^4.0.0"
     through ">=2.2.7 <3"
 
 "@signalk/nmea0183-signalk@git://github.com/sarfata/signalk-parser-nmea0183#0ea8afeb":
@@ -3722,6 +3722,12 @@ debug@^3.0.0, debug@^3.1.0:
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
   dependencies:
     ms "2.0.0"
+
+debug@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.0.1.tgz#f9bb36d439b8d1f0dd52d8fb6b46e4ebb8c1cd5b"
+  dependencies:
+    ms "^2.1.1"
 
 decamelize-keys@^1.0.0:
   version "1.1.0"
@@ -7478,7 +7484,7 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-ms@2.1.1:
+ms@2.1.1, ms@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
 
