@@ -7,9 +7,27 @@ export type Timestamp = string
 
 export type SKValueType = number|string|SKPosition|Date
 
+export function parseSKValueType(path: string, value: any): SKValueType {
+  // FIXME: This should use the schema to know what is the expected type for
+  // a given path.
+  if (path === 'navigation.position' && typeof value === 'object'
+      && 'latitude' in value && 'longitude' in value) {
+    return SKPosition.fromJSON(value)
+  }
+  else if (path === 'navigation.datetime' && typeof value === 'string') {
+    return new Date(value)
+  }
+  else if (typeof value === 'number' || typeof value === 'string') {
+    return value
+  }
+  else {
+    throw new Error(`Invalid value ${JSON.stringify(value)} for path ${path}.`)
+  }
+}
+
 export interface SKValueJSON {
   path: string
-  value: SKValueType
+  value: any
 }
 
 /**
@@ -31,16 +49,7 @@ export class SKValue {
     else {
       let v : SKValue = Object.create(SKValue.prototype)
       v.path = json.path
-      if (v.path === 'navigation.position' && typeof json.value === 'object'
-          && 'latitude' in json.value && 'longitude' in json.value) {
-        v.value = SKPosition.fromJSON(json.value)
-      }
-      else if (v.path === 'navigation.datetime' && typeof json.value === 'string') {
-        v.value = new Date(json.value)
-      }
-      else if (typeof json.value === 'number' || typeof json.value === 'string') {
-        v.value = json.value
-      }
+      v.value = parseSKValueType(json.path, json.value)
       return v
     }
   }
