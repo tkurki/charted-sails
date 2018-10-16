@@ -1,3 +1,4 @@
+import { action } from '@storybook/addon-actions';
 import { number, withKnobs } from '@storybook/addon-knobs';
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
@@ -28,6 +29,7 @@ const buildTimePanelWithKnob = (start:Date, duration:number, progress: number) =
             startTime={start}
             selectedTime={myDateKnob('time', start, end, current)}
             onSelectedTimeChange={ () => true }
+            playSpeed={0} onPlaySpeedChange={ (speed) => action(`new speed: ${speed}`) }
           />
 }
 
@@ -65,6 +67,27 @@ storiesOf("Components/TimePanel", module)
       startBoundTime={myDateKnob('startBound', new Date("2018-06-23T09:03:12"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T10:03:12")) }
       endBoundTime={myDateKnob('endBound', new Date("2018-06-23T09:03:12"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T18:03:12")) }
       onBoundsChanged={ () => true }
+      playSpeed={ 0 } onPlaySpeedChange={ () => true }
     />
-})
+  })
+
+  .add('Speed controls', () => {
+    let speed = 0
+    return <TimePanel
+      startTime={new Date("2018-06-23T09:03:12")}
+      endTime={new Date("2018-06-23T19:03:12")}
+      selectedTime={myDateKnob('selected', new Date("2018-06-23T12:00:00"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T10:03:12"))}
+      onSelectedTimeChange={ () => true }
+      editableBounds={false}
+      startBoundTime={myDateKnob('startBound', new Date("2018-06-23T09:03:12"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T10:03:12")) }
+      endBoundTime={myDateKnob('endBound', new Date("2018-06-23T09:03:12"), new Date("2018-06-23T19:03:12"), new Date("2018-06-23T18:03:12")) }
+      onBoundsChanged={ () => true }
+      playSpeed={ number('playSpeed', speed, {
+        range: true,
+        min: 0,
+        max: 7200,
+        step: 1
+      }) } onPlaySpeedChange={ (s) => { speed = s } }
+    />
+  })
 

@@ -36,11 +36,19 @@ export interface AppState {
   viewport : any
   trip: InteractiveTrip|null,
   hoveredObject?: any
+
+  /* Modes */
   showDataTable: boolean
   editing: boolean
+  satelliteView: boolean
+
+  /* Playback info */
+  playbackSpeed: number
+  playbackAnimationReference: [Date,Date] | null
+
+  /* When editing track bounds */
   newStartBoundTime?: Date
   newEndBoundTime?: Date
-  satelliteView: boolean
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -59,7 +67,9 @@ export default class App extends React.Component<AppProps, AppState> {
       },
       showDataTable: false,
       editing: false,
-      satelliteView: false
+      satelliteView: false,
+      playbackSpeed: 0,
+      playbackAnimationReference: null
     }
     this._resize = this._resize.bind(this);
     this.setSelection = this.setSelection.bind(this)
@@ -127,6 +137,7 @@ export default class App extends React.Component<AppProps, AppState> {
               // FIXME: Need a better way to initialize selectedSegment! This should never be null when we have a trip.
               selectedTime={ this.state.trip.getSelection().getCenter() }
               onSelectedTimeChange={ t => this._onSelectedTimeChange(t) }
+              playSpeed={this.state.playbackSpeed} onPlaySpeedChange={(speed) => this.setPlaybackSpeed(speed)}
               editableBounds={ this.state.editing }
               startBoundTime={ this.state.newStartBoundTime }
               endBoundTime={ this.state.newEndBoundTime }
@@ -336,6 +347,11 @@ export default class App extends React.Component<AppProps, AppState> {
       // FIXME: State should be immutable!
       this.state.trip.setSelection(s)
       this.setState({trip: this.state.trip})
+
+      // Reset animation reference if we are in playback mode.
+      if (this.state.playbackSpeed > 0) {
+        this.setState({ playbackAnimationReference: [new Date(), this.state.trip.getSelection().getCenter() ] })
+      }
     }
   }
 
@@ -343,7 +359,8 @@ export default class App extends React.Component<AppProps, AppState> {
     if (this.state.trip) {
       this.setState({
         newStartBoundTime: this.state.trip.getStartTime(),
-        newEndBoundTime: this.state.trip.getEndTime()
+        newEndBoundTime: this.state.trip.getEndTime(),
+        playbackSpeed: 0
        })
     }
   }
@@ -355,6 +372,34 @@ export default class App extends React.Component<AppProps, AppState> {
         this.state.trip.trimBounds(this.state.newStartBoundTime, this.state.newEndBoundTime)
       }
       this.setState({ trip: this.state.trip })
+    }
+  }
+
+  private setPlaybackSpeed(speed: number) {
+    if (this.state.trip && speed > 0) {
+      requestAnimationFrame(() => this.animatePlayback() )
+      this.setState({ playbackAnimationReference: [new Date(), this.state.trip.getSelection().getCenter() ], playbackSpeed: speed })
+    }
+    else {
+      this.setState({ playbackAnimationReference: null, playbackSpeed: speed })
+    }
+  }
+
+  private animatePlayback() {
+    if (this.state.playbackSpeed > 0 && this.state.trip && this.state.playbackAnimationReference) {
+      const [referenceRealtime, referenceSelection] = this.state.playbackAnimationReference
+      let newTime = new Date(referenceSelection.getTime() + (Date.now() - referenceRealtime.getTime()) * this.state.playbackSpeed)
+
+      if (newTime > this.state.trip.getEndTime()) {
+        newTime = this.state.trip.getEndTime()
+        this.setState({ playbackSpeed: 0 })
+      }
+
+      this.state.trip.setSelection(new TimeSelection(newTime))
+      this.setState({
+        trip: this.state.trip
+      })
+      requestAnimationFrame( () => this.animatePlayback() )
     }
   }
 }

@@ -1,4 +1,5 @@
-import { Card, HandleInteractionKind, HandleType, Intent, MultiSlider, Slider } from '@blueprintjs/core';
+import { Button, ButtonGroup, Card, HandleInteractionKind, HandleType, Intent, MultiSlider, Slider } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import moment from 'moment';
 import * as React from "react";
 import './TimePanel.css';
@@ -8,6 +9,10 @@ export interface TimePanelProps {
   startTime: Date;
   selectedTime: Date
   onSelectedTimeChange: (d: Date) => void
+
+  playSpeed: number
+  onPlaySpeedChange: (speed: number) => void
+
   style?: React.CSSProperties
   /// Should the start and end bounds be editable by the user?
   editableBounds?: boolean
@@ -31,8 +36,9 @@ export default class TimePanel extends React.Component<TimePanelProps> {
   constructor(props: TimePanelProps) {
     super(props)
     this.onSelectedTimeChange = this.onSelectedTimeChange.bind(this)
-    this.onStartBoundChanged = this.onStartBoundChanged.bind(this)
-    this.onEndBoundChanged = this.onEndBoundChanged.bind(this)
+    this.onPlaySpeedChange = this.onPlaySpeedChange.bind(this)
+    this.onStartBoundChange = this.onStartBoundChange.bind(this)
+    this.onEndBoundChange = this.onEndBoundChange.bind(this)
   }
 
   public render() {
@@ -52,39 +58,57 @@ export default class TimePanel extends React.Component<TimePanelProps> {
 
       return (
         <Card elevation={2} className="time-panel" style={ this.props.style}>
-          <MultiSlider
-            min={ startTime.getTime() }
-            max={ endTime.getTime() }
-            showTrackFill={true}
-            labelRenderer={range.renderer}
-            labelStepSize={this.calculateLabelStepSize(rangeDuration, range.stepSize, 7)}
-            stepSize={100}
-            defaultTrackIntent={Intent.PRIMARY}
-          >
-            <MultiSlider.Handle value={ startBoundValue } onChange={ this.onStartBoundChanged }
-              type={HandleType.START} intentBefore={Intent.NONE}
-            />
-            <MultiSlider.Handle value={ selectedTime.getTime() } onChange={ this.onSelectedTimeChange } interactionKind={HandleInteractionKind.PUSH}/>
-            <MultiSlider.Handle value={ endBoundValue } onChange={ this.onEndBoundChanged }
-              type={HandleType.END} intentAfter={Intent.NONE}
-            />
-          </MultiSlider>
+          <div className="time-panel-wrapper">
+            <MultiSlider
+              min={ startTime.getTime() }
+              max={ endTime.getTime() }
+              showTrackFill={true}
+              labelRenderer={range.renderer}
+              labelStepSize={this.calculateLabelStepSize(rangeDuration, range.stepSize, 7)}
+              stepSize={100}
+              defaultTrackIntent={Intent.PRIMARY}
+              className="time-panel-slider"
+            >
+              <MultiSlider.Handle value={ startBoundValue } onChange={ this.onStartBoundChange }
+                type={HandleType.START} intentBefore={Intent.NONE}
+              />
+              <MultiSlider.Handle value={ selectedTime.getTime() } onChange={ this.onSelectedTimeChange } interactionKind={HandleInteractionKind.PUSH}/>
+              <MultiSlider.Handle value={ endBoundValue } onChange={ this.onEndBoundChange }
+                type={HandleType.END} intentAfter={Intent.NONE}
+              />
+            </MultiSlider>
+          </div>
         </Card>
       )
     }
     else {
       return (
         <Card elevation={2} className="time-panel" style={ this.props.style}>
-          <Slider
-            min={ startTime.getTime() }
-            max={ endTime.getTime() }
-            value={ selectedTime.getTime() }
-            onChange={ this.onSelectedTimeChange }
-            showTrackFill={false}
-            labelRenderer={range.renderer}
-            labelStepSize={this.calculateLabelStepSize(rangeDuration, range.stepSize, 7)}
-            stepSize={100}
-            />
+          <div className="time-panel-wrapper">
+            <Slider
+              min={ startTime.getTime() }
+              max={ endTime.getTime() }
+              value={ selectedTime.getTime() }
+              onChange={ this.onSelectedTimeChange }
+              showTrackFill={false}
+              labelRenderer={range.renderer}
+              labelStepSize={this.calculateLabelStepSize(rangeDuration, range.stepSize, 7)}
+              stepSize={100}
+              className="time-panel-slider"
+              />
+            <ButtonGroup
+              className="time-panel-buttons"
+              >
+              <Button icon={ IconNames.PAUSE } active={ this.props.playSpeed === 0 }
+                onClick={ () => this.onPlaySpeedChange(0) }/>
+              <Button icon={ IconNames.STEP_FORWARD } active={ this.props.playSpeed > 0 && this.props.playSpeed < 60 }
+                onClick={ () => this.onPlaySpeedChange(1) }/>
+              <Button icon={ IconNames.PLAY } active={ this.props.playSpeed >= 60 && this.props.playSpeed < 3600 }
+                onClick={ () => this.onPlaySpeedChange(60) }/>
+              <Button icon={ IconNames.FAST_FORWARD } active={ this.props.playSpeed >= 3600 }
+                onClick={ () => this.onPlaySpeedChange(3600) }/>
+            </ButtonGroup>
+          </div>
         </Card>
       )
     }
@@ -94,13 +118,17 @@ export default class TimePanel extends React.Component<TimePanelProps> {
     this.props.onSelectedTimeChange(new Date(t))
   }
 
-  private onStartBoundChanged(start:number) {
+  private onPlaySpeedChange(s:number) {
+    this.props.onPlaySpeedChange(s)
+  }
+
+  private onStartBoundChange(start:number) {
     if (this.props.onBoundsChanged) {
       this.props.onBoundsChanged(new Date(start), this.props.endBoundTime ? this.props.endBoundTime : this.props.endTime)
     }
   }
 
-  private onEndBoundChanged(end:number) {
+  private onEndBoundChange(end:number) {
     if (this.props.onBoundsChanged) {
       this.props.onBoundsChanged(this.props.startBoundTime ? this.props.startBoundTime : this.props.startTime, new Date(end))
     }

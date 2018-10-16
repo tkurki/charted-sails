@@ -10,3 +10,9 @@
     transform: translate(-50%, 100%)
   }
 }
+
+.time-panel-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
