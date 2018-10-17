@@ -1,0 +1,8 @@
+.login-dialog-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.login-dialog-buttons > button {
+  margin: 10px 10px 0px;
+}

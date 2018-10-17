@@ -1,5 +1,6 @@
 import { SKPosition } from '@aldis/strongly-signalk';
 import { Button, ButtonGroup, Intent, ProgressBar } from '@blueprintjs/core';
+import { User } from 'firebase';
 import queryString from 'query-string';
 import * as React from 'react';
 import ReactGA from 'react-ga';
@@ -7,6 +8,8 @@ import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import './App.css';
 import { AppToaster } from './AppToaster';
+import { auth } from './backend/firebase';
+import UserButton from './components/auth/UserButton';
 import DataPanel from './components/detailed/DataPanel';
 import DataTable from './components/detailed/DataTable';
 import TimePanel from './components/detailed/TimePanel';
@@ -18,6 +21,7 @@ import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
 import LogParser, { LogParserOutput } from './parsing/LogParser';
 import { sampleDataTripOverviews } from './sample-data/SampleData';
+
 
 const MAPBOX_STYLE_SATELLITE = 'mapbox://styles/mapbox/satellite-v9'
 const MAPBOX_STYLE_MAP = 'mapbox://styles/mapbox/light-v9';
@@ -49,6 +53,9 @@ export interface AppState {
   /* When editing track bounds */
   newStartBoundTime?: Date
   newEndBoundTime?: Date
+
+  /* User state */
+  user: null | User
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -69,7 +76,8 @@ export default class App extends React.Component<AppProps, AppState> {
       editing: false,
       satelliteView: false,
       playbackSpeed: 0,
-      playbackAnimationReference: null
+      playbackAnimationReference: null,
+      user: null
     }
     this._resize = this._resize.bind(this);
     this.setSelection = this.setSelection.bind(this)
@@ -102,9 +110,9 @@ export default class App extends React.Component<AppProps, AppState> {
           }
         </ReactMapGL>
 
-        {this.state.trip && (
-          <React.Fragment>
-            <ButtonGroup large={true} className='buttonGroupBar'>
+        <ButtonGroup large={true} className='buttonGroupBar'>
+          {this.state.trip && (
+            <React.Fragment>
               <Button icon="satellite" active={ this.state.satelliteView } onClick={ () => {
                 ReactGA.event({ category: 'ButtonGroup', action: `Satellite ${ this.state.satelliteView ? 'Off' : 'On' }`})
                 this.setState({ satelliteView: !this.state.satelliteView })
@@ -125,7 +133,40 @@ export default class App extends React.Component<AppProps, AppState> {
               }
               }/>
               <Button icon="cross" onClick={ () => this.onCloseTrip() }/>
-            </ButtonGroup>
+            </React.Fragment>
+          )}
+          <UserButton style={ { position: 'absolute', top: '50px', right: '50px' }  }
+            onLoginWithEmailAndPassword={ (username, password) => {
+              return auth.signInAndRetrieveDataWithEmailAndPassword(username, password)
+                .then((userCredential) => {
+                  if (userCredential.user != null) {
+                    this.setState({ user: userCredential.user })
+                    return userCredential.user.sendEmailVerification()
+                  }
+                  else {
+                    throw new Error('Unknown error (should not happen).')
+                  }
+                })
+            }}
+            onCreateAccountWithEmailAndPassword={ (username, password) => {
+              return auth.createUserWithEmailAndPassword(username, password)
+                .then((userCredential) => {
+                  if (userCredential.user != null) {
+                    this.setState({ user: userCredential.user })
+                  }
+                  else {
+                    throw new Error('Unknown error (should not happen).')
+                  }
+                })
+            }}
+            onLogout={ () => {
+              return auth.signOut()
+            } }
+            userInfo={ this.state.user ? this.state.user : null }/>
+        </ButtonGroup>
+
+        {this.state.trip && (
+          <React.Fragment>
             <DataPanel
               dataProvider={ this.state.trip.getDataProvider() }
               hoveringMode={ this.state.hoveredObject ? true : false }
@@ -212,6 +253,10 @@ export default class App extends React.Component<AppProps, AppState> {
       ReactGA.initialize(GA_TRACKING_CODE || '', { testMode: true });
     }
     ReactGA.pageview(window.location.pathname + window.location.search);
+
+    auth.onAuthStateChanged((user) => {
+      this.setState({ user })
+    })
 
     window.addEventListener('resize', this._resize);
     this._resize();

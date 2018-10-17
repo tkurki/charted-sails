@@ -1,0 +1,8 @@
+.logout-dialog-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.logout-dialog-buttons > button {
+  margin: 20px 10px 0px;
+}
