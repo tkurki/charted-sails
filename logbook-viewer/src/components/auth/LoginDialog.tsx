@@ -6,6 +6,7 @@ import './LoginDialog.css';
 interface LoginDialogProps {
   isOpen: boolean
   onLoginWithEmailAndPassword: (username: string, password: string) => Promise<void>
+  onLoginWithFacebook?: () => Promise<void>
   onCreateAccountWithEmailAndPassword: (username: string, password: string) => Promise<void>
   onDismiss: () => void
 }
@@ -65,6 +66,7 @@ export default class LoginDialog extends React.Component<LoginDialogProps, Login
           <div className="login-dialog-buttons">
             <Button onClick={ () => this.props.onDismiss() }>Cancel</Button>
             <Button icon={IconNames.LOG_IN} onClick={ () => this.createAccountWithEmailAndPassword() }>Create account</Button>
+            { this.props.onLoginWithFacebook && <Button icon={IconNames.LOG_IN} onClick={ () => this.loginWithFacebook() }>Login with Facebook</Button> }
             <Button icon={IconNames.LOG_IN} intent={Intent.PRIMARY} onClick={ () => this.loginWithEmailAndPassword() }>Log in</Button>
           </div>
         </div>
@@ -91,6 +93,21 @@ export default class LoginDialog extends React.Component<LoginDialogProps, Login
       })
       .catch((e) => {
         this.setState({ loading: false, errorMessage: e.message, password: '' })
+      })
+  }
+
+  private loginWithFacebook() {
+    if (!this.props.onLoginWithFacebook) {
+      return
+    }
+
+    this.setState({ loading: true, username: '', password: '' })
+    this.props.onLoginWithFacebook()
+      .then(() => {
+        this.setState({ loading: false, errorMessage: null })
+      })
+      .catch((e) => {
+        this.setState({ loading: false, errorMessage: e.message })
       })
   }
 }

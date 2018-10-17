@@ -8,7 +8,7 @@ import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import './App.css';
 import { AppToaster } from './AppToaster';
-import { auth } from './backend/firebase';
+import { auth, facebookProvider } from './backend/firebase';
 import UserButton from './components/auth/UserButton';
 import DataPanel from './components/detailed/DataPanel';
 import DataTable from './components/detailed/DataTable';
@@ -158,6 +158,9 @@ export default class App extends React.Component<AppProps, AppState> {
                     throw new Error('Unknown error (should not happen).')
                   }
                 })
+            }}
+            onLoginWithFacebook={ () => {
+              return auth.signInWithRedirect(facebookProvider)
             }}
             onLogout={ () => {
               return auth.signOut()

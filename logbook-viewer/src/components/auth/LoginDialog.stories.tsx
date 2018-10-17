@@ -43,3 +43,27 @@ stories.add('Login exception after 1 sec', () => {
       onDismiss={ action(`dismiss`) } />
   )
 })
+
+stories.add('Login with facebook enabled', () => {
+  return (
+    <LoginDialog isOpen={ true }
+      onLoginWithEmailAndPassword={ (username:string, password: string) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => { reject(new Error('try facebook')) }, 1000)
+        })
+      } }
+      onLoginWithFacebook={ () => {
+        action(`Now logging in with facebook`)
+        return new Promise((resolve) => {
+          setTimeout(() => { resolve() }, 1000)
+        })
+      } }
+      onCreateAccountWithEmailAndPassword={ (username:string, password: string) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => { reject(new Error('try facebook')) }, 1000)
+        })
+      } }
+
+      onDismiss={ action(`dismiss`) } />
+  )
+})

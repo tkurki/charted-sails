@@ -15,3 +15,4 @@ if (!firebase.apps.length) {
 }
 
 export const auth = firebase.auth()
+export const facebookProvider = new firebase.auth.FacebookAuthProvider()

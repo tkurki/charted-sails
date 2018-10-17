@@ -10,6 +10,7 @@ interface UserButtonProps {
   style?: React.CSSProperties
   onLoginWithEmailAndPassword: (username:string, password:string) => Promise<void>
   onCreateAccountWithEmailAndPassword: (username:string, password:string) => Promise<void>
+  onLoginWithFacebook?: () => Promise<void>
   onLogout: () => void
 }
 
@@ -43,6 +44,7 @@ export default class UserButton extends React.Component<UserButtonProps, UserBut
         <LoginDialog isOpen={ this.state.showingLoginDialog }
           onLoginWithEmailAndPassword={ (username, password) => this.loginWithEmailAndPassword(username, password) }
           onCreateAccountWithEmailAndPassword={ (username, password) => this.createAccountWithEmailAndPassword(username, password) }
+          onLoginWithFacebook={ this.props.onLoginWithFacebook ? (() => this.loginWithFacebook()) : undefined }
           onDismiss={ () => this.setState({ showingLoginDialog: false }) }/>
         <LogoutDialog isOpen={ this.state.showingLogoutDialog }
           onLogout={ () => this.logout() }
@@ -62,6 +64,18 @@ export default class UserButton extends React.Component<UserButtonProps, UserBut
     return this.props.onCreateAccountWithEmailAndPassword(username, password).then(() => {
       this.setState({ showingLoginDialog: false })
     })
+  }
+
+  private loginWithFacebook() {
+    if (this.props.onLoginWithFacebook) {
+      return this.props.onLoginWithFacebook().then(() => {
+        this.setState({ showingLoginDialog: false })
+      })
+    }
+    else {
+      this.setState({ showingLoginDialog: false })
+      return Promise.resolve()
+    }
   }
 
   private logout() {
