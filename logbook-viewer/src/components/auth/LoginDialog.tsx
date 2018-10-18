@@ -62,7 +62,7 @@ export default class LoginDialog extends React.Component<LoginDialogProps, Login
               animate={false}
               id="login-method"
               selectedTabId={ this.state.selectedProvider }
-              onChange={ (tabId) => this.setState({ selectedProvider: tabId as ("email"|"facebook") })}
+              onChange={ (tabId) => this.setState({ selectedProvider: tabId as ("email"|"facebook"), errorMessage: null })}
             >
               <Tab id="email" title="Email" panel={ this.renderEmailForm() } />
               <Tab id="facebook" title="Facebook" panel={ this.renderFacebookForm() } />

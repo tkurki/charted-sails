@@ -140,7 +140,6 @@ export default class App extends React.Component<AppProps, AppState> {
               return auth.signInAndRetrieveDataWithEmailAndPassword(username, password)
                 .then((userCredential) => {
                   if (userCredential.user != null) {
-                    this.setState({ user: userCredential.user })
                     return userCredential.user.sendEmailVerification()
                   }
                   else {
@@ -160,7 +159,10 @@ export default class App extends React.Component<AppProps, AppState> {
                 })
             }}
             onLoginWithFacebook={ () => {
-              return auth.signInWithRedirect(facebookProvider)
+              return auth.signInWithPopup(facebookProvider).then( (result) => {
+                // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                // var token = result.credential.accessToken;
+              })
             }}
             onLogout={ () => {
               return auth.signOut()
