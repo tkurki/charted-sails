@@ -96,15 +96,11 @@ export default class LoginDialog extends React.Component<LoginDialogProps, Login
           {this.state.errorMessage}
         </Callout> }
 
-        <FormGroup
-            label="Email"
-        >
+        <FormGroup label="Email">
           <InputGroup id="username-input" placeholder="youremail@sailing.dream" leftIcon={ IconNames.USER }
             value={this.state.username} onChange={ (e:any) => this.setState({ username: e.target.value }) }/>
         </FormGroup>
-        <FormGroup
-            label="Password"
-        >
+        <FormGroup label="Password">
           <InputGroup id="password-input" type="password" leftIcon={ IconNames.LOCK }
             value={this.state.password} onChange={ (e:any) => this.setState({ password: e.target.value }) }/>
         </FormGroup>
