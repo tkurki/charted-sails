@@ -1,5 +1,6 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/storage';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_APIKEY,
@@ -15,4 +16,5 @@ if (!firebase.apps.length) {
 }
 
 export const auth = firebase.auth()
+export const storage = firebase.storage()
 export const facebookProvider = new firebase.auth.FacebookAuthProvider()

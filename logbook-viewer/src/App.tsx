@@ -8,7 +8,7 @@ import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
 import './App.css';
 import { AppToaster } from './AppToaster';
-import { auth, facebookProvider } from './backend/firebase';
+import { auth, facebookProvider, storage } from './backend/firebase';
 import UserButton from './components/auth/UserButton';
 import DataPanel from './components/detailed/DataPanel';
 import DataTable from './components/detailed/DataTable';
@@ -290,7 +290,26 @@ export default class App extends React.Component<AppProps, AppState> {
   private openFile(f: File) {
     ReactGA.event({ category: 'Trip', action: 'Load file', label: f.name })
 
-    this.openLogParserPromise(new LogParser().openFile(f), `file-upload://${f.name}`)
+    const loadLogPromise = new LogParser().openFile(f)
+    if (auth.currentUser) {
+      // User is logged in. Upload and load in parallel.
+      const userStorageRef = storage.ref(`/user/${ auth.currentUser.uid }/uploads`)
+      const fileUploadRef = userStorageRef.child(f.name)
+      const uploadPromise = fileUploadRef.put(f).then(() => {
+        console.log('file uploaded')
+      })
+      .catch(e => {
+        console.log(`upload error:`, e)
+      })
+
+      const combinedPromise = Promise.all([uploadPromise, loadLogPromise])
+        .then((results) => results[1] )
+      this.openLogParserPromise(combinedPromise, `file-upload://${f.name}`)
+    }
+    else {
+      // User is not logged in. Just load the file locally.
+      this.openLogParserPromise(loadLogPromise, `file-upload://${f.name}`)
+    }
   }
 
   private openURL(url: string) {

@@ -1,0 +1,9 @@
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Files look like: "user/<UID>/path/to/file.txt"
+    match /user/{userId}/{allPaths=**} {
+      allow read: if request.auth.uid == userId;
+      allow write: if request.auth.uid == userId && request.resource.size < 25 * 1024 * 1024;
+    }
+  }
+}
