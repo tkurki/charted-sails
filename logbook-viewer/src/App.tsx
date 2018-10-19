@@ -159,7 +159,7 @@ export default class App extends React.Component<AppProps, AppState> {
                 })
             }}
             onLoginWithFacebook={ () => {
-              return auth.signInWithPopup(facebookProvider).then( (result) => {
+              return auth.signInWithPopup(facebookProvider).then( (_) => {
                 // This gives you a Facebook Access Token. You can use it to access the Facebook API.
                 // var token = result.credential.accessToken;
               })

@@ -30,7 +30,7 @@ stories.add('Login exception after 1 sec', () => {
     <LoginDialog isOpen={ true }
       onLoginWithEmailAndPassword={ (username:string, password: string) => {
         action(`Now logging in with ${username}/${password}`)
-        return new Promise((resolve, reject) => {
+        return new Promise((_, reject) => {
           setTimeout(() => { reject(new Error('something terrible happened')) }, 1000)
         })
       } }
@@ -47,8 +47,8 @@ stories.add('Login exception after 1 sec', () => {
 stories.add('Login with facebook enabled', () => {
   return (
     <LoginDialog isOpen={ true }
-      onLoginWithEmailAndPassword={ (username:string, password: string) => {
-        return new Promise((resolve, reject) => {
+      onLoginWithEmailAndPassword={ () => {
+        return new Promise((_, reject) => {
           setTimeout(() => { reject(new Error('try facebook')) }, 1000)
         })
       } }
@@ -58,8 +58,8 @@ stories.add('Login with facebook enabled', () => {
           setTimeout(() => { resolve() }, 1000)
         })
       } }
-      onCreateAccountWithEmailAndPassword={ (username:string, password: string) => {
-        return new Promise((resolve, reject) => {
+      onCreateAccountWithEmailAndPassword={ () => {
+        return new Promise((_, reject) => {
           setTimeout(() => { reject(new Error('try facebook')) }, 1000)
         })
       } }
