@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import * as functions from 'firebase-functions';
 import * as schemaPrinter from 'graphql/utilities/schemaPrinter';
+import { config } from './firebase-admin';
 import resolvers from './graphql/resolvers';
 import schema from './graphql/schema';
 
@@ -21,7 +22,12 @@ app.use('/schema', (_, res) => {
   res.send(schemaPrinter.printSchema(schema));
 });
 
-const graphQLServer = new ApolloServer({ schema, resolvers })
+// To enable introspection: firebase functions:config:set apollo.allow_introspection=true
+let allowIntrospection = false
+if (config && config.apollo && config.apollo.allow_introspection === 'true') {
+  allowIntrospection = true
+}
+const graphQLServer = new ApolloServer({ schema, resolvers, introspection: allowIntrospection })
 graphQLServer.applyMiddleware({ app , path: '/' });
 
 exports.api = functions.https.onRequest(app);

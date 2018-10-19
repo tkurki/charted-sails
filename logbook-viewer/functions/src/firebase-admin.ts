@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin';
+import * as functions from 'firebase-functions';
 import { existsSync, readFileSync } from 'fs';
 
 if (admin.apps.length === 0) {
@@ -17,3 +18,4 @@ if (admin.apps.length === 0) {
 }
 
 export const appStorage = admin.storage().bucket()
+export const config = functions.config()
