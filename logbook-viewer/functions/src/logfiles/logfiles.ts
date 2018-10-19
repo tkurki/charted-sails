@@ -1,6 +1,7 @@
 import { appStorage } from '../firebase-admin';
 
 const filenameRe = /user\/([a-zA-Z0-9]+)\/uploads\/(.*)/
+const LOG_DOWNLOAD_LINK_VALIDITY = 10*60*1000
 
 export interface LogFile {
   id: string
@@ -20,7 +21,7 @@ export function listAllLogFiles() {
           id: file.name,
           uploaderId: results[1],
           name: results[2],
-          url: 'xx'
+          url: file.getSignedUrl({ action: 'read', expires: Date.now() + LOG_DOWNLOAD_LINK_VALIDITY})
         }
       }
       else {

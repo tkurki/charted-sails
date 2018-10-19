@@ -6,15 +6,24 @@ jest.mock('../firebase-admin')
 
 const aUserId = '424242'
 
-const mockStorage : File[] = [
-  { name: `user/${aUserId}/uploads/tukki-inreach-export.gpx`} as File,
-  { name: 'user/anotherUser/uploads/log1.gpx' } as File,
-  { name: 'user/anotherUser/uploads/log2.gpx' } as File
+interface MockFile {
+  name: string
+}
+
+const mockStorage : MockFile[] = [
+  { name: `user/${aUserId}/uploads/tukki-inreach-export.gpx`},
+  { name: 'user/anotherUser/uploads/log1.gpx' },
+  { name: 'user/anotherUser/uploads/log2.gpx' }
 ]
+
+function makeMockFile(file: MockFile): File {
+    (file as any).getSignedUrl = () => `supersecure:///` + file.name
+    return file as File
+}
 
 beforeAll(() => {
   appStorage.getFiles = (query?: BucketQuery): Promise<[File[]]> => {
-    const ret : [File[]] = [ mockStorage ]
+    const ret : [File[]] = [ mockStorage.map(f => makeMockFile(f)) ]
     return Promise.resolve(ret)
   }
 })
