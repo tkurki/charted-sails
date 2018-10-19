@@ -1,10 +1,10 @@
 import { ApolloServer } from 'apollo-server-express';
+import cors from 'cors';
 import express from 'express';
 import * as functions from 'firebase-functions';
 import * as schemaPrinter from 'graphql/utilities/schemaPrinter';
 import resolvers from './graphql/resolvers';
 import schema from './graphql/schema';
-
 
 const app: express.Application = express()
 
@@ -12,6 +12,8 @@ app.use((_, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   return next();
 });
+
+app.use(cors({ origin: true }))
 
 app.use('/schema', (_, res) => {
   res.set('Content-Type', 'text/plain');

@@ -13,7 +13,7 @@ export interface LogFile {
 export function listAllLogFiles() {
   return appStorage.getFiles({ prefix: 'user/' })
   .then( ([files]) => {
-    return files.map(file => {
+    return Promise.all(files.map(async file => {
       const results = filenameRe.exec(file.name)
       console.log(`File: ${file.name} - ${JSON.stringify(results)}`)
       if (results && results.length === 3) {
@@ -21,14 +21,16 @@ export function listAllLogFiles() {
           id: file.name,
           uploaderId: results[1],
           name: results[2],
-          url: file.getSignedUrl({ action: 'read', expires: Date.now() + LOG_DOWNLOAD_LINK_VALIDITY})
+          url: (await file.getSignedUrl({ action: 'read', expires: Date.now() + LOG_DOWNLOAD_LINK_VALIDITY}))[0]
         }
       }
       else {
         return null
       }
-    })
-    .filter(x => x !== null)
+    }))
+  })
+  .then(logFiles => {
+    return logFiles.filter(x => x !== null)
   })
 }
 

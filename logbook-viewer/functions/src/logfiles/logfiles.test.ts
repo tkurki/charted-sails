@@ -13,12 +13,14 @@ interface MockFile {
 const mockStorage : MockFile[] = [
   { name: `user/${aUserId}/uploads/tukki-inreach-export.gpx`},
   { name: 'user/anotherUser/uploads/log1.gpx' },
-  { name: 'user/anotherUser/uploads/log2.gpx' }
+  { name: 'user/anotherUser/uploads/log2.gpx' },
+  { name: 'anotherfile/that/should/not/be/included' }
 ]
 
-function makeMockFile(file: MockFile): File {
-    (file as any).getSignedUrl = () => `supersecure:///` + file.name
-    return file as File
+function makeMockFile(mockFile: MockFile): File {
+  const f = mockFile as File
+  f.getSignedUrl = () => Promise.resolve([`supersecure:///` + f.name] as [string])
+  return f
 }
 
 beforeAll(() => {
@@ -31,7 +33,7 @@ beforeAll(() => {
 it('can serve the list of all logfiles', (done) => {
   listAllLogFiles().then(files => {
     expect(files).not.toBeNull()
-    files.forEach((file, index) => {
+    files.slice(0, files.length-1).forEach((file, index) => {
       expect(file.name).toEqual(mockStorage[index].name.split('/').pop())
       if (index === 0) {
         expect(file.uploaderId).toEqual(aUserId)
@@ -44,7 +46,7 @@ it('can serve the list of all logfiles', (done) => {
   })
 })
 
-it('can filter the list of log fil  es per user', (done) => {
+it('can filter the list of log files per user', (done) => {
   listUserLogFiles(aUserId).then(files => {
     expect(files).toHaveLength(1)
     done()
