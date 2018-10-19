@@ -12,7 +12,6 @@
     "object-literal-sort-keys": [false],
     "jsx-no-lambda": [false],
     "no-console": [false],
-    "no-unused-variable": [true, { "check-parameters": true }],
     "no-unused-expression": [true]
   }
 }

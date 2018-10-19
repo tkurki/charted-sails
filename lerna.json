@@ -1,9 +1,10 @@
 {
   "lerna": "2.11.0",
   "packages": [
-    "*"
+    "*",
+    "logbook-viewer/functions"
   ],
   "version": "0.0.0",
   "npmClient": "yarn",
-  "useWorkspaces" : true
+  "useWorkspaces": true
 }

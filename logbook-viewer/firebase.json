@@ -9,5 +9,11 @@
   },
   "storage": {
     "rules": "firebase-storage.rules"
+  },
+  "functions": {
+    "predeploy": [
+      "yarn --cwd \"$RESOURCE_DIR\" run lint",
+      "yarn --cwd \"$RESOURCE_DIR\" run build"
+    ]
   }
 }

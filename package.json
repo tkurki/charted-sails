@@ -14,12 +14,13 @@
     "deploy-prod": "cd logbook-viewer && yarn run deploy-prod"
   },
   "workspaces": [
-    "*"
+    "*",
+    "logbook-viewer/functions"
   ],
   "devDependencies": {
     "@types/node": "^10.3.3",
     "jest-junit": "^5.1.0",
     "lerna": "^2.11.0",
-    "typescript": "^3.0.1"
+    "typescript": "^3.1.3"
   }
 }
