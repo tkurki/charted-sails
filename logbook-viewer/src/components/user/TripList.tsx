@@ -3,7 +3,7 @@ import { IconNames } from "@blueprintjs/icons";
 import { User } from "firebase";
 import * as React from 'react';
 import { Query } from "react-apollo";
-import { GET_USER_LOGFILES, Logfile } from "src/backend/graphql";
+import { GET_USER_LOGFILES, Logfile } from "../../backend/gql";
 
 interface TripListProps {
   user: User|null
