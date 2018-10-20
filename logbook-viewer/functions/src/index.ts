@@ -23,7 +23,7 @@ app.use('/schema', (_, res) => {
 });
 
 // To enable introspection: firebase functions:config:set apollo.allow_introspection=true
-let allowIntrospection = false
+let allowIntrospection
 if (config && config.apollo && config.apollo.allow_introspection === 'true') {
   allowIntrospection = true
 }
