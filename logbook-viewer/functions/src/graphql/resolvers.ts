@@ -7,7 +7,7 @@ export default {
       return listAllLogFiles()
     },
     logfilesByUser(_, args) {
-      return listUserLogFiles(args.id)
+      return listUserLogFiles(args.userId)
     }
     /*
     folders() {

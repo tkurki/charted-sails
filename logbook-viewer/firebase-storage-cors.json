@@ -1,0 +1,11 @@
+[
+  {
+    "origin": [
+      "https://chartedsails.com",
+      "https://beta.chartedsails.com",
+      "http://localhost:3000"
+    ],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600
+  }
+]

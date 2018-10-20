@@ -8,6 +8,7 @@ import LogoutDialog from './LogoutDialog';
 interface UserButtonProps {
   userInfo: UserInfo | null
   style?: React.CSSProperties
+  id?: string
   onLoginWithEmailAndPassword: (username:string, password:string) => Promise<void>
   onCreateAccountWithEmailAndPassword: (username:string, password:string) => Promise<void>
   onLoginWithFacebook?: () => Promise<void>
@@ -32,12 +33,12 @@ export default class UserButton extends React.Component<UserButtonProps, UserBut
     return (
       <React.Fragment>
         { this.props.userInfo && (
-          <Button icon={IconNames.USER} onClick={ () => this.setState({ showingLogoutDialog: true }) }>
+          <Button id={this.props.id} icon={IconNames.USER} onClick={ () => this.setState({ showingLogoutDialog: true }) }>
             {this.props.userInfo.displayName ? this.props.userInfo.displayName : this.props.userInfo.email }
           </Button>
         )}
         { !this.props.userInfo && (
-          <Button icon={IconNames.LOG_IN} intent={Intent.PRIMARY} onClick={ () => this.setState({ showingLoginDialog: true }) }>
+          <Button  id={this.props.id} icon={IconNames.LOG_IN} intent={Intent.PRIMARY} onClick={ () => this.setState({ showingLoginDialog: true }) }>
             Login
           </Button>
         )}

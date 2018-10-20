@@ -15,7 +15,6 @@ export function listAllLogFiles() {
   .then( ([files]) => {
     return Promise.all(files.map(async file => {
       const results = filenameRe.exec(file.name)
-      console.log(`File: ${file.name} - ${JSON.stringify(results)}`)
       if (results && results.length === 3) {
         return {
           id: file.name,

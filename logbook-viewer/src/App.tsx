@@ -1,8 +1,9 @@
 import { SKPosition } from '@aldis/strongly-signalk';
-import { Button, ButtonGroup, Intent, ProgressBar } from '@blueprintjs/core';
+import { Button, ButtonGroup, Intent, Popover, ProgressBar } from '@blueprintjs/core';
 import { User } from 'firebase';
 import queryString from 'query-string';
 import * as React from 'react';
+import { ApolloConsumer } from 'react-apollo';
 import ReactGA from 'react-ga';
 import ReactMapGL from 'react-map-gl';
 import WebMercatorViewport from 'viewport-mercator-project';
@@ -16,6 +17,7 @@ import TimePanel from './components/detailed/TimePanel';
 import TripOverlay from './components/detailed/TripOverlay';
 import { IntroductionPanel } from './components/overview/IntroductionPanel';
 import TripSelectorOverlay from './components/overview/TripSelectorOverlay';
+import TripList from './components/user/TripList';
 import InteractiveTrip from './model/InteractiveTrip';
 import TimeSelection from './model/TimeSelection';
 import { TripOverview } from './model/TripOverview';
@@ -135,39 +137,44 @@ export default class App extends React.Component<AppProps, AppState> {
               <Button icon="cross" onClick={ () => this.onCloseTrip() }/>
             </React.Fragment>
           )}
-          <UserButton style={ { position: 'absolute', top: '50px', right: '50px' }  }
-            onLoginWithEmailAndPassword={ (username, password) => {
-              return auth.signInAndRetrieveDataWithEmailAndPassword(username, password)
-                .then((userCredential) => {
-                  if (userCredential.user != null) {
-                    return userCredential.user.sendEmailVerification()
-                  }
-                  else {
-                    throw new Error('Unknown error (should not happen).')
-                  }
-                })
-            }}
-            onCreateAccountWithEmailAndPassword={ (username, password) => {
-              return auth.createUserWithEmailAndPassword(username, password)
-                .then((userCredential) => {
-                  if (userCredential.user != null) {
-                    this.setState({ user: userCredential.user })
-                  }
-                  else {
-                    throw new Error('Unknown error (should not happen).')
-                  }
-                })
-            }}
-            onLoginWithFacebook={ () => {
-              return auth.signInWithPopup(facebookProvider).then( (_) => {
-                // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-                // var token = result.credential.accessToken;
-              })
-            }}
-            onLogout={ () => {
-              return auth.signOut()
-            } }
-            userInfo={ this.state.user ? this.state.user : null }/>
+          <ApolloConsumer>
+            { client =>
+            <React.Fragment>
+              <Popover isOpen={ this.state.user !== null && this.state.trip === null }
+                content={ <TripList user={this.state.user} onTripSelected={ (url) => { this.openURL(url)} } /> }
+                >
+                <UserButton id="user-profile-button" style={ { position: 'absolute', top: '50px', right: '50px' }  }
+                onLoginWithEmailAndPassword={ (username, password) => {
+                  return auth.signInAndRetrieveDataWithEmailAndPassword(username, password)
+                    .then(() => { setTimeout(() => client.resetStore(), 0) })
+                }}
+                onCreateAccountWithEmailAndPassword={ (username, password) => {
+                  return auth.createUserWithEmailAndPassword(username, password)
+                    .then((userCredential) => {
+                      setTimeout(() => client.resetStore(), 0)
+                      if (userCredential.user != null) {
+                        return userCredential.user.sendEmailVerification()
+                      }
+                      else {
+                        throw new Error('Unknown error (should not happen).')
+                      }
+                    })
+                }}
+                onLoginWithFacebook={ () => {
+                  return auth.signInWithPopup(facebookProvider).then( (_) => {
+                    setTimeout(() => client.resetStore(), 0)
+                    // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                    // var token = result.credential.accessToken;
+                  })
+                }}
+                onLogout={ () => {
+                  return auth.signOut().then(() => { client.resetStore() })
+                } }
+                userInfo={ this.state.user ? this.state.user : null }/>
+              </Popover>
+            </React.Fragment>
+            }
+          </ApolloConsumer>
         </ButtonGroup>
 
         {this.state.trip && (

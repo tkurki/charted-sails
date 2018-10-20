@@ -30,6 +30,14 @@ To run tests:
 $ yarn test
 ```
 
+## Firebase configuration
+
+This project uses Firebase for the backend.
+
+### Configure CORS on your storage
+
+    gsutil cors set firebase-storage-cors.json gs://chartedsails.appspot.com
+
 ## License
 
 MIT
